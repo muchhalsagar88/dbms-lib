@@ -4,6 +4,11 @@ We will develop the functionality and then expose an API which can be leveraged 
 
 The project is a basic JPA project generated using Maven. The `persistence.xml` needs to be edited to connect to a local instance of Oracle database which will be used for development.
 
+## Dependencies
+1. Maven 
+2. Oracle 11g Express edition
+3. Eclipse, probably the latest edition but doesn't matter much
+
 ## Eclipse integration
 Clone the repository using the SSH link to faciliate the check ins without entering username and password repeatedly. This is a maven project which will require Maven to be installed on your dev machine.
 To setup the project in eclipse locally, run the following set of commands
