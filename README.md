@@ -29,6 +29,15 @@ Replace the username and password in the `persistence.xml` file with your local 
 Oracle has stopped shipping 10g on its website. So for development purposes, we can use Oracle 11g express edition. I have checked the backward compatibility and we should be good whne we port to 10g.
 Found a great [link](http://www2.hawaii.edu/~lipyeow/ics321/2014fall/installoracle11g.html) to install Oracle on Ubuntu, so check it if you are using it since Ubuntu is not a listed Linux distro.
 For other OSs, fairly decent amount of Oracle support is available. It should be a cakewalk.
+### Add the Oracle instance to Eclipse
+I will update this section with a step by step gif in some time. In the meanwhile to briefly summarize it, 
+
+1. Change the Eclipse perspective to JPA
+2. Right click on the `Database Connections` window to setup a new connection
+3. Select `Oracle` as your Connection Type.
+4. Select the Driver named `Oracle Thin Driver` with the latest version. Add the previously used ojdbc6.jar to this driver as well.
+5. Change the SID(xe, by default) Host(localhost, by default) and Port(1521, by default). Input your user credentials and `Test your connection`.
+6. Click `Finish` to complete adding the Database Connection.
 
 ## Problems that you might face
 1. The Oracle driver jar might not be a part of your local Maven repository. If thats the case, you will have an error in Eclipse saying that the jar can't be found. 
