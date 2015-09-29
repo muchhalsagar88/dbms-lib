@@ -1,0 +1,8 @@
+# Eclipse settings
+.settings
+.classpath
+.project
+
+# Java specific resources
+.class
+target/
