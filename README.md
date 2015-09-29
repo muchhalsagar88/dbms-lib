@@ -43,3 +43,5 @@ I will update this section with a step by step gif in some time. In the meanwhil
 1. The Oracle driver jar might not be a part of your local Maven repository. If thats the case, you will have an error in Eclipse saying that the jar can't be found. 
 The jar would need to be added to your local Maven repo, follow this [link](http://www.mkyong.com/maven/how-to-add-oracle-jdbc-driver-in-your-maven-local-repository/) for detailed instructions about the same.
 
+2. When you view the code in Eclipse, the annotation `@Table` is the entity might show you a compliation error stating that the table is not found. Ignore that, since Eclipse takes a database screenshot when you initially connect to it. So any new tables added via code might not be present in the screenshot. Refreshing the conneection will take care of it, otherwise ignore it.
+
