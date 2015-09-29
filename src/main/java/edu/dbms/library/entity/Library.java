@@ -1,13 +1,12 @@
 package edu.dbms.library.entity;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -16,15 +15,16 @@ public class Library {
 
 	@Id 
     @GeneratedValue(strategy=GenerationType.SEQUENCE)
+	@Column(name="library_id")
 	private long libraryId;
 	
+	@Column(name="library_name")
 	private String libraryName;
 	
-	@OneToOne(optional=false, cascade= CascadeType.PERSIST)
+	@Embedded
 	@JoinColumn(name="address_id")
 	private Address libraryAddress;
 
-	@Column(name="library_id")
 	public long getLibraryId() {
 		return libraryId;
 	}
@@ -33,7 +33,6 @@ public class Library {
 		this.libraryId = libraryId;
 	}
 
-	@Column(name="library_name")
 	public String getLibraryName() {
 		return libraryName;
 	}
@@ -49,7 +48,5 @@ public class Library {
 	public void setLibraryAddress(Address libraryAddress) {
 		this.libraryAddress = libraryAddress;
 	}
-	
-	
 	
 }
