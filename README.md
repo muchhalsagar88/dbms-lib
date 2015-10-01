@@ -45,3 +45,22 @@ The jar would need to be added to your local Maven repo, follow this [link](http
 
 2. When you view the code in Eclipse, the annotation `@Table` is the entity might show you a compliation error stating that the table is not found. Ignore that, since Eclipse takes a database screenshot when you initially connect to it. So any new tables added via code might not be present in the screenshot. Refreshing the conneection will take care of it, otherwise ignore it.
 
+## Running the project
+
+### Note
+Before running the project, make sure the `persistence.xml` file has the correct credentials and the links pointing to your local Oracle instance.
+
+### Using Maven to compile and run unit tests
+To run the project, initiate a build command from the base folder using the following command
+```
+mvn clean compile
+```
+
+To run the unit tests to check entity persistence, run
+```
+mvn test
+```
+Individual unit tests can be run via
+```
+mvn test -Dtest={name_of_unit_test_class} test
+```
