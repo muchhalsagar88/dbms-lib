@@ -6,12 +6,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="library")
-public class Library {
+public class Library extends AbsEntity {
 
 	@Id 
     @GeneratedValue(strategy=GenerationType.SEQUENCE)
@@ -22,7 +21,6 @@ public class Library {
 	private String libraryName;
 	
 	@Embedded
-	@JoinColumn(name="address_id")
 	private Address libraryAddress;
 
 	public long getLibraryId() {

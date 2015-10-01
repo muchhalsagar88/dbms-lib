@@ -1,69 +1,84 @@
 package edu.dbms.library.entity;
 
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
-@Table
-public class Student {
+@Table(name="student")
+@DiscriminatorValue("S")
+public class Student extends Patron {
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.AUTO) 	
-   
-   private int eid;
-   private String ename;
-   private double salary;
-   private String deg;
-   
-   public Student(int eid, String ename, double salary, String deg) {
-      super( );
-      this.eid = eid;
-      this.ename = ename;
-      this.salary = salary;
-      this.deg = deg;
-   }
+	@Column(name="phone_no", nullable=false)
+	private String phoneNumber;
+	
+	@Column(name="alt_phone_no")
+	private String alternatePhoneNumber;
+	
+	@Embedded
+	private Address homeAddress;
+	
+	@Temporal(TemporalType.DATE)
+	@Column(name="dob")
+	private Date dateOfBirth;
+	
+	private Character sex;
 
-   public Student( ) {
-      super();
-   }
+	public Student() {}
+	
+	public Student(String phoneNumber, String alternatePhoneNumber, Address homeAddress, Date dateOfBirth,
+			Character sex) {
+		super();
+		this.phoneNumber = phoneNumber;
+		this.alternatePhoneNumber = alternatePhoneNumber;
+		this.homeAddress = homeAddress;
+		this.dateOfBirth = dateOfBirth;
+		this.sex = sex;
+	}
 
-   public int getEid( ) {
-      return eid;
-   }
-   
-   public void setEid(int eid) {
-      this.eid = eid;
-   }
-   
-   public String getEname( ) {
-      return ename;
-   }
-   
-   public void setEname(String ename) {
-      this.ename = ename;
-   }
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
 
-   public double getSalary( ) {
-      return salary;
-   }
-   
-   public void setSalary(double salary) {
-      this.salary = salary;
-   }
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
 
-   public String getDeg( ) {
-      return deg;
-   }
-   
-   public void setDeg(String deg) {
-      this.deg = deg;
-   }
-   
-   @Override
-   public String toString() {
-      return "Student [eid=" + eid + ", ename=" + ename + ", salary=" + salary + ", deg=" + deg + "]";
-   }
+	public String getAlternatePhoneNumber() {
+		return alternatePhoneNumber;
+	}
+
+	public void setAlternatePhoneNumber(String alternatePhoneNumber) {
+		this.alternatePhoneNumber = alternatePhoneNumber;
+	}
+
+	public Address getHomeAddress() {
+		return homeAddress;
+	}
+
+	public void setHomeAddress(Address homeAddress) {
+		this.homeAddress = homeAddress;
+	}
+
+	public Date getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(Date dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
+
+	public Character getSex() {
+		return sex;
+	}
+
+	public void setSex(Character sex) {
+		this.sex = sex;
+	}
 }
