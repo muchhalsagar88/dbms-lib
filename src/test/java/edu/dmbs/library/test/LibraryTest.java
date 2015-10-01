@@ -10,7 +10,7 @@ import edu.dbms.library.entity.Address;
 import edu.dbms.library.entity.Library;
 import junit.framework.Assert;
 
-public class LibraryTest implements ITest {
+public class LibraryTest extends BaseTest implements ITest {
 
 	public static final long DEFAULT_LIBRARY_COUNT = 2;
 	
@@ -43,25 +43,12 @@ public class LibraryTest implements ITest {
 	
 	@Test
 	public void testDataGeneration() {
+		
+		// Actually persist the test data
+		generateTestData();
+		
 		Assert.assertEquals("Number of libraries persisted is different", 
-				DEFAULT_LIBRARY_COUNT, generateTestData());
+				DEFAULT_LIBRARY_COUNT, getCount(Library.class));
 	}
 	
-	/*public static void main(String []args) {
-		List<Library> list = new LibraryTest()._generateTestData();
-		for(Library lib: list) {
-			//DBUtils.persist(lib);
-			EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("main");
-
-			EntityManager entitymanager = emfactory.createEntityManager( );
-			entitymanager.getTransaction( ).begin( );
-
-			entitymanager.persist(lib);
-			entitymanager.getTransaction().commit();
-
-			entitymanager.close();
-			emfactory.close();
-		}
-		System.out.println("Done");
-	}*/
 }

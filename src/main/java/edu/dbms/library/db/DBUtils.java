@@ -47,4 +47,21 @@ public class DBUtils {
 		emfactory.close();
 		
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static List<? extends AbsEntity> fetchAllEntities(String query) {
+		
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DEFAULT_PERSISTENCE_UNIT_NAME);
+
+		EntityManager entitymanager = emfactory.createEntityManager( );
+		entitymanager.getTransaction( ).begin( );
+		
+		List<? extends AbsEntity> entities = entitymanager.createQuery(query).getResultList();
+		
+		entitymanager.close();
+		emfactory.close();
+		
+		return entities;
+	}
 }
