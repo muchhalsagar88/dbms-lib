@@ -22,13 +22,13 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
-	<!-- repositories>
+	<repositories>
 		<repository>
 			<id>oss.sonatype.org</id>
 			<name>OSS Sonatype Staging</name>
 			<url>https://oss.sonatype.org/content/groups/staging</url>
 		</repository>
-	</repositories-->
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>javax.persistence</groupId>
