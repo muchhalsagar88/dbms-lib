@@ -1,5 +1,6 @@
 package edu.dbms.library.entity.catalog;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -13,6 +14,7 @@ public class Year extends AbsEntity {
 	@Id
 	private long id;
 	
+	@Column(unique=true)
 	private String name;
 
 	public long getId() {

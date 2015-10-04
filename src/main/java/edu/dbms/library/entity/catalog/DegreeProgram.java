@@ -1,5 +1,6 @@
 package edu.dbms.library.entity.catalog;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,6 +18,7 @@ public class DegreeProgram extends AbsEntity {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
+	@Column(unique=true)
 	private String name;
 	
 	@ManyToOne

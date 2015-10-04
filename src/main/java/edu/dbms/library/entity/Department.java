@@ -18,7 +18,7 @@ public class Department extends AbsEntity {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 
-	@Column(name="dept_name")
+	@Column(name="dept_name", unique=true)
 	private String departmentName;
 
 	@OneToMany(mappedBy="department")

@@ -2,6 +2,7 @@ package edu.dbms.library.entity.catalog;
 
 import java.util.Collection;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,6 +20,7 @@ public class Classification extends AbsEntity {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
+	@Column(unique=true)
 	private String name;
 	
 	@OneToMany(mappedBy="classification")

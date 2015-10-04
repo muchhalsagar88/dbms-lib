@@ -17,7 +17,7 @@ public class Library extends AbsEntity {
 	@Column(name="library_id")
 	private long libraryId;
 	
-	@Column(name="library_name")
+	@Column(name="library_name", unique=true)
 	private String libraryName;
 	
 	@Embedded
