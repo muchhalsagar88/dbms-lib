@@ -1,5 +1,10 @@
 package edu.dmbs.library.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -10,45 +15,78 @@ import junit.framework.Assert;
 
 public class FacultyTest extends BaseTest {
 
-	public static final int DEFAULT_FACULTY_COUNT = 2;
+	public int DEFAULT_FACULTY_COUNT;
 	
-	public int generateTestData() {
+	private List<Department> testDepartments;
+	
+	private FacultyCategory testFacultyCategory;
+	
+	private List<Faculty> testFaculty;
+	
+	public FacultyTest() {
+		this.testDepartments = new ArrayList<Department>();
+		this.testFaculty = new ArrayList<Faculty>();
+	}
+	
+	@Before
+	public void generateTestData() {
 		
-		Department d1 = new Department("Faculty Department 1");
-		Department d2 = new Department("Faculty Department 2");
-		DBUtils.persist(d1);
-		DBUtils.persist(d2);
-				
-		FacultyCategory fc1 = new FacultyCategory();
-		fc1.setName("Faculty Category 1");
-		DBUtils.persist(fc1);
+		// Persist dependencies
+		Department d = new Department("Faculty Department 1");
+		DBUtils.persist(d);
+		this.testDepartments.add(d);
+		
+		d = new Department("Faculty Department 2");
+		DBUtils.persist(d);
+		this.testDepartments.add(d);
+		
+		this.testFacultyCategory = new FacultyCategory("Faculty Category 1");
+		DBUtils.persist(this.testFacultyCategory);
 		
 		Faculty f1 = new Faculty();
 		f1.setFirstName("John");
 		f1.setLastName("Hancock");
 		f1.setNationality("American");
-		f1.setDepartment(d1);
-		f1.setCategory(fc1);
+		f1.setDepartment(this.testDepartments.get(0));
+		f1.setCategory(this.testFacultyCategory);
 		DBUtils.persist(f1);
+		this.testFaculty.add(f1);
 		
 		Faculty f2 = new Faculty();
 		f2.setFirstName("Bruce");
 		f2.setLastName("Wayne");
 		f2.setNationality("Canadian");
-		f2.setDepartment(d2);
-		f2.setCategory(fc1);
+		f2.setDepartment(this.testDepartments.get(1));
+		f2.setCategory(this.testFacultyCategory);
 		DBUtils.persist(f2);
-			
-		return DEFAULT_FACULTY_COUNT;
+		this.testFaculty.add(f2);
+		
+		this.DEFAULT_FACULTY_COUNT = this.testFaculty.size();
 	}
-
+	
 	@Test
 	public void testDataGeneration() {
-		
-		// Actually persist the test data
-		generateTestData();
 		
 		Assert.assertEquals("Number of faculties persisted is different", 
 				DEFAULT_FACULTY_COUNT, getCount(Faculty.class));
 	}
+	
+	@After
+	public void clearGeneratedData() {
+		
+		for(Faculty f: this.testFaculty) {
+			DBUtils.removeEntity(Faculty.class, f.getId(), String.class);
+		}
+		for(Department d: this.testDepartments) {
+			DBUtils.removeEntity(Department.class, d.getId(), long.class);
+		}
+		DBUtils.removeEntity(FacultyCategory.class, this.testFacultyCategory.getId(), long.class);
+	}
+	
+	/*public static void main(String []args) {
+		FacultyTest test = new FacultyTest();
+		test.generateTestData();
+		test.testDataGeneration();
+		test.clearGeneratedData();
+	}*/
 }
