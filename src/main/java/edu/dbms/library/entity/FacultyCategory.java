@@ -19,6 +19,12 @@ public class FacultyCategory extends AbsEntity {
 	
 	private String name;
 
+	public FacultyCategory(){}
+	
+	public FacultyCategory(String name) {
+		this.name = name;
+	}
+
 	@OneToMany(mappedBy="category")
 	private Collection<Faculty> faculties; 
 	
