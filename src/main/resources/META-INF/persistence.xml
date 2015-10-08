@@ -9,6 +9,18 @@
 		<class>edu.dbms.library.entity.Faculty</class>
 		<class>edu.dbms.library.entity.FacultyCategory</class>
 		<class>edu.dbms.library.entity.Department</class>
+		
+		<class>edu.dbms.library.entity.Author</class>
+		<class>edu.dbms.library.entity.Publisher</class>
+		
+		<class>edu.dbms.library.entity.resource.Book</class>
+		<class>edu.dbms.library.entity.resource.Camera</class>
+		<class>edu.dbms.library.entity.resource.ConferenceProceeding</class>
+		<class>edu.dbms.library.entity.resource.Journal</class>
+		<class>edu.dbms.library.entity.resource.Publication</class>
+		<class>edu.dbms.library.entity.resource.Resource</class>
+		<class>edu.dbms.library.entity.resource.Room</class>
+		
 		<class>edu.dbms.library.entity.catalog.Classification</class>
 		<class>edu.dbms.library.entity.catalog.DegreeProgram</class>
 		<class>edu.dbms.library.entity.catalog.Year</class>
