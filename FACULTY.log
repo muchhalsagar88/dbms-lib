@@ -1,0 +1,33 @@
+
+SQL*Loader: Release 11.2.0.2.0 - Production on Sun Oct 11 20:01:02 2015
+
+Copyright (c) 1982, 2009, Oracle and/or its affiliates.  All rights reserved.
+
+Control File:   C:\Users\ARPIT\Google Drive\Workspace\CSC540\dbms-lib\Data\TestData\FACULTY.ctl
+Data File:      C:\Users\ARPIT\Google Drive\Workspace\CSC540\dbms-lib\Data\TestData\FACULTY.csv
+  Bad File:     C:\Users\ARPIT\Google Drive\Workspace\CSC540\dbms-lib\Data\TestData\FACULTY.bad
+  Discard File:  none specified
+ 
+ (Allow all discards)
+
+Number to load: ALL
+Number to skip: 0
+Errors allowed: 50
+Bind array:     64 rows, maximum of 256000 bytes
+Continuation:    none specified
+Path used:      Conventional
+
+Table FACULTY, loaded from every logical record.
+Insert option in effect for this table: INSERT
+
+   Column Name                  Position   Len  Term Encl Datatype
+------------------------------ ---------- ----- ---- ---- ---------------------
+LIBRARY_ID                          FIRST     *   ,  O(") CHARACTER            
+LIBRARY_NAME                         NEXT     *   ,  O(") CHARACTER            
+ADDRESSID                            NEXT     *   ,  O(") CHARACTER            
+ADDRESSLINEONE                       NEXT     *   ,  O(") CHARACTER            
+ADDRESSLINETWO                       NEXT     *   ,  O(") CHARACTER            
+CITYNAME                             NEXT     *   ,  O(") CHARACTER            
+PINCODE                              NEXT     *   ,  O(") CHARACTER            
+
+SQL*Loader-466: Column LIBRARY_ID does not exist in table FACULTY.

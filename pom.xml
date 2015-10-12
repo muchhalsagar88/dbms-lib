@@ -24,9 +24,9 @@
 
 	<repositories>
 		<repository>
-	      <id>codelds</id>
-	      <url>https://code.lds.org/nexus/content/groups/main-repo</url>
-    	</repository>
+			<id>codelds</id>
+			<url>https://code.lds.org/nexus/content/groups/main-repo</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -55,6 +55,10 @@
 			<artifactId>junit</artifactId>
 			<version>4.9</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.2</version>
+		</dependency>
 	</dependencies>
 </project>
