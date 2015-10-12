@@ -1,5 +1,6 @@
 package edu.dmbs.library.test;
 
+import org.junit.After;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -88,4 +89,21 @@ public class CatalogTest extends BaseTest {
 		Assert.assertEquals("Number of classifications persisted is different", 
 				DEFAULT_DEGPROG_COUNT, getCount(DegreeProgram.class));
 	}
+	
+	@After
+	public void clearTestData() {
+		
+		// Actually persist the test data
+	
+		DBUtils.removeAllEntities("DegreeProgram");
+		DBUtils.removeAllEntities("Year");
+		DBUtils.removeAllEntities("Classification");
+		
+		
+				
+        System.out.println("@After: executedAfterEach");
+
+	}
+	
+	
 }

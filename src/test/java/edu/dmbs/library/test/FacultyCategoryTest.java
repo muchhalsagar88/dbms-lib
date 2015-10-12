@@ -3,6 +3,7 @@ package edu.dmbs.library.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -54,4 +55,16 @@ public class FacultyCategoryTest extends BaseTest {
 		Assert.assertEquals("Number of faculty categories persisted is different", 
 				DEFAULT_FC_COUNT, getCount(FacultyCategory.class));
 	}
+	
+	@After
+	public void clearTestData() {
+		
+		// Actually persist the test data
+	
+		DBUtils.removeAllEntities("FacultyCategory");
+				
+        System.out.println("@After: executedAfterEach");
+
+	}
+	
 }

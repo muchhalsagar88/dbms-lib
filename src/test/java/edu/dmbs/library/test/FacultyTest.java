@@ -1,5 +1,6 @@
 package edu.dmbs.library.test;
 
+import org.junit.After;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -50,5 +51,18 @@ public class FacultyTest extends BaseTest {
 		
 		Assert.assertEquals("Number of faculties persisted is different", 
 				DEFAULT_FACULTY_COUNT, getCount(Faculty.class));
+	}
+	
+	@After
+	public void clearTestData() {
+		
+		// Actually persist the test data
+	
+		DBUtils.removeAllEntities("Faculty");
+		DBUtils.removeAllEntities("Department");
+		DBUtils.removeAllEntities("FacultyCategory");
+				
+        System.out.println("@After: executedAfterEach");
+
 	}
 }

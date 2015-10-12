@@ -2,6 +2,7 @@ package edu.dmbs.library.test;
 
 import java.util.Date;
 
+import org.junit.After;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -52,4 +53,17 @@ public static final int DEFAULT_STUDENT_COUNT = 2;
 				DEFAULT_STUDENT_COUNT, getCount(Student.class));
 	}
 
+	@After
+	public void clearTestData() {
+		
+		// Actually persist the test data
+	
+		DBUtils.removeAllEntities("Student");
+		DBUtils.removeAllEntities("Department");
+		
+        System.out.println("@After: executedAfterEach");
+
+	}
+
+	
 }

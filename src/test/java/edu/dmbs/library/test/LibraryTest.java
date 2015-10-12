@@ -3,6 +3,7 @@ package edu.dmbs.library.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -49,6 +50,18 @@ public class LibraryTest extends BaseTest implements ITest {
 		
 		Assert.assertEquals("Number of libraries persisted is different", 
 				DEFAULT_LIBRARY_COUNT, getCount(Library.class));
+	}
+	
+	@After
+	public void clearTestData() {
+		
+		// Actually persist the test data
+	
+		DBUtils.removeAllEntities("Library");
+	
+		
+        System.out.println("@After: executedAfterEach");
+
 	}
 	
 }
