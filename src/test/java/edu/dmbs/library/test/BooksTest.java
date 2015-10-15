@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.Address;
 import edu.dbms.library.entity.Author;
-import edu.dbms.library.entity.FacultyCategory;
 import edu.dbms.library.entity.Library;
 import edu.dbms.library.entity.resource.Book;
 import edu.dbms.library.entity.resource.PublicationFormat;
@@ -56,20 +56,17 @@ public class BooksTest extends BaseTest {
 		return bookList;
 	}
 	
-	public int generateTestData() {
+	@Before
+	public void generateTestData() {
 		
 		List<Book> bookList = _generateTestData();
 		for(Book book: bookList)
 			DBUtils.persist(book);
-			
-		return bookList.size();
+		
 	}
 	
 	@Test
 	public void testDataGeneration() {
-		
-		// Actually persist the test data
-		generateTestData();
 		
 		Assert.assertEquals("Number of Books persisted is different", 
 				DEFAULT_BOOK_COUNT, getCount(Book.class));
@@ -78,12 +75,10 @@ public class BooksTest extends BaseTest {
 	@After
 	public void clearTestData() {
 		
-		// Actually persist the test data
-		DBUtils.removeAllEntities("Book");
-		DBUtils.removeAllEntities("Author");
-		DBUtils.removeAllEntities("Library");
+		removeAllEntities(Book.class);
+		removeAllEntities(Author.class);
+		removeAllEntities(Library.class);
 		
         System.out.println("@After: executedAfterEach");
-
 	}
 }

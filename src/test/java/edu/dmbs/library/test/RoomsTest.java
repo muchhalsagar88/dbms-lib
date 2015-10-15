@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -65,20 +66,16 @@ public class RoomsTest extends BaseTest {
 		return roomList;
 	}
 	
-	public int generateTestData() {
+	@Before
+	public void generateTestData() {
 		
 		List<Room> roomList = _generateTestData();
 		for(Room room: roomList)
 			DBUtils.persist(room);
-			
-		return roomList.size();
 	}
 	
 	@Test
 	public void testDataGeneration() {
-		
-		// Actually persist the test data
-		generateTestData();
 		
 		Assert.assertEquals("Number of faculty categories persisted is different", 
 				DEFAULT_FC_COUNT, getCount(Room.class));
@@ -87,13 +84,10 @@ public class RoomsTest extends BaseTest {
 	@After
 	public void clearTestData() {
 		
-		// Actually persist the test data
-		
-		DBUtils.removeAllEntities("Room");
-		DBUtils.removeAllEntities("Library");
+		removeAllEntities(Room.class);
+		removeAllEntities(Library.class);
 		
         System.out.println("@After: executedAfterEach");
-
 	}
 	
 	

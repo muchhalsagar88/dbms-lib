@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -47,21 +48,18 @@ public class PublisherTest extends BaseTest {
 		return publisherList;
 	}
 	
-	public int generateTestData() {
+	@Before
+	public void generateTestData() {
 		
 		List<Publisher> pubList = _generateTestData();
 		
 		for(Publisher publisher: pubList)
 			DBUtils.persist(publisher);
 			
-		return pubList.size();
 	}
 	
 	@Test
 	public void testDataGeneration() {
-		
-		// Actually persist the test data
-		generateTestData();
 		
 		Assert.assertEquals("Number of Publishers persisted is different", 
 				DEFAULT_FC_COUNT, getCount(Publisher.class));
@@ -70,13 +68,7 @@ public class PublisherTest extends BaseTest {
 	@After
 	public void clearTestData() {
 		
-		// Actually persist the test data
-		
-		DBUtils.removeAllEntities("Publisher");
-			
-        System.out.println("@After: executedAfterEach");
-
+		removeAllEntities(Publisher.class);
+		System.out.println("@After: executedAfterEach");
 	}
-	
-	
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -11,7 +12,7 @@ import edu.dbms.library.entity.Address;
 import edu.dbms.library.entity.Library;
 import junit.framework.Assert;
 
-public class LibraryTest extends BaseTest implements ITest {
+public class LibraryTest extends BaseTest {
 
 	public static final long DEFAULT_LIBRARY_COUNT = 2;
 	
@@ -33,20 +34,16 @@ public class LibraryTest extends BaseTest implements ITest {
 		return libraries;
 	}
 	
-	public int generateTestData() {
+	@Before
+	public void generateTestData() {
 		
 		List<Library> libraries = _generateTestData();
 		for(Library lib: libraries)
 			DBUtils.persist(lib);
-			
-		return libraries.size();
 	}
 	
 	@Test
 	public void testDataGeneration() {
-		
-		// Actually persist the test data
-		generateTestData();
 		
 		Assert.assertEquals("Number of libraries persisted is different", 
 				DEFAULT_LIBRARY_COUNT, getCount(Library.class));
@@ -55,13 +52,8 @@ public class LibraryTest extends BaseTest implements ITest {
 	@After
 	public void clearTestData() {
 		
-		// Actually persist the test data
-	
-		DBUtils.removeAllEntities("Library");
-	
-		
-        System.out.println("@After: executedAfterEach");
-
+		removeAllEntities(Library.class);
+	    System.out.println("@After: executedAfterEach");
 	}
 	
 }

@@ -90,14 +90,12 @@ public class DBUtils {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
-	public static  int removeAllEntities(String tableName) {
+	public static  int removeAllEntities(String query) {
 		
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
 				DEFAULT_PERSISTENCE_UNIT_NAME);
 		EntityManager entitymanager = emfactory.createEntityManager( );
 		
-		String query = "Delete from "+ tableName;
 		entitymanager.getTransaction( ).begin( );
 		int deletedCount = entitymanager.createQuery(query).executeUpdate();
 		

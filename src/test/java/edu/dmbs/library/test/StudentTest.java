@@ -3,6 +3,7 @@ package edu.dmbs.library.test;
 import java.util.Date;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -15,7 +16,8 @@ public class StudentTest extends BaseTest {
 	
 public static final int DEFAULT_STUDENT_COUNT = 2;
 	
-	public int generateTestData() {
+	@Before
+	public void generateTestData() {
 		
 		Department d1 = new Department("Faculty Department 1");
 		Department d2 = new Department("Faculty Department 2");
@@ -40,14 +42,10 @@ public static final int DEFAULT_STUDENT_COUNT = 2;
 		s2.setDepartment(d2);
 		DBUtils.persist(s2);
 		
-		return DEFAULT_STUDENT_COUNT;
 	}
 
 	@Test
 	public void testDataGeneration() {
-		
-		// Actually persist the test data
-		generateTestData();
 		
 		Assert.assertEquals("Number of students persisted is different", 
 				DEFAULT_STUDENT_COUNT, getCount(Student.class));
@@ -56,13 +54,10 @@ public static final int DEFAULT_STUDENT_COUNT = 2;
 	@After
 	public void clearTestData() {
 		
-		// Actually persist the test data
-	
-		DBUtils.removeAllEntities("Student");
-		DBUtils.removeAllEntities("Department");
+		removeAllEntities(Student.class);
+		removeAllEntities(Department.class);
 		
         System.out.println("@After: executedAfterEach");
-
 	}
 
 	

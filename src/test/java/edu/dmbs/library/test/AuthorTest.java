@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.Author;
-import edu.dbms.library.entity.FacultyCategory;
 import junit.framework.Assert;
 
 public class AuthorTest extends BaseTest {
@@ -38,21 +38,17 @@ public class AuthorTest extends BaseTest {
 		return authorList;
 	}
 	
-	public int generateTestData() {
+	@Before
+	public void generateTestData() {
 		
 		List<Author> authorList = _generateTestData();
 		for(Author author: authorList)
 			DBUtils.persist(author);
 	
-			
-		return authorList.size();
 	}
 	
 	@Test
 	public void testDataGeneration() {
-		
-		// Actually persist the test data
-		generateTestData();
 		
 		Assert.assertEquals("Number of Authors persisted is different", 
 				DEFAULT_AUTH_COUNT, getCount(Author.class));
@@ -61,12 +57,9 @@ public class AuthorTest extends BaseTest {
 	@After
 	public void clearTestData() {
 		
-		// Actually persist the test data
+		removeAllEntities(Author.class);
 	
-		DBUtils.removeAllEntities("Author");
-	
-		
-        System.out.println("@After: executedAfterEach");
-
+		System.out.println("@After: executedAfterEach");
 	}
 }
+

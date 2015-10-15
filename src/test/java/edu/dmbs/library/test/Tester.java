@@ -11,8 +11,8 @@ public class Tester {
 		
 		// Can use reflection to find all classes implementing ITest and
 		// can call the appropriate methods
-		Assert.assertEquals("Number of libraries persisted is different", 
+		/*Assert.assertEquals("Number of libraries persisted is different", 
 				LibraryTest.DEFAULT_LIBRARY_COUNT, 
-				new LibraryTest().generateTestData());
+				new LibraryTest().generateTestData());*/
 	}
 }
