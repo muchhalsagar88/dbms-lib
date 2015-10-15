@@ -65,20 +65,6 @@ public class PublicationTest extends BaseTest {
 		removeAllEntities(Book.class);
 		removeAllEntities(Author.class);
 		removeAllEntities(Library.class);
-		/*for(Book b: this.books) {
-			DBUtils.removeEntity(Book.class, b.getId(), String.class);
-		}
-		for(Author a: this.authors) {
-			DBUtils.removeEntity(Author.class, a.getId(), String.class);
-		}
-		DBUtils.removeEntity(Library.class, this.testLib.getLibraryId(), long.class);*/
 	}
 	
-	/*public static void main(String []args) {
-		PublicationTest test = new PublicationTest();
-		test.generateTestData();
-		test.testDataGeneration();
-		test.clearGeneratedData();
-		System.out.println("............ DONE ..............");
-	}*/
 }
