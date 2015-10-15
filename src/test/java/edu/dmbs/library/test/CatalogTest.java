@@ -1,5 +1,7 @@
 package edu.dmbs.library.test;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.dbms.library.db.DBUtils;
@@ -16,7 +18,8 @@ public class CatalogTest extends BaseTest {
 	
 	public static final int DEFAULT_DEGPROG_COUNT = 3;
 	
-	public int generateTestData() {
+	@Before
+	public void generateTestData() {
 		
 		Classification c1 = new Classification("Undergraduate");
 		DBUtils.persist(c1);
@@ -52,7 +55,6 @@ public class CatalogTest extends BaseTest {
 		DBUtils.persist(dp2);
 		DBUtils.persist(dp3);
 		
-		return 0;
 	}
 
 	/*@SuppressWarnings("unchecked")
@@ -76,9 +78,6 @@ public class CatalogTest extends BaseTest {
 	@Test
 	public void testDataGeneration() {
 		
-		// Actually persist the test data
-		generateTestData();
-		
 		Assert.assertEquals("Number of classifications persisted is different", 
 				DEFAULT_CLASSIFICATION_COUNT, getCount(Classification.class));
 		
@@ -88,4 +87,15 @@ public class CatalogTest extends BaseTest {
 		Assert.assertEquals("Number of classifications persisted is different", 
 				DEFAULT_DEGPROG_COUNT, getCount(DegreeProgram.class));
 	}
+	
+	@After
+	public void clearTestData() {
+		
+		System.out.println(removeAllEntities(DegreeProgram.class));
+		System.out.println(removeAllEntities(Year.class));
+		System.out.println(removeAllEntities(Classification.class));
+		
+		System.out.println("@After: executedAfterEach");
+	}
+	
 }

@@ -14,4 +14,10 @@ public class BaseTest {
 		
 		return list.size();
 	}
+	
+	public static  <T> int removeAllEntities(Class<T> c) {
+		
+		String query = "Delete from "+ c.getSimpleName();
+		return DBUtils.removeAllEntities(query);
+	}
 }
