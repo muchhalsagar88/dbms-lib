@@ -6,3 +6,6 @@
 # Java specific resources
 .class
 target/
+
+# LOG classes generated for Master data loader
+*.LOG
