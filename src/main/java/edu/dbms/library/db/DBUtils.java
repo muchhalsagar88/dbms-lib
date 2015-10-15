@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import edu.dbms.library.entity.AbsEntity;
@@ -36,12 +37,16 @@ public class DBUtils {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
 				DEFAULT_PERSISTENCE_UNIT_NAME);
 
-		EntityManager entitymanager = emfactory.createEntityManager( );
-		entitymanager.getTransaction( ).begin( );
-
-		for(Object obj: objects)
+		EntityManager entitymanager = emfactory.createEntityManager();
+		//entitymanager.getTransaction().begin( );
+		EntityTransaction trx = entitymanager.getTransaction(); 
+		trx.begin();
+		for(Object obj: objects) {
 			entitymanager.persist(obj);
-		entitymanager.getTransaction().commit();
+			entitymanager.flush();
+			entitymanager.clear();
+		}
+		trx.commit();
 
 		entitymanager.close();
 		emfactory.close();
@@ -64,4 +69,24 @@ public class DBUtils {
 		
 		return entities;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T, S> boolean removeEntity(Class<T> c, Object id, Class<S> idType) {
+		
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DEFAULT_PERSISTENCE_UNIT_NAME);
+		EntityManager entitymanager = emfactory.createEntityManager( );
+		
+		T entity = (T) entitymanager.find(c, (S)id);
+		
+		entitymanager.getTransaction( ).begin( );
+		entitymanager.remove(entity);
+		entitymanager.getTransaction( ).commit();
+		
+		entitymanager.close();
+		emfactory.close();
+		
+		return true;
+	}
+	
 }
