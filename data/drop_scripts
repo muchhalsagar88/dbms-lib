@@ -1,0 +1,3 @@
+--Run the following query and use the output of the query as drop scripts
+
+SELECT 'DROP '||OBJECT_TYPE||' '||OBJECT_NAME||DECODE(OBJECT_TYPE,'TABLE', ' CASCADE CONSTRAINTS;', ';') FROM USER_OBJECTS;
