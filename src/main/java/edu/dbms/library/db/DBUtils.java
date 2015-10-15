@@ -89,4 +89,23 @@ public class DBUtils {
 		return true;
 	}
 	
+	
+	public static  int removeAllEntities(String query) {
+		
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DEFAULT_PERSISTENCE_UNIT_NAME);
+		EntityManager entitymanager = emfactory.createEntityManager( );
+		
+		entitymanager.getTransaction( ).begin( );
+		int deletedCount = entitymanager.createQuery(query).executeUpdate();
+		
+		entitymanager.getTransaction( ).commit();
+		
+		entitymanager.close();
+		emfactory.close();
+		
+		return deletedCount;
+	}
+	
+	
 }
