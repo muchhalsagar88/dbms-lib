@@ -1,13 +1,18 @@
 package edu.dbms.library.entity.resource;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import edu.dbms.library.entity.Author;
 import edu.dbms.library.entity.Library;
 
 @Entity
@@ -24,6 +29,9 @@ public class Publication extends Resource {
 	private String edition;
 	
 	private int publicationYear;
+	
+	@ManyToMany(mappedBy="publications")
+	private Collection<Author> authors;
 	
 	public Publication() {
 		super();
@@ -82,4 +90,17 @@ public class Publication extends Resource {
 		this.publicationFormat = publicationFormat;
 	}
 	
+	public Collection<Author> getAuthors() {
+		return authors;
+	}
+
+	public void setAuthors(Collection<Author> authors) {
+		this.authors = authors;
+	}
+
+	public void setAuthor(Author author) {
+		if(this.authors == null)
+			this.authors = new ArrayList<Author>();
+		this.authors.add(author);
+	}
 }
