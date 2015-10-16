@@ -1,5 +1,7 @@
 package edu.dbms.library.entity;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -10,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -32,6 +35,23 @@ public class Patron extends AbsEntity {
 	
 	@ManyToOne
 	private Department department;
+
+	@OneToMany(mappedBy="patron")
+	private Collection<ResourceCheckout> resourceCheckouts;
+
+	public Collection<ResourceCheckout> getResourceCheckouts() {
+		return resourceCheckouts;
+	}
+
+	public void setResourceCheckouts(Collection<ResourceCheckout> resourceCheckouts) {
+		this.resourceCheckouts = resourceCheckouts;
+	}
+
+	public void setResourceCheckout(ResourceCheckout resourceCheckout) {
+		if(this.resourceCheckouts == null)
+			this.resourceCheckouts = new ArrayList<ResourceCheckout>();
+		this.resourceCheckouts.add(resourceCheckout);
+	}
 
 	public Patron() {
 		this.id = UUID.randomUUID().toString();

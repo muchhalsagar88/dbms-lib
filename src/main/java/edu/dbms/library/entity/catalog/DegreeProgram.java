@@ -1,9 +1,14 @@
 package edu.dbms.library.entity.catalog;
 
+import java.util.Collection;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -21,6 +26,16 @@ public class DegreeProgram extends AbsEntity {
 	
 	@ManyToOne
 	private Classification classification;
+
+	@JoinTable(name="degree_year",
+			joinColumns = {
+				@JoinColumn(name="degree_id", referencedColumnName="id")
+			},
+			inverseJoinColumns = {
+				@JoinColumn(name="year_id", referencedColumnName="id")
+			})
+	@ManyToMany
+	private Collection<Year> years;
 
 	public long getId() {
 		return id;
