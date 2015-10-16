@@ -1,14 +1,9 @@
 package edu.dbms.library.entity.resource;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import edu.dbms.library.entity.Author;
 import edu.dbms.library.entity.Library;
 
 @Entity
@@ -17,9 +12,6 @@ import edu.dbms.library.entity.Library;
 public class Journal extends Publication {
 
 	private String issnNumber;
-
-	@ManyToMany(mappedBy="journals")
-	private Collection<Author> authors;
 
 	public Journal() {
 		super();
@@ -42,19 +34,5 @@ public class Journal extends Publication {
 
 	public void setIssnNumber(String issnNUmber) {
 		this.issnNumber = issnNUmber;
-	}
-
-	public Collection<Author> getAuthors() {
-		return authors;
-	}
-
-	public void setAuthors(Collection<Author> authors) {
-		this.authors = authors;
-	}
-
-	public void setAuthor(Author author) {
-		if(this.authors == null)
-			this.authors = new ArrayList<Author>();
-		this.authors.add(author);
 	}
 }
