@@ -8,7 +8,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="room")
 @DiscriminatorValue("R")
-public class Room extends Resource {
+public class Room extends Asset {
 	
 	private int roomNo;
 	

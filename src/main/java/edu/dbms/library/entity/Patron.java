@@ -1,5 +1,7 @@
 package edu.dbms.library.entity;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -10,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -21,22 +24,42 @@ public class Patron extends AbsEntity {
 	@Id
 	@Column(name="patron_id")
 	private String id;
-	
+
 	@Column(name="first_name")
 	private String firstName;
-	
+
 	@Column(name="last_name")
 	private String lastName;
-	
+
 	private String nationality;
-	
+
 	@ManyToOne
 	private Department department;
+
+	@OneToMany(mappedBy="patron")
+	private Collection<AssetCheckout> assetCheckouts;
+
+	@OneToMany(mappedBy="patron")
+	private Collection<ReserveBook> reserveBooks;
+
+	public Collection<AssetCheckout> getAssetCheckouts() {
+		return assetCheckouts;
+	}
+
+	public void setAssetCheckouts(Collection<AssetCheckout> assetCheckouts) {
+		this.assetCheckouts = assetCheckouts;
+	}
+
+	public void setAssetCheckout(AssetCheckout assetCheckout) {
+		if(this.assetCheckouts == null)
+			this.assetCheckouts = new ArrayList<AssetCheckout>();
+		this.assetCheckouts.add(assetCheckout);
+	}
 
 	public Patron() {
 		this.id = UUID.randomUUID().toString();
 	}
-	
+
 	public String getId() {
 		return id;
 	}
@@ -76,5 +99,4 @@ public class Patron extends AbsEntity {
 	public void setDepartment(Department department) {
 		this.department = department;
 	}
-	
 }

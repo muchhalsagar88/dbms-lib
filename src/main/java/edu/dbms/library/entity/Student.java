@@ -1,11 +1,15 @@
 package edu.dbms.library.entity;
 
+import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -29,6 +33,17 @@ public class Student extends Patron {
 	private Date dateOfBirth;
 	
 	private Character sex;
+
+	@JoinTable(name="enroll",
+			joinColumns = {
+				@JoinColumn(name="student_id", referencedColumnName="id")
+			},
+			inverseJoinColumns = {
+					@JoinColumn(name="course_id", referencedColumnName="id")
+			}
+	)
+	@ManyToMany
+	private Collection<Course> courses;
 
 	public Student() {}
 	

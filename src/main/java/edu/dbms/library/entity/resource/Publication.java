@@ -20,24 +20,24 @@ import edu.dbms.library.entity.Library;
 @DiscriminatorValue("P")
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(name="pub_type", discriminatorType=DiscriminatorType.CHAR)
-public class Publication extends Resource {
+public class Publication extends Asset {
 	
 	private String publicationFormat;
 
 	private String title;
-	
+
 	private String edition;
-	
+
 	private int publicationYear;
-	
+
 	@ManyToMany(mappedBy="publications")
 	private Collection<Author> authors;
-	
+
 	public Publication() {
 		super();
 		publicationFormat = PublicationFormat.HARDCOPY.name();
 	}
-	
+
 	public Publication(PublicationFormat format, String title, String edition, int year) {
 		super();
 		this.publicationFormat = format.name();
@@ -45,7 +45,7 @@ public class Publication extends Resource {
 		this.edition = edition;
 		this.publicationYear = year;
 	}
-	
+
 	public Publication(Library containingLibrary, PublicationFormat format, String title, String edition, int year) {
 		super(containingLibrary);
 		this.publicationFormat = format.name();
@@ -53,7 +53,7 @@ public class Publication extends Resource {
 		this.edition = edition;
 		this.publicationYear = year;
 	}
-	
+
 	public PublicationFormat getPublicationFormat() {
 		return PublicationFormat.valueOf(publicationFormat);
 	}

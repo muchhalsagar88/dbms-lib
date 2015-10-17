@@ -9,7 +9,7 @@ import javax.persistence.Table;
 @DiscriminatorValue("C")
 public class ConferenceProceeding extends Publication {
 
-	private int confNumber;
+	private String confNumber;
 	
 	private String confName;
 	
@@ -17,11 +17,11 @@ public class ConferenceProceeding extends Publication {
 		super();
 	}
 	
-	public int getConfNumber() {
+	public String getConfNumber() {
 		return confNumber;
 	}
 
-	public void setConfNumber(int confNumber) {
+	public void setConfNumber(String confNumber) {
 		this.confNumber = confNumber;
 	}
 

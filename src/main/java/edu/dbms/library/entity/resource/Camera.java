@@ -7,7 +7,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="camera")
 @DiscriminatorValue("C")
-public class Camera extends Resource {
+public class Camera extends Asset {
 	
 	private int cameraId;
 	

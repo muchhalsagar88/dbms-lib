@@ -1,5 +1,7 @@
 package edu.dbms.library.entity.resource;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 import javax.persistence.DiscriminatorColumn;
@@ -10,29 +12,48 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import edu.dbms.library.entity.AbsEntity;
 import edu.dbms.library.entity.Library;
+import edu.dbms.library.entity.AssetCheckout;
 
 @Entity
-@Table(name="parent_resource")
+@Table(name="parent_asset")
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(name="asset_type", discriminatorType=DiscriminatorType.CHAR)
-public class Resource extends AbsEntity {
+public class Asset extends AbsEntity {
 	
 	@Id
 	private String id;
-	
+
 	@ManyToOne
 	@JoinColumn(name="library_id", nullable=false)
 	private Library library;
 
-	public Resource() {
+	@OneToMany(mappedBy="asset_id")
+	private Collection<AssetCheckout> assetCheckouts;
+
+	public Collection<AssetCheckout> getAssetCheckouts() {
+		return assetCheckouts;
+	}
+
+	public void setAssetCheckouts(Collection<AssetCheckout> assetCheckouts) {
+		this.assetCheckouts = assetCheckouts;
+	}
+
+	public void setAssetCheckout(AssetCheckout assetCheckout) {
+		if(this.assetCheckouts == null)
+			this.assetCheckouts = new ArrayList<AssetCheckout>();
+		this.assetCheckouts.add(assetCheckout);
+	}
+
+	public Asset() {
 		this.id = UUID.randomUUID().toString();
 	}
-	
-	public Resource(Library library) {
+
+	public Asset(Library library) {
 		this();
 		this.library = library;
 	}
@@ -48,6 +69,4 @@ public class Resource extends AbsEntity {
 	public void setLibrary(Library library) {
 		this.library = library;
 	}
-	
-	
 }
