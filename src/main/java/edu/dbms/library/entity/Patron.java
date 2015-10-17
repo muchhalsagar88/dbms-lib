@@ -24,39 +24,42 @@ public class Patron extends AbsEntity {
 	@Id
 	@Column(name="patron_id")
 	private String id;
-	
+
 	@Column(name="first_name")
 	private String firstName;
-	
+
 	@Column(name="last_name")
 	private String lastName;
-	
+
 	private String nationality;
-	
+
 	@ManyToOne
 	private Department department;
 
 	@OneToMany(mappedBy="patron")
-	private Collection<ResourceCheckout> resourceCheckouts;
+	private Collection<AssetCheckout> assetCheckouts;
 
-	public Collection<ResourceCheckout> getResourceCheckouts() {
-		return resourceCheckouts;
+	@OneToMany(mappedBy="patron")
+	private Collection<ReserveBook> reserveBooks;
+
+	public Collection<AssetCheckout> getAssetCheckouts() {
+		return assetCheckouts;
 	}
 
-	public void setResourceCheckouts(Collection<ResourceCheckout> resourceCheckouts) {
-		this.resourceCheckouts = resourceCheckouts;
+	public void setAssetCheckouts(Collection<AssetCheckout> assetCheckouts) {
+		this.assetCheckouts = assetCheckouts;
 	}
 
-	public void setResourceCheckout(ResourceCheckout resourceCheckout) {
-		if(this.resourceCheckouts == null)
-			this.resourceCheckouts = new ArrayList<ResourceCheckout>();
-		this.resourceCheckouts.add(resourceCheckout);
+	public void setAssetCheckout(AssetCheckout assetCheckout) {
+		if(this.assetCheckouts == null)
+			this.assetCheckouts = new ArrayList<AssetCheckout>();
+		this.assetCheckouts.add(assetCheckout);
 	}
 
 	public Patron() {
 		this.id = UUID.randomUUID().toString();
 	}
-	
+
 	public String getId() {
 		return id;
 	}
@@ -96,5 +99,4 @@ public class Patron extends AbsEntity {
 	public void setDepartment(Department department) {
 		this.department = department;
 	}
-	
 }

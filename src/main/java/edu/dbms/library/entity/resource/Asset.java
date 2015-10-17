@@ -17,13 +17,13 @@ import javax.persistence.Table;
 
 import edu.dbms.library.entity.AbsEntity;
 import edu.dbms.library.entity.Library;
-import edu.dbms.library.entity.ResourceCheckout;
+import edu.dbms.library.entity.AssetCheckout;
 
 @Entity
-@Table(name="parent_resource")
+@Table(name="parent_asset")
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(name="asset_type", discriminatorType=DiscriminatorType.CHAR)
-public class Resource extends AbsEntity {
+public class Asset extends AbsEntity {
 	
 	@Id
 	private String id;
@@ -32,28 +32,28 @@ public class Resource extends AbsEntity {
 	@JoinColumn(name="library_id", nullable=false)
 	private Library library;
 
-	@OneToMany(mappedBy="resource_id")
-	private Collection<ResourceCheckout> resourceCheckouts;
+	@OneToMany(mappedBy="asset_id")
+	private Collection<AssetCheckout> assetCheckouts;
 
-	public Collection<ResourceCheckout> getResourceCheckouts() {
-		return resourceCheckouts;
+	public Collection<AssetCheckout> getAssetCheckouts() {
+		return assetCheckouts;
 	}
 
-	public void setResourceCheckouts(Collection<ResourceCheckout> resourceCheckouts) {
-		this.resourceCheckouts = resourceCheckouts;
+	public void setAssetCheckouts(Collection<AssetCheckout> assetCheckouts) {
+		this.assetCheckouts = assetCheckouts;
 	}
 
-	public void setResourceCheckout(ResourceCheckout resourceCheckout) {
-		if(this.resourceCheckouts == null)
-			this.resourceCheckouts = new ArrayList<ResourceCheckout>();
-		this.resourceCheckouts.add(resourceCheckout);
+	public void setAssetCheckout(AssetCheckout assetCheckout) {
+		if(this.assetCheckouts == null)
+			this.assetCheckouts = new ArrayList<AssetCheckout>();
+		this.assetCheckouts.add(assetCheckout);
 	}
 
-	public Resource() {
+	public Asset() {
 		this.id = UUID.randomUUID().toString();
 	}
 
-	public Resource(Library library) {
+	public Asset(Library library) {
 		this();
 		this.library = library;
 	}

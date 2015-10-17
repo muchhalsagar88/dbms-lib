@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import edu.dbms.library.entity.resource.Resource;
+import edu.dbms.library.entity.resource.Asset;
 
 @Entity
 @Table(name="library")
@@ -29,7 +29,7 @@ public class Library extends AbsEntity {
 	private Address libraryAddress;
 
 	@OneToMany(mappedBy="library")
-	private Collection<Resource> resources;
+	private Collection<Asset> assets;
 	
 	public long getLibraryId() {
 		return libraryId;
