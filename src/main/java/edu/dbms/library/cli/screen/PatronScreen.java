@@ -4,7 +4,7 @@ import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.Route;
 import edu.dbms.library.cli.route.RouteConstant;
-import edu.dbms.library.cli.route.RouteController;
+import edu.dbms.library.session.SessionUtils;
 
 public class PatronScreen extends BaseScreen {
 
@@ -30,16 +30,8 @@ public class PatronScreen extends BaseScreen {
 			o = readInput();
 		}
 		
-		Class t = RouteController.getInstance().getScreen(options.get((Integer)o).getRouteKey());
-		BaseScreen nextScreen;
-		try {
-			nextScreen = (BaseScreen)t.newInstance();
-			nextScreen.execute();
-		} catch (InstantiationException | IllegalAccessException e) {
-			
-			e.printStackTrace();
-		}
-		
+		BaseScreen nextScreen = getNextScreen(options.get((Integer)o).getRouteKey());
+		nextScreen.execute();
 	}
 
 	public void readInputLabel() {
@@ -47,13 +39,21 @@ public class PatronScreen extends BaseScreen {
 	}
 	
 	public Object readInput() {
-		int option = 0;
-		//while(inputScanner.hasNextInt()){
-			option = inputScanner.nextInt();
-		//}
+		/*
+		 * Buggy!! Returns incorrect input without any input
+		 * 
+		 * String option = inputScanner.nextLine();
+		try {
+			int correct = Integer.parseInt(option);
+			return correct;
+		} catch (Exception e) {
+			return option;
+		}*/
+		int option = inputScanner.nextInt();
 		return option;
 	}
 	
+	@Override
 	public void displayOptions() {
 		
 		String[] title = {""};
@@ -73,6 +73,8 @@ public class PatronScreen extends BaseScreen {
 	}
 	
 	public static void main(String []args) {
+		SessionUtils.init("patron_id", true);
+		SessionUtils.updateCurrentRoute("/patron");
 		new PatronScreen().execute();
 	}
 }
