@@ -2,46 +2,80 @@ package edu.dbms.library.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.ManyToOne;
-
-import edu.dbms.library.entity.resource.Book;
 
 @Embeddable
 public class ReserveBookKey {
 	
-	@ManyToOne
-	@Column(name="book_id", nullable = false)
-	private Book book;
+	// ADD DB Constraint over this
+	@Column(name="book_isbn")
+	private String isbnNumber;
 	
-	@ManyToOne
-	@Column(name="course_id", nullable = false)
-	private Course course;
+	@Column(name="course_id")
+	private long courseId;
 	
-	@ManyToOne
-	@Column(name="patron_id", nullable = false)
-	private Patron patron;
+	@Column(name="faculty_id")
+	private String facultyId;
+
+	public String getIsbnNumber() {
+		return isbnNumber;
+	}
+
+	public void setIsbnNumber(String isbnNumber) {
+		this.isbnNumber = isbnNumber;
+	}
+
+	public long getCourseId() {
+		return courseId;
+	}
+
+	public void setCourseId(long courseId) {
+		this.courseId = courseId;
+	}
+
+	public String getFacultyId() {
+		return facultyId;
+	}
+
+	public void setFacultyId(String facultyId) {
+		this.facultyId = facultyId;
+	}
+
+	@Override
+	public int hashCode() {
+		
+		int result;
+		 
+        result = (int) (this.courseId%Integer.MAX_VALUE);
+        result = 31 * result + (this.isbnNumber != null ? this.isbnNumber.hashCode() : 0);
+        result = 31 * result + (this.facultyId != null ? this.facultyId.hashCode() : 0);
+        return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		
+		if(obj==null || (obj.getClass() != getClass()))
+			return false;
+		
+		ReserveBookKey thatKey = (ReserveBookKey)obj;
+		
+		if(this.isbnNumber != thatKey.getIsbnNumber())
+			return false;
+		if(this.courseId != thatKey.getCourseId())
+			return false;
+		if(this.facultyId != thatKey.getFacultyId())
+			return false;
+		
+		return true;
+	}
 	
-	public Book getBook() {
-		return book;
-	}
+	public ReserveBookKey(){}
 
-	public void setBook(Book book) {
-		this.book = book;
+	public ReserveBookKey(String isbnNumber, long courseId, String facultyId) {
+		super();
+		this.isbnNumber = isbnNumber;
+		this.courseId = courseId;
+		this.facultyId = facultyId;
 	}
-
-	public Course getCourse() {
-		return course;
-	}
-
-	public void setCourse(Course course) {
-		this.course = course;
-	}
-
-	public Patron getPatron() {
-		return patron;
-	}
-
-	public void setPatron(Patron patron) {
-		this.patron = patron;
-	}
+	
 }

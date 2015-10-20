@@ -1,14 +1,14 @@
 package edu.dbms.library.entity.resource;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import edu.dbms.library.entity.Library;
 
 @Entity
 @Table(name="journal")
-@DiscriminatorValue("J")
+@PrimaryKeyJoinColumn(name="journal_id", referencedColumnName="id")
 public class Journal extends Publication {
 
 	private String issnNumber;

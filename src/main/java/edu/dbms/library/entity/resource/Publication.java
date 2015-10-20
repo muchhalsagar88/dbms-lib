@@ -3,13 +3,11 @@ package edu.dbms.library.entity.resource;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import edu.dbms.library.entity.Author;
@@ -17,9 +15,8 @@ import edu.dbms.library.entity.Library;
 
 @Entity
 @Table(name="publication")
-@DiscriminatorValue("P")
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-@DiscriminatorColumn(name="pub_type", discriminatorType=DiscriminatorType.CHAR)
+@PrimaryKeyJoinColumn(name="publication_id", referencedColumnName="id")
+@Inheritance(strategy=InheritanceType.JOINED)
 public class Publication extends Asset {
 	
 	private String publicationFormat;
@@ -32,7 +29,7 @@ public class Publication extends Asset {
 
 	@ManyToMany(mappedBy="publications")
 	private Collection<Author> authors;
-
+	
 	public Publication() {
 		super();
 		publicationFormat = PublicationFormat.HARDCOPY.name();

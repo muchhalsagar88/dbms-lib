@@ -1,13 +1,13 @@
 package edu.dbms.library.entity.resource;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="room")
-@DiscriminatorValue("R")
+@PrimaryKeyJoinColumn(name="room_id", referencedColumnName="id")
 public class Room extends Asset {
 	
 	private int roomNo;

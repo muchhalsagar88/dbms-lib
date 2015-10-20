@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
@@ -16,13 +14,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import edu.dbms.library.entity.AbsEntity;
-import edu.dbms.library.entity.Library;
 import edu.dbms.library.entity.AssetCheckout;
+import edu.dbms.library.entity.Library;
 
 @Entity
-@Table(name="parent_asset")
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-@DiscriminatorColumn(name="asset_type", discriminatorType=DiscriminatorType.CHAR)
+@Table(name="asset")
+@Inheritance(strategy=InheritanceType.JOINED)
 public class Asset extends AbsEntity {
 	
 	@Id
@@ -32,7 +29,7 @@ public class Asset extends AbsEntity {
 	@JoinColumn(name="library_id", nullable=false)
 	private Library library;
 
-	@OneToMany(mappedBy="asset_id")
+	@OneToMany(mappedBy="asset")
 	private Collection<AssetCheckout> assetCheckouts;
 
 	public Collection<AssetCheckout> getAssetCheckouts() {

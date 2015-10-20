@@ -4,19 +4,19 @@ import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
 @Table(name="student")
-@DiscriminatorValue("S")
+@PrimaryKeyJoinColumn(name="student_id", referencedColumnName="patron_id")
 public class Student extends Patron {
 
 	@Column(name="phone_no", nullable=false)
@@ -36,7 +36,7 @@ public class Student extends Patron {
 
 	@JoinTable(name="enroll",
 			joinColumns = {
-				@JoinColumn(name="student_id", referencedColumnName="id")
+				@JoinColumn(name="student_id", referencedColumnName="student_id")
 			},
 			inverseJoinColumns = {
 					@JoinColumn(name="course_id", referencedColumnName="id")

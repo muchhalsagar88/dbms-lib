@@ -2,6 +2,7 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
 	<persistence-unit name="main" transaction-type="RESOURCE_LOCAL">
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<class>edu.dbms.library.entity.LoginDetails</class>
 		<class>edu.dbms.library.entity.Student</class>
 		<class>edu.dbms.library.entity.Library</class>
 		<class>edu.dbms.library.entity.Address</class>
@@ -13,24 +14,33 @@
 		<class>edu.dbms.library.entity.Author</class>
 		<class>edu.dbms.library.entity.Publisher</class>
 		
+		<class>edu.dbms.library.entity.resource.Asset</class>
 		<class>edu.dbms.library.entity.resource.Book</class>
 		<class>edu.dbms.library.entity.resource.Camera</class>
 		<class>edu.dbms.library.entity.resource.ConferenceProceeding</class>
 		<class>edu.dbms.library.entity.resource.Journal</class>
 		<class>edu.dbms.library.entity.resource.Publication</class>
-		<class>edu.dbms.library.entity.resource.Resource</class>
 		<class>edu.dbms.library.entity.resource.Room</class>
 		
 		<class>edu.dbms.library.entity.catalog.Classification</class>
 		<class>edu.dbms.library.entity.catalog.DegreeProgram</class>
 		<class>edu.dbms.library.entity.catalog.Year</class>
+		
+		<class>edu.dbms.library.entity.Course</class>
+		<class>edu.dbms.library.entity.ReserveBook</class>
+		<class>edu.dbms.library.entity.AssetCheckout</class>
+		<class>edu.dbms.library.entity.AssetCheckoutConstraint</class>
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:xe"/>
-			<property name="javax.persistence.jdbc.user" value="csc540"/>
-			<property name="javax.persistence.jdbc.password" value="csc540"/>
+			<property name="javax.persistence.jdbc.user" value="sagar"/>
+			<property name="javax.persistence.jdbc.password" value="password"/>
 			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
 			
 			<property name="eclipselink.logging.level" value="INFO"/>
+			<!-- For SQL query debug  -->
+			<property name="eclipselink.logging.level.sql" value="FINE"/>
+			<property name="eclipselink.logging.parameters" value="true"/>
+			
          	<property name="eclipselink.ddl-generation" value="create-tables"/>
 		</properties>
 	</persistence-unit>
