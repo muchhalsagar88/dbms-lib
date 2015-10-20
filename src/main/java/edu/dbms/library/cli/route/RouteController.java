@@ -5,6 +5,7 @@ import java.util.Map;
 
 import edu.dbms.library.cli.screen.BaseScreen;
 import edu.dbms.library.cli.screen.LoginScreen;
+import edu.dbms.library.cli.screen.LogoutScreen;
 import edu.dbms.library.cli.screen.PatronScreen;
 import edu.dbms.library.cli.screen.ProfileScreen;
 
@@ -23,6 +24,7 @@ public class RouteController {
 		mapping.put(RouteConstant.LOGIN, LoginScreen.class);
 		mapping.put(RouteConstant.PATRON_BASE, PatronScreen.class);
 		mapping.put(RouteConstant.PATRON_PROFILE, ProfileScreen.class);
+		mapping.put(RouteConstant.LOGOUT, LogoutScreen.class);
 	}
 	
 	public static synchronized RouteController getInstance() {

@@ -20,4 +20,8 @@ public class RouteConstant {
 	
 	public static final String LOGOUT = "/logout";
 	
+	public static final String BACK = "/back";
+	
+	public static final String EXIT = "/exit";
+	
 }

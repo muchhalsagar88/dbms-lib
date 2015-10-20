@@ -8,4 +8,10 @@ public class LoginScreen extends BaseScreen {
 		
 	}
 
+	@Override
+	public void displayOptions() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

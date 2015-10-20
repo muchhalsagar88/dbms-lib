@@ -17,4 +17,8 @@ public class Constant {
 	public static final String OPTION_LOGOUT = "Logout";
 	
 	public static final String OPTION_BACK = "Back";
+	
+	public static final String OPTION_LOGIN = "Login";
+	
+	public static final String OPTION_EXIT = "Exit";
 }
