@@ -4,25 +4,20 @@ import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.Route;
 import edu.dbms.library.cli.route.RouteConstant;
+import edu.dbms.library.session.SessionUtils;
 
-/*
- *  TODO: 	Fire a query based on the PATRON table for details
- *  	  	Pass back some flag or parameter to differentiate between 
- *  	  	Student and Faculty
- */
-public class ProfileScreen extends BaseScreen {
+public class LogoutScreen extends BaseScreen {
 
-	public ProfileScreen() {
+	public LogoutScreen() {
 		super();
-		options.put(1, new Route(RouteConstant.BACK));
-		options.put(2, new Route(RouteConstant.LOGOUT));
-		getPatronDetails();
+		options.put(1, new Route(RouteConstant.LOGIN));
+		options.put(2, new Route(RouteConstant.EXIT));
 	}
 	
 	@Override
 	public void execute() {
+		SessionUtils.kill();
 		displayOptions();
-		readInputLabel();
 		Object o = readInput();
 		while(!(o instanceof Integer)) {
 			System.out.println("Incorrect input.");
@@ -30,27 +25,29 @@ public class ProfileScreen extends BaseScreen {
 			o = readInput();
 		}
 		
+		// Check for EXIT option, will appear only once in the application
+		if((Integer)o == 2) {
+			System.exit(0);
+		}
 		BaseScreen nextScreen = getNextScreen(options.get((Integer)o).getRouteKey());
 		nextScreen.execute();
 	}
 
 	@Override
 	public void displayOptions() {
-		
-		System.out.println("Patron details:");
-		System.out.println("-------------------------------------------");
+		System.out.println("You have logged out of the system.");
 		
 		String[] title = {""};
 		String[][] options = { 
-							{Constant.OPTION_BACK},
-							{Constant.OPTION_LOGOUT}
+							{Constant.OPTION_LOGIN},
+							{Constant.OPTION_EXIT}
 							};
 		TextTable tt = new TextTable(title, options);
 		tt.setAddRowNumbering(true);
 		tt.printTable();
-		
+
 	}
-	
+
 	public void readInputLabel() {
 		System.out.print("Enter your choice: ");
 	}
@@ -59,11 +56,4 @@ public class ProfileScreen extends BaseScreen {
 		int option = inputScanner.nextInt();
 		return option;
 	}
-
-	// Implement the internal logic for this method
-	private Object getPatronDetails() {
-		
-		return null;
-	}
-	
 }
