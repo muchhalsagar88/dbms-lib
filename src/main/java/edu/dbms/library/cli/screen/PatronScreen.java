@@ -4,7 +4,6 @@ import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.Route;
 import edu.dbms.library.cli.route.RouteConstant;
-import edu.dbms.library.session.SessionUtils;
 
 public class PatronScreen extends BaseScreen {
 
@@ -68,13 +67,12 @@ public class PatronScreen extends BaseScreen {
 							};
 		TextTable tt = new TextTable(title, options);
 		tt.setAddRowNumbering(true);
-		//tt.setSort(0);
 		tt.printTable();
 	}
 	
-	public static void main(String []args) {
+	/*public static void main(String []args) {
 		SessionUtils.init("patron_id", true);
 		SessionUtils.updateCurrentRoute("/patron");
 		new PatronScreen().execute();
-	}
+	}*/
 }
