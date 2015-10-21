@@ -52,11 +52,6 @@ public class LoginScreen extends BaseScreen {
 		System.out.println("Enter password: ");
 	}
 
-	/*
-	 * TODO: 	Validate the username and password and return patron_id
-	 * 			and also boolean for isStudent
-	 * 			Also set the Session object
-	 */
 	private boolean validateCredentials(String username, String password) {
 		
 		LoginTO loginTO = LoginManager.checkCredentials(username, password);

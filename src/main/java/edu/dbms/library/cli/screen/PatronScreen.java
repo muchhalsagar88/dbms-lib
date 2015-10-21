@@ -70,9 +70,4 @@ public class PatronScreen extends BaseScreen {
 		tt.printTable();
 	}
 	
-	/*public static void main(String []args) {
-		SessionUtils.init("patron_id", true);
-		SessionUtils.updateCurrentRoute("/patron");
-		new PatronScreen().execute();
-	}*/
 }
