@@ -12,6 +12,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import edu.dbms.library.entity.resource.Asset;
+
 @Entity
 @Table(name="asset_checkout")
 public class AssetCheckout {
@@ -21,7 +23,7 @@ public class AssetCheckout {
 	private long id;
 	
 	@ManyToOne
-	private long assetId;
+	private Asset asset;
 
 	@ManyToOne
 	private Patron patron;
@@ -64,14 +66,14 @@ public class AssetCheckout {
 		this.returnDate = returnDate;
 	}
 
-	public long getAssetId() {
-		return assetId;
+	public Asset getAsset() {
+		return asset;
 	}
 
-	public void setAssetId(long assetId) {
-		this.assetId = assetId;
+	public void setAsset(Asset asset) {
+		this.asset = asset;
 	}
-	
+
 	public long getAssetSecondaryId() {
 		return assetSecondaryId;
 	}

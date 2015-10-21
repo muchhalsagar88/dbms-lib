@@ -1,12 +1,12 @@
 package edu.dbms.library.entity.resource;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="conf_proceeding")
-@DiscriminatorValue("C")
+@PrimaryKeyJoinColumn(name="conf_proc_id", referencedColumnName="id")
 public class ConferenceProceeding extends Publication {
 
 	private String confNumber;

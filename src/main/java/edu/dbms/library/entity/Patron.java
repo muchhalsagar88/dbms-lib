@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.UUID;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
@@ -17,8 +15,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="patron")
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-@DiscriminatorColumn(name="patron_type", discriminatorType=DiscriminatorType.CHAR)
+@Inheritance(strategy=InheritanceType.JOINED)
 public class Patron extends AbsEntity {
 
 	@Id
@@ -38,9 +35,6 @@ public class Patron extends AbsEntity {
 
 	@OneToMany(mappedBy="patron")
 	private Collection<AssetCheckout> assetCheckouts;
-
-	@OneToMany(mappedBy="patron")
-	private Collection<ReserveBook> reserveBooks;
 
 	public Collection<AssetCheckout> getAssetCheckouts() {
 		return assetCheckouts;

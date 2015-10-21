@@ -1,12 +1,12 @@
 package edu.dbms.library.entity.resource;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="camera")
-@DiscriminatorValue("C")
+@PrimaryKeyJoinColumn(name="camera_id", referencedColumnName="id")
 public class Camera extends Asset {
 	
 	private int cameraId;

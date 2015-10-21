@@ -10,7 +10,6 @@ import org.junit.Test;
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.Address;
 import edu.dbms.library.entity.Author;
-import edu.dbms.library.entity.FacultyCategory;
 import edu.dbms.library.entity.Library;
 import edu.dbms.library.entity.resource.Journal;
 import edu.dbms.library.entity.resource.PublicationFormat;
@@ -78,7 +77,7 @@ public class JournalTest extends BaseTest {
 	@Test
 	public void testDataGeneration() {
 		
-		Assert.assertEquals("Number of faculty categories persisted is different", 
+		Assert.assertEquals("Number of Journals persisted is different", 
 				DEFAULT_FC_COUNT, getCount(Journal.class));
 	}
 	

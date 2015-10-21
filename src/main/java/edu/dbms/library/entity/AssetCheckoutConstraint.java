@@ -2,6 +2,9 @@ package edu.dbms.library.entity;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -15,6 +18,11 @@ public class AssetCheckoutConstraint {
 	@EmbeddedId
 	private AssetCheckoutConstraintKey assetCheckoutConstraintKey;
 
+	@MapsId("patronId")
+    @JoinColumn(name ="patron_id", referencedColumnName = "patron_id")
+	@ManyToOne
+	private Patron patron;
+	
 	public AssetCheckout getAssetCheckout() {
 		return assetCheckout;
 	}

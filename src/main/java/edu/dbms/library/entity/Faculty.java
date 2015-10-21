@@ -3,17 +3,18 @@ package edu.dbms.library.entity;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="faculty")
-@DiscriminatorValue("F")
+@PrimaryKeyJoinColumn(name="faculty_id", referencedColumnName="patron_id")
 public class Faculty extends Patron {
 	
 	@ManyToOne
@@ -21,7 +22,7 @@ public class Faculty extends Patron {
 
 	@JoinTable(name="teach",
 			joinColumns = {
-				@JoinColumn(name="faculty_id", referencedColumnName="id")
+				@JoinColumn(name="faculty_id", referencedColumnName="faculty_id")
 			},
 			inverseJoinColumns = {
 					@JoinColumn(name="course_id", referencedColumnName="id")
@@ -29,6 +30,9 @@ public class Faculty extends Patron {
 	)
 	@ManyToMany
 	private Collection<Course> courses;
+	
+	@OneToMany(mappedBy="faculty")
+	private Collection<ReserveBook> reserveBooks;
 	
 	public Collection<Course> getCourses() {
 		return courses;
