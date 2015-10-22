@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
@@ -20,6 +22,7 @@ import edu.dbms.library.entity.Library;
 @Entity
 @Table(name="asset")
 @Inheritance(strategy=InheritanceType.JOINED)
+@DiscriminatorColumn(name="asset_type", discriminatorType=DiscriminatorType.INTEGER)
 public class Asset extends AbsEntity {
 	
 	@Id

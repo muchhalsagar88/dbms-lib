@@ -10,7 +10,9 @@ import org.junit.Test;
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.Address;
 import edu.dbms.library.entity.Library;
+import edu.dbms.library.entity.resource.ConferenceRoom;
 import edu.dbms.library.entity.resource.Room;
+import edu.dbms.library.entity.resource.StudyRoom;
 import junit.framework.Assert;
 
 public class RoomsTest extends BaseTest {
@@ -29,32 +31,32 @@ public class RoomsTest extends BaseTest {
 		
 		List<Room> roomList = new ArrayList<Room>();
 		
-		Room r1 = new Room();
+		Room r1 = new StudyRoom();
 		r1.setCapacity(40);
 		r1.setFloorLevel(2);
 		r1.setLibrary(lib);
 		r1.setRoomNo(201);
 		
-		Room r2 = new Room();
+		Room r2 = new StudyRoom();
 		r2.setCapacity(150);
 		r2.setFloorLevel(1);
 		r2.setLibrary(lib);
 		r2.setRoomNo(115);
 		
-		Room r3 = new Room();
+		Room r3 = new StudyRoom();
 		r3.setCapacity(30);
 		r3.setFloorLevel(2);
 		r3.setLibrary(lib);
 		r3.setRoomNo(205);
 		
-		Room r4 = new Room();
+		Room r4 = new ConferenceRoom();
 		r4.setCapacity(250);
 		r4.setFloorLevel(1);
 		r4.setLibrary(lib);
 		r4.setRoomNo(116);
 		
 		
-		Room r5 = new Room();
+		Room r5 = new ConferenceRoom();
 		r5.setCapacity(30);
 		r5.setFloorLevel(3);
 		r5.setLibrary(lib);

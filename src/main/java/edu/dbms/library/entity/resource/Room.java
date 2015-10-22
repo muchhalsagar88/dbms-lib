@@ -1,12 +1,16 @@
 package edu.dbms.library.entity.resource;
 
-import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="room")
+@DiscriminatorValue("11")
+@Inheritance(strategy=InheritanceType.JOINED)
 @PrimaryKeyJoinColumn(name="room_id", referencedColumnName="id")
 public class Room extends Asset {
 	
@@ -16,10 +20,10 @@ public class Room extends Asset {
 	
 	private int capacity;
 
-	@Column(name="room_type")
-	private char roomType;
+	//@Column(name="room_type")
+	//private char roomType;
 	
-	public Room() {
+	protected Room() {
 		super();
 	}
 	

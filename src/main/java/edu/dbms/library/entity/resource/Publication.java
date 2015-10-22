@@ -3,6 +3,7 @@ package edu.dbms.library.entity.resource;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -15,6 +16,7 @@ import edu.dbms.library.entity.Library;
 
 @Entity
 @Table(name="publication")
+@DiscriminatorValue("10")
 @PrimaryKeyJoinColumn(name="publication_id", referencedColumnName="id")
 @Inheritance(strategy=InheritanceType.JOINED)
 public class Publication extends Asset {

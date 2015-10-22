@@ -21,6 +21,8 @@
 		<class>edu.dbms.library.entity.resource.Journal</class>
 		<class>edu.dbms.library.entity.resource.Publication</class>
 		<class>edu.dbms.library.entity.resource.Room</class>
+		<class>edu.dbms.library.entity.resource.StudyRoom</class>
+		<class>edu.dbms.library.entity.resource.ConferenceRoom</class>
 		
 		<class>edu.dbms.library.entity.catalog.Classification</class>
 		<class>edu.dbms.library.entity.catalog.DegreeProgram</class>
