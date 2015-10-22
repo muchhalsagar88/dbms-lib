@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.UUID;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
@@ -16,6 +18,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="patron")
 @Inheritance(strategy=InheritanceType.JOINED)
+@DiscriminatorColumn(name="patron_type", discriminatorType=DiscriminatorType.CHAR)
 public class Patron extends AbsEntity {
 
 	@Id

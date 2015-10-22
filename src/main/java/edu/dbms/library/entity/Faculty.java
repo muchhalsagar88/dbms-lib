@@ -3,6 +3,7 @@ package edu.dbms.library.entity;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -15,6 +16,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="faculty")
 @PrimaryKeyJoinColumn(name="faculty_id", referencedColumnName="patron_id")
+@DiscriminatorValue("P")
 public class Faculty extends Patron {
 	
 	@ManyToOne

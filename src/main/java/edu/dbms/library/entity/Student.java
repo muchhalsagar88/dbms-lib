@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -17,6 +18,7 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name="student")
 @PrimaryKeyJoinColumn(name="student_id", referencedColumnName="patron_id")
+@DiscriminatorValue("S")
 public class Student extends Patron {
 
 	@Column(name="phone_no", nullable=false)
