@@ -10,6 +10,12 @@ public class RouteConstant {
 	
 	public static final String PATRON_RESOURCES = "/patron/resources";
 	
+	public static final String PATRON_RESOURCES_PUBLICATIONS = "/patron/resources/publications";
+	
+	public static final String PATRON_RESOURCES_ROOMS = "/patron/resources/rooms";
+	
+	public static final String PATRON_RESOURCES_CAMERA = "/patron/resources/cameras";
+	
 	public static final String PATRON_CHECKED_OUT = "/patron/checkedout";
 	
 	public static final String PATRON_RES_REQUEST = "/patron/resrequests";

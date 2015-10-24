@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="conf_proceeding")
-@PrimaryKeyJoinColumn(name="conf_proc_id", referencedColumnName="id")
+@PrimaryKeyJoinColumn(name="conf_proc_id", referencedColumnName="asset_id")
 @DiscriminatorValue("2")
 public class ConferenceProceeding extends Publication {
 

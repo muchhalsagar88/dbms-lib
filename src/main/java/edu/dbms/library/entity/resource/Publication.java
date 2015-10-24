@@ -17,7 +17,7 @@ import edu.dbms.library.entity.Library;
 @Entity
 @Table(name="publication")
 @DiscriminatorValue("10")
-@PrimaryKeyJoinColumn(name="publication_id", referencedColumnName="id")
+@PrimaryKeyJoinColumn(name="publication_id", referencedColumnName="asset_id")
 @Inheritance(strategy=InheritanceType.JOINED)
 public class Publication extends Asset {
 	

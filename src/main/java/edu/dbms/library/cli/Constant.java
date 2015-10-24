@@ -6,6 +6,12 @@ public class Constant {
 	
 	public static final String OPTION_RESOURCES = "Resources";
 	
+	public static final String OPTION_PUBLICATIONS = "Publications";
+	
+	public static final String OPTION_ROOMS = "Rooms";
+	
+	public static final String OPTION_CAMERAS = "Cameras";
+	
 	public static final String OPTION_CHKDOUT_RES = "Checked-out Resources";
 	
 	public static final String OPTION_RES_REQUEST = "Resource Request";
@@ -21,4 +27,8 @@ public class Constant {
 	public static final String OPTION_LOGIN = "Login";
 	
 	public static final String OPTION_EXIT = "Exit";
+	
+	public static final String OPTION_ASSET_CHECKOUT = "Checkout";
+	
+	public static final String OPTION_ASSET_RESERVE = "Reserve";
 }

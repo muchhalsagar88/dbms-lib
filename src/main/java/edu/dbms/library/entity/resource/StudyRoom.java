@@ -8,7 +8,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="study_room")
 @DiscriminatorValue("5")
-@PrimaryKeyJoinColumn(name="study_room_id", referencedColumnName="id")
+@PrimaryKeyJoinColumn(name="study_room_id", referencedColumnName="asset_id")
 public class StudyRoom extends Room {
 
 }

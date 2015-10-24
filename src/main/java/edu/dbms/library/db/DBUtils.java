@@ -107,5 +107,18 @@ public class DBUtils {
 		return deletedCount;
 	}
 	
+	public static <T extends AbsEntity, S> AbsEntity findEntity(Class<T> c, Object id, Class<S> idType) {
+		
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DEFAULT_PERSISTENCE_UNIT_NAME);
+		EntityManager entitymanager = emfactory.createEntityManager( );
+		
+		T entity = (T) entitymanager.find(c, (S)id);
+		
+		entitymanager.close();
+		emfactory.close();
+		
+		return entity;
+	}
 	
 }
