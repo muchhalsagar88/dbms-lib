@@ -33,6 +33,11 @@ public class CameraReservation extends AbsEntity {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="reserve_date")
 	private Date reserveDate;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="issue_date")
+	// The Friday when the patron wants the camera
+	private Date issueDate;
 
 	public CameraReservationPK getCameraReservationKey() {
 		return cameraReservationKey;
@@ -58,11 +63,29 @@ public class CameraReservation extends AbsEntity {
 		this.reserveDate = reserveDate;
 	}
 
-	public CameraReservation(String cameraId, String patronId, Patron patron, Date reserveDate) {
+	public Camera getCamera() {
+		return camera;
+	}
+
+	public void setCamera(Camera camera) {
+		this.camera = camera;
+	}
+
+	public Date getIssueDate() {
+		return issueDate;
+	}
+
+	public void setIssueDate(Date issueDate) {
+		this.issueDate = issueDate;
+	}
+
+	public CameraReservation(String cameraId, String patronId, Patron patron, Date reserveDate,
+			Date issueDate) {
 		this.cameraReservationKey.setCameraId(cameraId);
 		this.cameraReservationKey.setPatronId(patronId);
 		this.patron = patron;
 		this.reserveDate = reserveDate;
+		this.issueDate = issueDate;
 	}
 	
 	public CameraReservation() {

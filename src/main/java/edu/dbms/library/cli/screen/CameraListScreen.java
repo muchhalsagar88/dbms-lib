@@ -1,8 +1,15 @@
 package edu.dbms.library.cli.screen;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
@@ -13,6 +20,7 @@ import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.AssetCheckout;
 import edu.dbms.library.entity.Patron;
+import edu.dbms.library.entity.reserve.CameraReservation;
 import edu.dbms.library.entity.resource.Camera;
 import edu.dbms.library.session.SessionUtils;
 
@@ -73,7 +81,7 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 			input = readInput();
 		}
 		Camera c = mapAssetToInputOption((int) input);
-		reserve(c, selectedFriday);
+		System.out.println(reserve(c, selectedFriday));
 	}
 	
 	/*
@@ -94,8 +102,54 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 		assetCheckout.setIssueDate(new Date());*/
 	}
 	
-	private void reserve(Camera camera, String selectedFriday) {
-		System.out.println("Login to reserve");
+	private String reserve(Camera camera, String selectedFriday) {
+		
+		String message = null;
+		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = null;
+		try {
+			date = formatter.parse(selectedFriday);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
+		CameraReservation reservation = new CameraReservation();
+		reservation.setReserveDate(new Date());
+		reservation.setIssueDate(date);
+		reservation.setCamera(camera);
+		reservation.setPatron(loggedInPatron);
+		
+		// Check for Integrity constraint violation, and return message, saying camera already reserved
+		try {
+			DBUtils.persist(reservation);
+			
+			EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+					DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+			EntityManager entitymanager = emfactory.createEntityManager();
+			
+			Query query = entitymanager.createQuery("SELECT COUNT(res.cameraReservationKey.cameraId) FROM CameraReservation res"
+					+ " WHERE res.cameraReservationKey.cameraId=:cameraId"
+					+ " AND res.issueDate=:issueDate");
+			query.setParameter("cameraId", camera.getId());
+			query.setParameter("issueDate", date);
+			long waitlistNumber = (long)query.getSingleResult();
+			entitymanager.close();
+			emfactory.close();
+			
+			StringBuilder builder = new StringBuilder();
+			builder.append("The item has been reserved. ");
+			
+			if(waitlistNumber != 0)
+				builder.append("Your waitlist number is ").append(waitlistNumber-1);
+			message = builder.toString();
+		} catch(Exception e) {
+			e.printStackTrace();
+			message = "You have already reserved the camera";
+		}
+		return message;
 	}
 	
 	public void readInputLabel() {
@@ -113,7 +167,11 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 		LocalDate currDate = LocalDate.now();
 		int currDay = currDate.getDayOfWeek();
 		
-		LocalDate firstFriday = currDate.plusDays(Math.abs(DateTimeConstants.FRIDAY - currDay));
+		int diff = DateTimeConstants.FRIDAY - currDay;
+		if(diff < 0) 
+			diff += 7;
+		
+		LocalDate firstFriday = currDate.plusDays(diff);
 		fridays.add(firstFriday.toString());
 		for(int i=1; i<=4; ++i)
 			fridays.add(firstFriday.plusDays(7*i).toString());

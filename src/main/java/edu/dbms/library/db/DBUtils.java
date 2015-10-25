@@ -121,4 +121,20 @@ public class DBUtils {
 		return entity;
 	}
 	
+	public static Object executeCountQuery(String query) {
+		
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DEFAULT_PERSISTENCE_UNIT_NAME);
+
+		EntityManager entitymanager = emfactory.createEntityManager( );
+		entitymanager.getTransaction( ).begin( );
+		
+		Object result = entitymanager.createQuery(query).getSingleResult();
+		
+		entitymanager.close();
+		emfactory.close();
+		
+		return result;
+	}
+	
 }
