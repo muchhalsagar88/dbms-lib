@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
@@ -26,6 +27,7 @@ import edu.dbms.library.entity.Library;
 public class Asset extends AbsEntity {
 	
 	@Id
+	@Column(name="asset_id")
 	private String id;
 
 	@ManyToOne

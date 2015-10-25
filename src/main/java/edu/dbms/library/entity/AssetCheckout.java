@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -26,9 +27,11 @@ public class AssetCheckout {
 	private Asset asset;
 
 	@ManyToOne
+	@JoinColumn(name="patron_id",  referencedColumnName="patron_id")
 	private Patron patron;
 
-	private long assetSecondaryId;
+	@Column(name="asset_secondary_id")
+	private String assetSecondaryId;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="issue_date")
@@ -74,11 +77,11 @@ public class AssetCheckout {
 		this.asset = asset;
 	}
 
-	public long getAssetSecondaryId() {
+	public String getAssetSecondaryId() {
 		return assetSecondaryId;
 	}
 
-	public void setAssetSecondaryId(long assetSecondaryId) {
+	public void setAssetSecondaryId(String assetSecondaryId) {
 		this.assetSecondaryId = assetSecondaryId;
 	}
 

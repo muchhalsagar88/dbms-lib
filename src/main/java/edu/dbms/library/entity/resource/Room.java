@@ -11,7 +11,7 @@ import javax.persistence.Table;
 @Table(name="room")
 @DiscriminatorValue("11")
 @Inheritance(strategy=InheritanceType.JOINED)
-@PrimaryKeyJoinColumn(name="room_id", referencedColumnName="id")
+@PrimaryKeyJoinColumn(name="room_id", referencedColumnName="asset_id")
 public class Room extends Asset {
 	
 	private int roomNo;

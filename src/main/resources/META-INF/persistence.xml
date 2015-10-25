@@ -32,6 +32,8 @@
 		<class>edu.dbms.library.entity.ReserveBook</class>
 		<class>edu.dbms.library.entity.AssetCheckout</class>
 		<class>edu.dbms.library.entity.AssetCheckoutConstraint</class>
+		
+		<class>edu.dbms.library.entity.reserve.CameraReservation</class>
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:xe"/>
 			<property name="javax.persistence.jdbc.user" value="sagar"/>

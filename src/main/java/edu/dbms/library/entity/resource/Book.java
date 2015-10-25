@@ -9,7 +9,7 @@ import edu.dbms.library.entity.Library;
 
 @Entity
 @Table(name="book")
-@PrimaryKeyJoinColumn(name="book_id", referencedColumnName="id")
+@PrimaryKeyJoinColumn(name="book_id", referencedColumnName="asset_id")
 @DiscriminatorValue("1")
 public class Book extends Publication {
 

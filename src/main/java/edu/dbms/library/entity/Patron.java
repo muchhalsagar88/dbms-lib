@@ -31,6 +31,9 @@ public class Patron extends AbsEntity {
 	@Column(name="last_name")
 	private String lastName;
 
+	@Column(name="email_address")
+	private String emailAddress;
+	
 	private String nationality;
 
 	@ManyToOne
@@ -95,5 +98,13 @@ public class Patron extends AbsEntity {
 
 	public void setDepartment(Department department) {
 		this.department = department;
+	}
+	
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
 	}
 }
