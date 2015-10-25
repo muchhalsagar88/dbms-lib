@@ -10,6 +10,10 @@ import edu.dbms.library.cli.screen.LogoutScreen;
 import edu.dbms.library.cli.screen.PatronResourcesScreen;
 import edu.dbms.library.cli.screen.PatronScreen;
 import edu.dbms.library.cli.screen.ProfileScreen;
+import edu.dbms.library.cli.screen.ResourceBook;
+import edu.dbms.library.cli.screen.ResourceConfPapers;
+import edu.dbms.library.cli.screen.ResourceJournals;
+import edu.dbms.library.cli.screen.ResourcePublications;
 
 public class RouteController {
 
@@ -28,7 +32,13 @@ public class RouteController {
 		mapping.put(RouteConstant.PATRON_PROFILE, ProfileScreen.class);
 		mapping.put(RouteConstant.PATRON_RESOURCES, PatronResourcesScreen.class);
 		mapping.put(RouteConstant.PATRON_RESOURCES_CAMERA, CameraListScreen.class);
-		mapping.put(RouteConstant.LOGOUT, LogoutScreen.class);
+		mapping.put(RouteConstant.LOGOUT, LogoutScreen.class);		
+		
+		mapping.put(RouteConstant.PATRON_RESOURCES_PUBLICATIONS, ResourcePublications.class);
+		mapping.put(RouteConstant.PUBLICATION_BOOKS, ResourceBook.class);
+		mapping.put(RouteConstant.PUBLICATIONS_JOURNALS, ResourceJournals.class);
+		mapping.put(RouteConstant.PUBLICATIONS_CONFPAPERS, ResourceConfPapers.class);
+		
 	}
 	
 	public static synchronized RouteController getInstance() {
