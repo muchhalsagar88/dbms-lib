@@ -31,4 +31,19 @@ public class Constant {
 	public static final String OPTION_ASSET_CHECKOUT = "Checkout";
 	
 	public static final String OPTION_ASSET_RESERVE = "Reserve";
+
+	public static final String PUBLICATION_BOOKS = "Books";
+	public static final String PUBLICATIONS_JOURNALS = "Journals" ;
+	public static final String PUBLICATIONS_CONFPAPERS = "Conference Papers";
+	
+	public static final String OPTION_ISBN= "ISBN NUMBER";
+	public static final String OPTION_BOOK_TITLE= "BOOK TITLE";
+	public static final String OPTION_EDITION= "BOOK EDITION";
+	public static final String OPTION_AUTHORS= "AUTHORS";
+	public static final String OPTION_PUB_YEAR= "PUBLICATION YEAR";
+	public static final String OPTION_PUBLISHER= "PUBLISHERS";
+	
+	public static final String OPTION_ISSN= "ISSN NUMBER";
+	public static final String OPTION_JOURNAL_TITLE= "JOURNAL TITLE";
+	
 }
