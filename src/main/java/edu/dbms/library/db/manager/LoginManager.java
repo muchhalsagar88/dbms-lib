@@ -20,9 +20,8 @@ public class LoginManager extends DBManager {
 		if(login==null || !login.getPassword().equals(password)) 
 			return null;
 		
-		Query q = entitymanager.createQuery("SELECT s FROM LoginDetails l, Student s WHERE "
-				+ "l.patron.id = s.id "
-				+ "AND l.patron.id = :id");
+		Query q = entitymanager.createQuery("SELECT s FROM Student s WHERE "
+				+ "s.id = :id");
 		q.setParameter("id", login.getPatron().getId());
 		
 		Object student;
