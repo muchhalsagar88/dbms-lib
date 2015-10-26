@@ -24,28 +24,20 @@ public class AssetPatronConstraint extends AbsEntity {
 	
 	private float fine;
 	
+	public AssetPatronConstaintPK getKey() {
+		return key;
+	}
+
+	public void setKey(AssetPatronConstaintPK key) {
+		this.key = key;
+	}
+
 	public int getFineDuration() {
 		return fineDuration;
 	}
 
 	public void setFineDuration(int fineDuration) {
 		this.fineDuration = fineDuration;
-	}
-
-	public int getAssetType() {
-		return assetType;
-	}
-
-	public void setAssetType(int assetType) {
-		this.assetType = assetType;
-	}
-
-	public char getPatronType() {
-		return patronType;
-	}
-
-	public void setPatronType(char patronType) {
-		this.patronType = patronType;
 	}
 
 	public int getDuration() {
