@@ -14,6 +14,7 @@ import edu.dbms.library.cli.screen.ResourceBook;
 import edu.dbms.library.cli.screen.ResourceConfPapers;
 import edu.dbms.library.cli.screen.ResourceJournals;
 import edu.dbms.library.cli.screen.ResourcePublications;
+import edu.dbms.library.cli.screen.RoomsScreen;
 
 public class RouteController {
 
@@ -38,6 +39,8 @@ public class RouteController {
 		mapping.put(RouteConstant.PUBLICATION_BOOKS, ResourceBook.class);
 		mapping.put(RouteConstant.PUBLICATIONS_JOURNALS, ResourceJournals.class);
 		mapping.put(RouteConstant.PUBLICATIONS_CONFPAPERS, ResourceConfPapers.class);
+		
+		mapping.put(RouteConstant.PATRON_RESOURCES_ROOMS, RoomsScreen.class);
 		
 	}
 	
