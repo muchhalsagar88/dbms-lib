@@ -19,8 +19,8 @@ public static final int DEFAULT_STUDENT_COUNT = 2;
 	@Before
 	public void generateTestData() {
 		
-		Department d1 = new Department("Faculty Department 1");
-		Department d2 = new Department("Faculty Department 2");
+		Department d1 = new Department("Student Department 1");
+		Department d2 = new Department("Student Department 2");
 		DBUtils.persist(d1);
 		DBUtils.persist(d2);
 				
