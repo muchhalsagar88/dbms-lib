@@ -13,6 +13,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -41,6 +42,9 @@ public class Patron extends AbsEntity {
 
 	@OneToMany(mappedBy="patron")
 	private Collection<AssetCheckout> assetCheckouts;
+
+	@OneToOne(mappedBy="patron")
+	private LoginDetails loginDetails;
 
 	public Collection<AssetCheckout> getAssetCheckouts() {
 		return assetCheckouts;
@@ -100,6 +104,10 @@ public class Patron extends AbsEntity {
 		this.department = department;
 	}
 	
+	public boolean isEmailAddresNull() {
+		return emailAddress == null;
+	}
+
 	public String getEmailAddress() {
 		return emailAddress;
 	}
