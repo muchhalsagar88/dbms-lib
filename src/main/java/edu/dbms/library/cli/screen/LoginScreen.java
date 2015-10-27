@@ -17,11 +17,10 @@ public class LoginScreen extends BaseScreen {
 	public void execute() {
 		boolean validUser = false;
 		do {
-			inputUsernameLabel();
-			String username = readInput();
-			inputPasswordLabel();
-			String password =  readInput();
-			
+			String username = readInput("Enter Username");
+			String password = readInput("Enter Password");
+//			String username = "arpit";
+//			String password = "tyagi";
 			validUser = validateCredentials(username, password);
 			if(!validUser)
 				System.out.println("Username password combination is incorrect");

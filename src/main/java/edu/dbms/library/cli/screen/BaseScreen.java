@@ -20,13 +20,6 @@ public abstract class BaseScreen {
 
 	public abstract void displayOptions();
 
-	private void fillConsole(char c){
-		for(int i = 0; i<CONSOLE_WIDTH;i++)
-			System.out.print(c);
-		System.out.println();
-	}
-
-
 	public void displayOptions(Object[][] options, String[] title, boolean displayRowNumbers){
 
 		TextTable tt = new TextTable(title, options);
@@ -90,7 +83,12 @@ public abstract class BaseScreen {
 					throw new NumberFormatException();
 			}
 			catch(NumberFormatException e){
-				System.out.println("Invalid Choice. Please enter a valid choice.\nValid input is a Number between "+min+" and "+max+".");
+				if(min==max)
+					System.out.println("Invalid Choice. Please enter a valid choice.\nValid input is Number "+max+".");
+				else if(min==max-1)
+					System.out.println("Invalid Choice. Please enter a valid choice.\nValid input is Number "+min+" or "+max+".");
+				else
+					System.out.println("Invalid Choice. Please enter a valid choice.\nValid input is a Number between "+min+" and "+max+".");
 				continue;
 			}
 			break;
