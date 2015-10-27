@@ -1,10 +1,12 @@
 package edu.dbms.library.db.manager;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.Address;
@@ -120,6 +122,7 @@ public class RoomsManager extends DBManager {
 		catch(Exception e){
 			return false;
 		}
+		return true;
 	}
 
 	public static boolean cancel(long reservationId) {
