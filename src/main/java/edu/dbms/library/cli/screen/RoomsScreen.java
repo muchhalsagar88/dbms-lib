@@ -3,9 +3,8 @@
  */
 package edu.dbms.library.cli.screen;
 
+import java.awt.Container;
 import java.sql.Timestamp;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -16,8 +15,8 @@ import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.db.manager.RoomsManager;
 import edu.dbms.library.entity.Library;
-import edu.dbms.library.entity.RoomReserve;
 import edu.dbms.library.entity.resource.Room;
+import edu.dbms.library.session.SessionUtils;
 
 /**
  * @author ARPIT
@@ -41,10 +40,10 @@ public class RoomsScreen extends BaseScreen {
 		//displayOptions(options, "Book a Room");
 
 
-		String[][] options = {{"Book Rooms"},{"Check-out/Cancel Booked Room"},{"Back"},{"Logout"}};
+		String[][] options = {{"Book Rooms"},{"Check-out/Cancel Booked Room"},{"Check-In Room"},{"Back"},{"Logout"}};
 		String[] title = {"Options"};
 		displayOptions(options, title);
-		int choice = readOptionNumber("Enter a choice", 1, 4);
+		int choice = readOptionNumber("Enter a choice", 1, 5);
 		clearConsole();
 		switch(choice)
 		{
@@ -55,10 +54,13 @@ public class RoomsScreen extends BaseScreen {
 			checkoutRoom();
 			break;
 		case 3:
-			
+			checkinRoom();
 			break;
 		case 4:
-			
+			getNextScreen(RouteConstant.BACK).execute();
+			break;
+		case 5:
+			getNextScreen(RouteConstant.LOGOUT).execute();
 			break;
 		}
 		//if(options);
@@ -67,6 +69,52 @@ public class RoomsScreen extends BaseScreen {
 		//diplayAvailableRooms();
 	}
 
+
+	private void checkinRoom() {
+		System.out.println("=============CheckIn Room==========");
+		int choice = -1;
+		List<Object[]> rooms = RoomsManager.getCheckedOutRooms();
+		String[][] _rooms = new String[rooms.size()][3];
+		int i=0;
+		for (Iterator iterator = rooms.iterator(); iterator.hasNext();) {
+			Object[] room = (Object[]) iterator.next();
+			_rooms[i][0] = ""+room[3];
+			_rooms[i][1] = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)room[4]).getTime()));
+			_rooms[i][2] = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)room[5]).getTime()));
+			i++;
+		}
+
+		String[] RoomsTitles = {"Room No.","Start Time" ,"Due By"};
+		displayOptions(_rooms,RoomsTitles);
+		if(rooms.size()==0){
+			choice = readOptionNumber("No rooms available to check in\nEnter 0 to go back", 0, 0);
+			BaseScreen nextScreen = getNextScreen(SessionUtils.getCurrentRoute());
+			nextScreen.execute();
+			return;			
+		}
+		else{
+			int roomNo = readOptionNumber("Enter a choice (0 to go back)", 0, rooms.size());
+			if(roomNo==0){
+				BaseScreen nextScreen = getNextScreen(SessionUtils.getCurrentRoute());
+				nextScreen.execute();
+				return;
+			}
+			long checkoutId = Long.parseLong(rooms.get(roomNo-1)[7].toString());
+			boolean result = RoomsManager.checkIn(checkoutId);
+			if(result){
+				System.out.println("Checked In Successfully...");
+				BaseScreen nextScreen = getNextScreen(RouteConstant.BACK);
+				nextScreen.execute();
+				return;
+			}
+			
+		}
+
+		
+	}
+
+
+	
 	private void checkoutRoom() {
 		System.out.println("=============Checkout Room==========");
 		int choice = -1;
@@ -87,28 +135,44 @@ public class RoomsScreen extends BaseScreen {
 		String[] RoomsTitles = {"Room No.","Floor","Capacity","Type","Start Time" ,"Available to Check-In"};
 		displayOptions(_rooms,RoomsTitles);
 		if(rooms.size()==0){
-			choice = readOptionNumber("No rooms available for given criteria\nEnter 0 to go back or 1 to try other options", 0, 1);
-			if(choice==1){
-			}
+			choice = readOptionNumber("No rooms available for given criteria\nEnter 0 to go back", 0, 0);
+			BaseScreen nextScreen = getNextScreen(SessionUtils.getCurrentRoute());
+			nextScreen.execute();
+			return;
 		}
 		else{
 			int roomNo = readOptionNumber("Enter a choice (0 to go back)", 0, rooms.size());
+			if(roomNo==0){
+				BaseScreen nextScreen = getNextScreen(SessionUtils.getCurrentRoute());
+				nextScreen.execute();
+				return;
+			}
 			long reservationId = Long.parseLong(rooms.get(roomNo-1)[0].toString());
 			if("Available".equalsIgnoreCase(rooms.get(roomNo-1)[7].toString())){
 				choice = readOptionNumber("Press 1 to Checkout, 2 to Cancel or 0 to Go Back", 0, 2);
 				if(choice==0){
-					
+					BaseScreen nextScreen = getNextScreen(SessionUtils.getCurrentRoute());
+					nextScreen.execute();
+					return;
 				}
 				else if(choice==1){
 					boolean result = RoomsManager.checkOut(reservationId);
-					if(result)
+					if(result){
 						System.out.println("Room checked out Successfully\nYou need to vacate room by : "+new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)rooms.get(roomNo-1)[8]).getTime())));
+						BaseScreen nextScreen = getNextScreen(RouteConstant.BACK);
+						nextScreen.execute();
+						return;
+					}
 
 				}
 				else if(choice==2){
 					boolean result = RoomsManager.cancel(reservationId);
-					if(result)
+					if(result){
 						System.out.println("Cancelled Successfully...");
+						BaseScreen nextScreen = getNextScreen(RouteConstant.BACK);
+						nextScreen.execute();
+						return;
+					}
 				}
 					
 			}
@@ -116,12 +180,18 @@ public class RoomsScreen extends BaseScreen {
 			{
 				choice = readOptionNumber("Press 1 to Cancel or 0 to Go Back", 0, 1);
 				if(choice==0){
-
+					BaseScreen nextScreen = getNextScreen(SessionUtils.getCurrentRoute());
+					nextScreen.execute();
+					return;
 				}
 				else if(choice==1){
 					boolean result = RoomsManager.cancel(reservationId);
-					if(result)
+					if(result){
 						System.out.println("Cancelled Successfully...");
+						BaseScreen nextScreen = getNextScreen(RouteConstant.BACK);
+						nextScreen.execute();
+						return;
+					}
 				}
 			}
 		}
@@ -146,23 +216,23 @@ public class RoomsScreen extends BaseScreen {
 
 		String[] libTitles = {"Library","Address 1","Address 2","City","Post Code"};
 		displayOptions(lib_names,libTitles);
-		//choice = readOptionNumber("Enter a choice (0 to go back)", 0, libs.size());
-		int choice = 1;
+		int choice = readOptionNumber("Enter a choice (0 to go back)", 0, libs.size());
+		//int choice = 1;
 		if(choice==0){
-			BaseScreen nextScreen = getNextScreen(RouteConstant.BACK);
+			BaseScreen nextScreen = getNextScreen(SessionUtils.getCurrentRoute());
 			nextScreen.execute();
 			return;
 		}
 		Library library = libs.get(choice-1);
-		//choice = readOptionNumber("Enter number of occupents", 1, 20);
-		int occupents = 9;
+		int occupents = readOptionNumber("Enter number of occupents", 1, 20);
+		//int occupents = 9;
 		while(true){
-			//String date = readInput("Enter Date in MM/DD/YYYY Format");
-			//int startTime = readOptionNumber("Enter start time Hours(24 hours format)", 0, 23);
-			//int endTime = readOptionNumber("Enter End time Hours(24 hours format)", startTime, 23);
-			String date = "10/31/2015";
-			int startTime = 12;
-			int endTime = 14;
+			String date = readInput("Enter Date in MM/DD/YYYY Format");
+			int startTime = readOptionNumber("Enter start time Hours(24 hours format)", 0, 23);
+			int endTime = readOptionNumber("Enter End time Hours(24 hours format)", startTime, 23);
+//			String date = "10/31/2015";
+//			int startTime = 12;
+//			int endTime = 14;
 			if(endTime-startTime>3)
 			{
 				System.out.println("Max duration for room booking is 3 hours");
@@ -201,7 +271,7 @@ public class RoomsScreen extends BaseScreen {
 			else
 				choice = readOptionNumber("Enter a choice (0 to go back)", 0, rooms.size());
 			if(choice==0){
-				BaseScreen nextScreen = getNextScreen(RouteConstant.BACK);
+				BaseScreen nextScreen = getNextScreen(SessionUtils.getCurrentRoute());
 				nextScreen.execute();
 				return;
 			}
