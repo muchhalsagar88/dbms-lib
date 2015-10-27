@@ -23,7 +23,7 @@ import edu.dbms.library.entity.resource.Room;
  */
 @Entity
 @Table(name="room_reservation")
-public class RoomReserve implements Serializable {
+public class RoomReserve extends AbsEntity implements Serializable {
 
 	
 	private static final long serialVersionUID = 1L;
@@ -58,5 +58,61 @@ public class RoomReserve implements Serializable {
 	@OneToOne
 	@JoinColumn(name="checkout_id", referencedColumnName="chckout_id")
 	private AssetCheckout checkOut;
+
+	public long getReservation_id() {
+		return reservation_id;
+	}
+
+	public void setReservation_id(long reservation_id) {
+		this.reservation_id = reservation_id;
+	}
+
+	public Room getRoom() {
+		return room;
+	}
+
+	public void setRoom(Room room) {
+		this.room = room;
+	}
+
+	public Patron getPatron() {
+		return patron;
+	}
+
+	public void setPatron(Patron patron) {
+		this.patron = patron;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+
+	public Date getrTime() {
+		return rTime;
+	}
+
+	public void setrTime(Date rTime) {
+		this.rTime = rTime;
+	}
+
+	public AssetCheckout getCheckOut() {
+		return checkOut;
+	}
+
+	public void setCheckOut(AssetCheckout checkOut) {
+		this.checkOut = checkOut;
+	}
 
 }
