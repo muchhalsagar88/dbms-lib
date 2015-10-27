@@ -7,9 +7,20 @@ import javax.persistence.Query;
 
 import edu.dbms.library.entity.LoginDetails;
 import edu.dbms.library.to.LoginTO;
+import oracle.net.aso.b;
 
 public class LoginManager extends DBManager {
 
+	public static String getOraHash(String string, int bucketSize, int salt){
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DEFAULT_PERSISTENCE_UNIT_NAME);
+		EntityManager entitymanager = emfactory.createEntityManager( );
+		Query q = entitymanager.createNativeQuery("SELECT ORA_HASH(?, ?, ?) FROM DUAL");
+		q.setParameter(1, string);
+		q.setParameter(2, bucketSize);
+		q.setParameter(3, salt);
+		return q.getSingleResult().toString();
+	}
 	public static LoginTO checkCredentials(String username, String password) {
 		
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(

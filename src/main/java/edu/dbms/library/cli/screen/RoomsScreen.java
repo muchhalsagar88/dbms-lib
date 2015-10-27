@@ -6,6 +6,7 @@ package edu.dbms.library.cli.screen;
 import java.awt.Container;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -229,7 +230,7 @@ public class RoomsScreen extends BaseScreen {
 		while(true){
 			String date = readInput("Enter Date in MM/DD/YYYY Format");
 			int startTime = readOptionNumber("Enter start time Hours(24 hours format)", 0, 23);
-			int endTime = readOptionNumber("Enter End time Hours(24 hours format)", startTime, 23);
+			int endTime = readOptionNumber("Enter End time Hours(24 hours format, Use 24 for mid-night)", startTime, 24);
 //			String date = "10/31/2015";
 //			int startTime = 12;
 //			int endTime = 14;
@@ -238,15 +239,32 @@ public class RoomsScreen extends BaseScreen {
 				System.out.println("Max duration for room booking is 3 hours");
 				continue;
 			}
+			if(endTime-startTime<1)
+			{
+				System.out.println("Min duration for room booking is 1 hours");
+				continue;
+			}
 			Date startDate = DBUtils.validateDate(date+" "+(startTime<10?("0"+startTime):startTime)+":00", "MM/dd/yyyy HH:mm", true);
 			if(startDate==null){
 				System.out.println("Enter a valid start date(future date/time)");
 				continue;
 			}
-			Date endDate = DBUtils.validateDate(date+" "+(startTime<10?("0"+endTime):endTime)+":00", "MM/dd/yyyy HH:mm", true);
+			boolean adjust = false;
+			if(endTime==24)
+			{
+				endTime=0;
+				adjust = true;
+			}
+			Date endDate = DBUtils.validateDate(date+" "+(endTime<10?("0"+endTime):endTime)+":00", "MM/dd/yyyy HH:mm", true);
 			if(endDate==null){
 				System.out.println("Enter a valid future date/time for end time");
 				continue;
+			}
+			if(adjust){
+				Calendar c = Calendar.getInstance();
+				c.setTime(endDate);
+				c.add(Calendar.DATE, 1);  // number of days to add
+				endDate = c.getTime();
 			}
 			List<Object[]> rooms = RoomsManager.getAvailableRooms(occupents, library, startDate, endDate);
 			String[][] _rooms = new String[rooms.size()][4];
@@ -278,7 +296,7 @@ public class RoomsScreen extends BaseScreen {
 			Room room = (Room) DBUtils.findEntity(Room.class, rooms.get(choice-1)[0], String.class);
 			boolean status = RoomsManager.reserve(room, startDate, endDate);
 			if(status){
-				choice = readOptionNumber("Successfully booked Room#"+room.getRoomNo()+" on "+date+" from "+startTime+":00 Hrs to "+endTime+":00 Hrs\nDo not forget to check in within 15 minutes of start time\nEnter 0 to go back", 0, 0);
+				choice = readOptionNumber("Successfully booked Room # "+room.getRoomNo()+" on "+date+" from "+startTime+":00 Hrs to "+endTime+":00 Hrs\nDo not forget to check in within 1 Hour of start time\nEnter 0 to go back", 0, 0);
 				BaseScreen nextScreen = getNextScreen(RouteConstant.BACK);
 				nextScreen.execute();
 				return;
