@@ -78,7 +78,7 @@ public class RoomsManager extends DBManager {
 		
 		EntityManager entitymanager = emfactory.createEntityManager( );
 		
-		Query q = entitymanager.createNativeQuery("SELECT RR.RESERVATION_ID, R.*, AT.SUB_CATEGORY ,RR.START_TIME, CASE WHEN RR.START_TIME < SYSDATE+15/(24*60) THEN 'Available' ELSE 'Not Available' END AS IS_AVAILABLE, RR.END_TIME "
+		Query q = entitymanager.createNativeQuery("SELECT RR.RESERVATION_ID, R.*, AT.SUB_CATEGORY ,RR.START_TIME, CASE WHEN RR.START_TIME < SYSDATE+60/(24*60) THEN 'Available' ELSE 'Not Available' END AS IS_AVAILABLE, RR.END_TIME "
 					+ "FROM ROOM R, ROOM_RESERVATION RR, ASSET A, ASSET_TYPE AT "
 					+ "WHERE R.ROOM_ID = RR.ROOM_ASSET_ID "
 					+ "AND R.ROOM_ID = A.ASSET_ID "
@@ -100,6 +100,7 @@ public class RoomsManager extends DBManager {
 			ac.setIssueDate(rr.getStartTime());
 			ac.setDueDate(rr.getEndTime());
 			ac.setRoomReserve(rr);
+			ac.setPatron((Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class));
 			DBUtils.persist(ac);
 		}
 		catch(Exception e){
@@ -116,6 +117,38 @@ public class RoomsManager extends DBManager {
 			return false;
 		}
 		return true;
+	}
+
+	public static List<Object[]> getCheckedOutRooms() {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DEFAULT_PERSISTENCE_UNIT_NAME);
+		
+		EntityManager entitymanager = emfactory.createEntityManager( );
+		
+		Query q = entitymanager.createNativeQuery("SELECT R.*, AC.ISSUE_DATE, AC.DUE_DATE, RR.RESERVATION_ID, AC.ID FROM ROOM R, ROOM_RESERVATION RR, ASSET_CHECKOUT AC "
+					+ "WHERE R.ROOM_ID = RR.ROOM_ASSET_ID "
+					+ "AND RR.CHECKOUT_ID = AC.ID "
+					+ "AND AC.RETURN_DATE IS NULL "
+					+ "AND RR.PATRON_ID = ? ORDER BY DUE_DATE DESC");
+		q.setParameter(1, SessionUtils.getPatronId());
+		
+		List rooms = q.getResultList();
+		return rooms;
+	}
+
+	public static boolean checkIn(long checkoutId) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DEFAULT_PERSISTENCE_UNIT_NAME);
+		
+		EntityManager entitymanager = emfactory.createEntityManager( );
+		entitymanager.getTransaction().begin();
+		Query q = entitymanager.createNativeQuery("UPDATE ASSET_CHECKOUT AC SET AC.RETURN_DATE = SYSDATE "
+					+ "WHERE AC.ID = ?");
+		q.setParameter(1, checkoutId);
+
+		int r = q.executeUpdate();
+		entitymanager.getTransaction().commit();
+		return r==1;
 	}
 
 }
