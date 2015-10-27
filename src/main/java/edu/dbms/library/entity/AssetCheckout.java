@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -43,7 +44,18 @@ public class AssetCheckout {
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="return_date")
-	private Date returnDate;	
+	private Date returnDate;
+	
+	@OneToOne(mappedBy="checkOut")
+	private RoomReserve roomReserve;
+	
+	public RoomReserve getRoomReserve() {
+		return roomReserve;
+	}
+
+	public void setRoomReserve(RoomReserve roomReserve) {
+		this.roomReserve = roomReserve;
+	}
 
 	public Date getIssueDate() {
 		return issueDate;

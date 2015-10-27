@@ -20,13 +20,6 @@ public abstract class BaseScreen {
 
 	public abstract void displayOptions();
 
-	private void fillConsole(char c){
-		for(int i = 0; i<CONSOLE_WIDTH;i++)
-			System.out.print(c);
-		System.out.println();
-	}
-
-
 	public void displayOptions(Object[][] options, String[] title, boolean displayRowNumbers){
 
 		TextTable tt = new TextTable(title, options);

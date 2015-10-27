@@ -23,7 +23,7 @@ public class Room extends Asset {
 	//@Column(name="room_type")
 	//private char roomType;
 	
-	protected Room() {
+	public Room() {
 		super();
 	}
 	

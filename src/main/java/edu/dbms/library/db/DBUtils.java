@@ -1,5 +1,8 @@
 package edu.dbms.library.db;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -12,6 +15,22 @@ import edu.dbms.library.entity.AbsEntity;
 public class DBUtils {
 
 	public static final String DEFAULT_PERSISTENCE_UNIT_NAME = "main";
+	
+	public static Date validateDate(String date, String format, boolean isFutureDate){
+		SimpleDateFormat f = new SimpleDateFormat(format);
+		f.setLenient(false);
+		Date d = null;
+		try{
+			d = f.parse(date);
+			if(d.getTime() <= new Date().getTime()&&isFutureDate)
+				return null;
+		}
+		catch(ParseException e){
+			return null;
+		}
+		return d;
+	}
+	
 	
 	public static void persist(Object obj) {
 		
