@@ -56,7 +56,7 @@ public class RoomReserve extends AbsEntity implements Serializable {
 	private Date rTime;
 	
 	@OneToOne
-	@JoinColumn(name="checkout_id", referencedColumnName="chckout_id")
+	@JoinColumn(name="checkout_id", referencedColumnName="id")
 	private AssetCheckout checkOut;
 
 	public long getReservation_id() {

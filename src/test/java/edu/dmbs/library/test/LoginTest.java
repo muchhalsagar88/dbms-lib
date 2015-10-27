@@ -98,9 +98,9 @@ public class LoginTest extends BaseTest {
 	@After
 	public void clearTestData() {
 		
+		removeAllEntities(LoginDetails.class);
 		removeAllEntities(Student.class);
 		removeAllEntities(Department.class);
-		removeAllEntities(LoginDetails.class);
 	    System.out.println("@After: executedAfterEach");
 	}
 }
