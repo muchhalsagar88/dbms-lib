@@ -31,12 +31,11 @@ public class Publication extends Asset {
 
 	private int publicationYear;
 
-//	@ManyToMany(mappedBy="publications")
+	@ManyToMany
 	@JoinTable(
-//		      name="AUTHOR_PUBLICATION",
+		      name="PUBLICATION_AUTHOR",
 		      joinColumns={@JoinColumn(name="PUBLICATIONS_ASSET_ID", referencedColumnName="publication_id")},
 		      inverseJoinColumns={@JoinColumn(name="AUTHORS_ID", referencedColumnName="ID")})
-	
 	private Collection<Author> authors;
 	
 	public Publication() {
