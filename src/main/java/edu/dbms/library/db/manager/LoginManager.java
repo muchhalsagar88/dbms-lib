@@ -25,7 +25,11 @@ public class LoginManager extends DBManager {
 				+ "AND l.patron.id = :id");
 		q.setParameter("id", login.getPatron().getId());
 		
-		Object student = q.getSingleResult();
+		Object student;
+		if(q.getResultList().size() > 0)
+			student = q.getSingleResult();
+		else
+			student = null;
 		
 		LoginTO loginTo = new LoginTO(login.getPatron().getId());
 		if(student != null)
