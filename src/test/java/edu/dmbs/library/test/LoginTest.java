@@ -91,7 +91,7 @@ public class LoginTest extends BaseTest {
 	@Test
 	public void testDataGeneration() {
 		
-		Assert.assertEquals("Number of libraries persisted is different", 
+		Assert.assertEquals("Number of logins persisted is different", 
 				DEFAULT_LOGIN_COUNT, getCount(LoginDetails.class));
 	}
 	
@@ -101,6 +101,11 @@ public class LoginTest extends BaseTest {
 		removeAllEntities(LoginDetails.class);
 		removeAllEntities(Student.class);
 		removeAllEntities(Department.class);
+<<<<<<< HEAD
 	    System.out.println("@After: executedAfterEach");
+=======
+		System.out.println("@After: executedAfterEach");
+>>>>>>> 9070428c6021ab544c00bac22e74041fb8f6b4df
 	}
+	
 }

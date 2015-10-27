@@ -20,6 +20,7 @@ public class LoginScreen extends BaseScreen {
 		boolean validUser = false;
 		do {
 			String username = readInput("Enter Username");
+<<<<<<< HEAD
 			String password = null;
 			try{
 				password = new String(System.console().readPassword("Enter Password: "));
@@ -30,6 +31,9 @@ public class LoginScreen extends BaseScreen {
 			password = LoginManager.getOraHash(password, bucketSize, salt);
 //			String username = "arpit";
 //			String password = "tyagi";
+=======
+			String password = readInput("Enter Password");
+>>>>>>> 9070428c6021ab544c00bac22e74041fb8f6b4df
 			validUser = validateCredentials(username, password);
 			if(!validUser)
 				System.out.println("Username password combination is incorrect");

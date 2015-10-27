@@ -42,7 +42,7 @@ public class DepartmentTest extends BaseTest {
 	@Test
 	public void testDataGeneration() {
 		
-		Assert.assertEquals("Number of libraries persisted is different", 
+		Assert.assertEquals("Number of departments persisted is different", 
 				DEFAULT_DEPARTMENT_COUNT, getCount(Department.class));
 	}
 	
