@@ -38,7 +38,7 @@ public class DateUtils {
 	
 	public static Date getNextThursday(LocalDate fromFriday) {
 		
-		LocalDate nextThursday = fromFriday.plusDays(7);
+		LocalDate nextThursday = fromFriday.plusDays(6);
 		LocalDateTime time = nextThursday.toLocalDateTime(LocalTime.MIDNIGHT);
 		time = time.plusHours(18);
 		

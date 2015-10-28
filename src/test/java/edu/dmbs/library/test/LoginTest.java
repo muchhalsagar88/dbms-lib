@@ -101,11 +101,7 @@ public class LoginTest extends BaseTest {
 		removeAllEntities(LoginDetails.class);
 		removeAllEntities(Student.class);
 		removeAllEntities(Department.class);
-<<<<<<< HEAD
-	    System.out.println("@After: executedAfterEach");
-=======
+
 		System.out.println("@After: executedAfterEach");
->>>>>>> 9070428c6021ab544c00bac22e74041fb8f6b4df
 	}
-	
 }
