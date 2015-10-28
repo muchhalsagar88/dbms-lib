@@ -6,13 +6,16 @@ import java.util.List;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.StringUtils;
 
 import edu.dbms.library.entity.Author;
+import edu.dbms.library.entity.Department;
 import edu.dbms.library.entity.Library;
+import edu.dbms.library.entity.Publisher;
 
 @Entity
 @Table(name="book")
@@ -30,9 +33,10 @@ public class Book extends Publication {
 	}
 
 	public Book(Library containingLibrary, PublicationFormat format, String title, 
-			String edition, int year, String isbnNumber) {
+			String edition, int year, String isbnNumber,Publisher publisher) {
 		super(containingLibrary, format, title, edition, year);
 		this.isbnNumber = isbnNumber;
+		this.publisher = publisher;
 	}
 
 	public Book(String isbnNumber) {
@@ -48,6 +52,15 @@ public class Book extends Publication {
 		this.isbnNumber = isbnNUmber;
 	}
 	
+	
+	public Publisher getPublisher() {
+		return publisher;
+	}
+
+	public void setPublisher(Publisher publisher) {
+		this.publisher = publisher;
+	}
+
 	public Object[] toObjectArray() {
 		List<Object> objects = new LinkedList<Object>();
 		objects.add(this.isbnNumber);
@@ -62,7 +75,10 @@ public class Book extends Publication {
 		objects.add(authrs.toString());
 		objects.add(this.getPublicationYear());
 		objects.add(this.getPublicationFormat());
-		
+		objects.add(publisher.getName());
 		return objects.toArray();
 	}
+	
+	@ManyToOne
+	private Publisher publisher;
 }

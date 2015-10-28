@@ -19,13 +19,17 @@ import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.AssetCheckout;
 import edu.dbms.library.entity.Patron;
+import edu.dbms.library.entity.reserve.PublicationWaitlist;
 import edu.dbms.library.entity.resource.Book;
 import edu.dbms.library.entity.resource.ConferenceProceeding;
+import edu.dbms.library.entity.resource.Journal;
 import edu.dbms.library.session.SessionUtils;
 
 public class ResourceConfPapers extends BaseScreen {
 
 	List<ConferenceProceeding> confPapers = new ArrayList<ConferenceProceeding>();
+	Object[][] confPprs;
+	Object[][] confPprs1;
 
 	public ResourceConfPapers() {
 		super();
@@ -115,79 +119,237 @@ public class ResourceConfPapers extends BaseScreen {
 		// opt1: Display only those books tht a patron can checkout. 
 		// if the patron has been issued some books. remove thos ISBN number wala books from the display list..
 		// Display conditions for REserved books??
-		confPapers = getPapersList(); // publisher is not joined with books yet.
+//		confPapers = getPapersList(); // publisher is not joined with books yet.
 		String[] title = {"CONF_NUM", "TITLE", "CONF NAME", "AUTHOR(S)", "PUB_YEAR"};
 
-		Object[][] cp = new Object[confPapers.size()][]; 
-		int count = 0;
-		for(ConferenceProceeding b: confPapers)
-			cp[count++] = b.toObjectArray();
-
+		Object[][] cp = getPapersList();  
+		
 		TextTable tt = new TextTable(title, cp);
 		tt.setAddRowNumbering(true);
 		tt.printTable();
 	}
 
 
-	protected List<ConferenceProceeding> getPapersList() {
+	protected Object[][] getPapersList() {
 
-		String query = "SELECT cp FROM "+ConferenceProceeding.class.getName()+" cp";
-		//				+" WHERE b.id NOT IN"
-		//				+"(SELECT a.asset.id FROM AssetCheckout a WHERE a.dueDate IS NULL)";
+		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
 
-		return (List<ConferenceProceeding>)DBUtils.fetchAllEntities(query);
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				"main");
+		EntityManager entitymanager = emfactory.createEntityManager( );
+
+		String query = " SELECT conf1.CONF_PROC_ID, conf1.CONFNUMBER, pub1.TITLE, CONF1.CONFNAME,  " 
+				+" rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, pub1.PUBLICATIONYEAR, pub1.PUBLICATIONFORMAT   "
+				+" FROM asset ast1, CONF_PROCEEDING conf1, publication pub1 , Author auth1, PUBLICATION_AUTHOR pa1 " 
+				+" WHERE conf1.CONF_PROC_ID = ast1.asset_id "
+				+" AND pub1.publication_id = ast1.asset_id "
+				+" AND pub1.publication_id = ast1.asset_id "
+				+" AND ast1.asset_type = 2 "
+				+" AND AUTH1.ID = PA1.AUTHORS_ID "  
+				+" AND PA1.PUBLICATIONS_ASSET_ID = conf1.CONF_PROC_ID " 
+				+" Group By conf1.CONF_PROC_ID, conf1.CONFNUMBER,CONF1.CONFNAME, pub1.TITLE, pub1.PUBLICATIONFORMAT, pub1.PUBLICATIONYEAR "
+		+" MINUS "
+		+" SELECT conf1.CONF_PROC_ID, conf1.CONFNUMBER, pub1.TITLE, CONF1.CONFNAME,  " 
+		+" rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, pub1.PUBLICATIONYEAR, pub1.PUBLICATIONFORMAT   "
+		+" FROM asset ast1, CONF_PROCEEDING conf1, publication pub1 , Author auth1, PUBLICATION_AUTHOR pa1 " 
+		+" WHERE conf1.CONF_PROC_ID = ast1.asset_id "
+		+" AND pub1.publication_id = ast1.asset_id "
+		+" AND pub1.publication_id = ast1.asset_id "
+		+" AND ast1.asset_type = 2 "
+		+" AND AUTH1.ID = PA1.AUTHORS_ID "  
+		+" AND PA1.PUBLICATIONS_ASSET_ID = conf1.CONF_PROC_ID "
+		+" AND conf1.CONFNUMBER IN "
+		+"     (SELECT wtlist.PUBSECONDARYID " 
+		+"         FROM publication_waitlist wtlist " 
+		+"         WHERE (wtlist.PATRONID = ?)) "
+		+" Group By conf1.CONF_PROC_ID, conf1.CONFNUMBER,CONF1.CONFNAME, pub1.TITLE, pub1.PUBLICATIONFORMAT, pub1.PUBLICATIONYEAR "
+		+" MINUS "
+		+" SELECT conf1.CONF_PROC_ID, conf1.CONFNUMBER, pub1.TITLE, CONF1.CONFNAME,  " 
+		+" rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, pub1.PUBLICATIONYEAR, pub1.PUBLICATIONFORMAT   "
+		+" FROM asset ast1, CONF_PROCEEDING conf1, publication pub1 , Author auth1, PUBLICATION_AUTHOR pa1 "
+		+" WHERE ( EXISTS "
+		+"         (SELECT * FROM asset_checkout astchkt, publication_waitlist wtlist, asset_checkout_constraint astchkcon " 
+		+"             WHERE (((((astchkt.asset_secondary_id = conf1.CONFNUMBER) "
+		+"                 AND (astchkt.patron_id = ?)) " 
+		+"                 AND (wtlist.PATRONID <> ?)) "
+		+"                 AND (wtlist.PUBSECONDARYID = conf1.CONFNUMBER)) "
+		+" AND (astchkt.ID = astchkcon.ASSETCHECKOUT_ID)))  "
+		+" AND (((conf1.CONF_PROC_ID = ast1.asset_id) "
+		+" AND ((pub1.publication_id = ast1.asset_id) " 
+		+" AND (pub1.publication_id = ast1.asset_id))) " 
+		+" AND (ast1.asset_type = 2))) "
+		+" AND AUTH1.ID = PA1.AUTHORS_ID " 
+		+" AND PA1.PUBLICATIONS_ASSET_ID = conf1.CONF_PROC_ID " 
+		+" Group By conf1.CONF_PROC_ID, conf1.CONFNUMBER, pub1.TITLE, CONF1.CONFNAME,pub1.PUBLICATIONYEAR, pub1.PUBLICATIONFORMAT  "; 
+
+		
+		
+		
+		
+//				+" MINUS "
+//				+" SELECT jour1.journal_id, jour1.ISSNNUMBER, pub1.TITLE, pub1.PUBLICATIONFORMAT , pub1.PUBLICATIONYEAR," 
+//				+" rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS "
+//				+" FROM asset ast1, journal jour1, publication pub1 , Author auth1, PUBLICATION_AUTHOR pa1 "
+//				+" WHERE  jour1.journal_id = ast1.asset_id  "
+//				+" AND pub1.publication_id = ast1.asset_id "
+//				+" AND pub1.publication_id = ast1.asset_id "
+//				+" AND AUTH1.ID = PA1.AUTHORS_ID "
+//				+" AND PA1.PUBLICATIONS_ASSET_ID = jour1.journal_id " 
+//				+" AND ast1.asset_type = 3 "
+//				+" AND jour1.ISSNNUMBER IN "
+//				+"     (SELECT wtlist.PUBSECONDARYID " 
+//				+"         FROM publication_waitlist wtlist " 
+//				+"         WHERE (wtlist.PATRONID = ?)) "
+//				+" Group By jour1.journal_id, jour1.ISSNNUMBER, pub1.TITLE, pub1.PUBLICATIONFORMAT,pub1.PUBLICATIONYEAR "
+//				+" MINUS "
+//				+" SELECT jour1.journal_id, jour1.ISSNNUMBER, pub1.TITLE, pub1.PUBLICATIONFORMAT , pub1.PUBLICATIONYEAR," 
+//				+" rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS "
+//				+" FROM asset ast1, journal jour1, publication pub1 , Author auth1, PUBLICATION_AUTHOR pa1 "
+//				+" WHERE ( EXISTS "
+//				+"         (SELECT * FROM asset_checkout astchkt, publication_waitlist wtlist, asset_checkout_constraint astchkcon " 
+//				+"             WHERE (((((astchkt.asset_secondary_id = jour1.ISSNNUMBER) "
+//				+"                 AND (astchkt.patron_id = ?)) " 
+//				+"                 AND (wtlist.PATRONID <> ?)) "
+//				+"                 AND (wtlist.PUBSECONDARYID = jour1.ISSNNUMBER)) "
+//				+" AND (astchkt.ID = astchkcon.ASSETCHECKOUT_ID)))  "
+//				+" AND (((jour1.journal_id = ast1.asset_id) "
+//				+" AND ((pub1.publication_id = ast1.asset_id) " 
+//				+" AND (pub1.publication_id = ast1.asset_id))) " 
+//				+" AND (ast1.asset_type = 3))) "
+//				+" AND AUTH1.ID = PA1.AUTHORS_ID " 
+//				+" AND PA1.PUBLICATIONS_ASSET_ID = jour1.journal_id " 
+//				+" Group By jour1.journal_id, jour1.ISSNNUMBER, pub1.TITLE, pub1.PUBLICATIONFORMAT, pub1.PUBLICATIONYEAR"; 
+
+		Query q = entitymanager.createNativeQuery(query);
+
+		String w1 = "SELECT CP from ConferenceProceeding CP";
+		
+		Query q1 = entitymanager.createQuery(w1);
+		
+		q.setParameter(1, loggedInPatron.getId()).setParameter(2, loggedInPatron.getId()).setParameter(3, loggedInPatron.getId());
+
+
+		List obj1 = q.getResultList();
+		List onj2 = q1.getResultList();
+		entitymanager.close();
+		emfactory.close();
+		
+		int i =0;
+		confPprs  = new Object[obj1.size()][5];
+		confPprs1 = new Object[obj1.size()][];
+		while(i<obj1.size()){
+		Object[] arr = (Object[]) obj1.get(i);
+		confPprs1[i] =  arr;
+		confPprs[i][0]=  arr[1];
+		confPprs[i][1]=  arr[2];
+		confPprs[i][2]=  arr[3];
+		confPprs[i][3]=  arr[4];
+		confPprs[i][4]=  arr[5];
+				
+		i++;
+		}
+		
+		
+		return confPprs ;
+
+
+
 	}
 
 
 	public void checkout(int bookNo) {
-		
-		
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				"main");
-		EntityManager entitymanager = emfactory.createEntityManager( );
-		
 
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("main");
+		EntityManager entitymanager = emfactory.createEntityManager( );
+
+
+//		Journal journal = journals.get(bookNo-1);
+		String cpId  = (String)confPprs1[bookNo-1][0];
+		String query = "SELECT cp FROM "+AssetCheckout.class.getName()
+				+" cp where cp.asset.id = :num and cp.returnDate IS NULL";
+		Query q = entitymanager.createQuery(query);
 		
-		ConferenceProceeding confPpr = confPapers.get(bookNo-1);
+		q.setParameter("num", cpId);
 		
-		String query = "SELECT count(*) FROM asset_checkout cp"
-				+"  where cp.ASSET_ASSET_ID = '"+confPpr.getId()+"' AND  cp.RETURN_DATE IS NULL";
-		
-		Query q = entitymanager.createNativeQuery(query);
-		
-		
-	
-		Object outputObj = q.getSingleResult();
-		BigDecimal count = (BigDecimal)outputObj;
+		List<AssetCheckout> asc = (List<AssetCheckout>) q.getResultList();
+
+		long count = asc.size();
+
 		System.out.println("No Of results:"+ count);
 		entitymanager.close();
 		emfactory.close();
+
+		ConferenceProceeding cp1 = (ConferenceProceeding) DBUtils.findEntity(ConferenceProceeding.class, cpId, String.class);
 		
-		AssetCheckout astChkOut = new AssetCheckout();
+		boolean isStudent = SessionUtils.isStudent();
 
 		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
-		Date issueDate = new Date();
-		DateTime dt1 = new DateTime(issueDate);
-		DateTime dt2 = dt1.plusHours(12);
-		Date dueDate = dt2.toDate();
+		if(asc.size()==0){ //resource avlble in library
+			AssetCheckout astChkOut = new AssetCheckout();
+
+			Date issueDate = new Date();
+			DateTime dt1 = new DateTime(issueDate);
+			DateTime dt2;
+			if (isStudent)
+				dt2 = dt1.plusDays(14);
+			else
+				dt2 = dt1.plusMonths(1);
+
+			Date dueDate = dt2.toDate();
+
+			astChkOut.setAssetSecondaryId(cp1.getConfNumber());
+			astChkOut.setAsset(cp1);
+			astChkOut.setIssueDate(issueDate );
+			astChkOut.setDueDate(dueDate);
+			astChkOut.setPatron(loggedInPatron);
+			DBUtils.persist(astChkOut);
+			System.out.println("The item has been checked out: The return time is :"+ dueDate);
+
+		}
+		else{
+
+			AssetCheckout asc1 = asc.get(0);
+			if(asc.size()==1 && loggedInPatron.getId() == asc1.getPatron().getId()){ 
+				//renewe condition
+				Date issueDate = new Date();
+				DateTime dt1 = new DateTime(issueDate);
+				DateTime dt2;
+				if (isStudent)
+					dt2 = dt1.plusDays(14);
+				else
+					dt2 = dt1.plusMonths(1);
+
+				Date dueDate = dt2.toDate();
+
+				entitymanager.getTransaction().begin();
+				asc1.setDueDate(dueDate);
+				entitymanager.getTransaction().commit();
+			}
+			else{ // reosurce nt avlble.. add to the waitlist.
+				int flag = 0;
+				if (isStudent) flag =1;
+				PublicationWaitlist pb = new PublicationWaitlist(loggedInPatron.getId(),cp1.getConfNumber(), new Date(), flag );
+
+				DBUtils.persist(pb); 
+
+				System.out.println("The item you have requested is not avlble. You are on waitlist");
+
+			}
 
 
-		astChkOut.setAsset(confPpr);
-		astChkOut.setIssueDate(issueDate );
-		astChkOut.setDueDate(dueDate);
-		astChkOut.setPatron(loggedInPatron);
-		DBUtils.persist(astChkOut);
-		System.out.println("The item has been checked out: The return time is :"+ dueDate);
-		//check of the book is already issues?
-		// if issued by the same patron - check the waitlist for renew condition
-		// if issued by other user -- add the entry to waitlist
-		// if the book is not issued
-		// entry int asset_checkout table.
 
-		// checkout Rules:
-		//	1. Reserved books can be checked out for maximum of 4hrs and by only students of the class for which the book is reserved.
-		//	2. Electronic publications Have	no checkout duration.
-		//	3. Journals and Conference Proceedings can be checked out for a period of 12 hours 
-		//	4. Every other book Students: 2 weeks // faculty : 1 month.
-	}
+
+			//check of the book is already issues?
+			// if issued by the same patron - check the waitlist for renew condition
+			// if issued by other user -- add the entry to waitlist
+			// if the book is not issued
+			// entry int asset_checkout table.
+
+			// checkout Rules:
+			//	1. Reserved books can be checked out for maximum of 4hrs and by only students of the class for which the book is reserved.
+			//	2. Electronic publications Have	no checkout duration.
+			//	3. Journals and Conference Proceedings can be checked out for a period of 12 hours 
+			//	4. Every other book Students: 2 weeks // faculty : 1 month.
+		}
+	}	
 }
