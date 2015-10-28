@@ -10,10 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import edu.dbms.library.entity.catalog.DegreeYear;
 
 @Entity
 @Table(name="student")
@@ -30,6 +33,17 @@ public class Student extends Patron {
 	@Embedded
 	private Address homeAddress;
 	
+	@ManyToOne
+	private DegreeYear degreeYear;
+	
+	public Collection<Course> getCourses() {
+		return courses;
+	}
+
+	public void setCourses(Collection<Course> courses) {
+		this.courses = courses;
+	}
+
 	@Temporal(TemporalType.DATE)
 	@Column(name="dob")
 	private Date dateOfBirth;
@@ -59,6 +73,10 @@ public class Student extends Patron {
 		this.sex = sex;
 	}
 
+	public boolean isPhoneNumberNull() {
+		return phoneNumber == null;
+	}
+	
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
@@ -67,6 +85,10 @@ public class Student extends Patron {
 		this.phoneNumber = phoneNumber;
 	}
 
+	public boolean isAlternatePhoneNumberNull() {
+		return alternatePhoneNumber == null;
+	}
+	
 	public String getAlternatePhoneNumber() {
 		return alternatePhoneNumber;
 	}
@@ -75,14 +97,44 @@ public class Student extends Patron {
 		this.alternatePhoneNumber = alternatePhoneNumber;
 	}
 
+	public DegreeYear getDegreeYear() {
+		return degreeYear;
+	}
+
+	public void setDegreeYear(DegreeYear degreeYear) {
+		this.degreeYear = degreeYear;
+	}
+
+	public boolean isHomeAddressNull() {
+		return homeAddress == null;
+	}
+	
 	public Address getHomeAddress() {
 		return homeAddress;
 	}
 
+	public String getHomeAddressString() {
+		String homeAddrString = "";
+		if(homeAddress.getAddressLineOne() != null)
+			homeAddrString = homeAddrString.concat(homeAddress.getAddressLineOne() + "\n");
+		if(homeAddress.getAddressLineTwo() != null)
+			homeAddrString = homeAddrString.concat(homeAddress.getAddressLineTwo() + "\n");
+		if(homeAddress.getCityName() != null)
+			homeAddrString = homeAddrString.concat(homeAddress.getCityName() + "\n");
+		if(homeAddress.getPinCode() != 0)
+			homeAddrString = homeAddrString.concat(Integer.toString(homeAddress.getPinCode()));
+		
+		return homeAddrString;
+	}
+	
 	public void setHomeAddress(Address homeAddress) {
 		this.homeAddress = homeAddress;
 	}
 
+	public boolean isDateOfBirthNull() {
+		return dateOfBirth == null;
+	}
+	
 	public Date getDateOfBirth() {
 		return dateOfBirth;
 	}
@@ -91,6 +143,10 @@ public class Student extends Patron {
 		this.dateOfBirth = dateOfBirth;
 	}
 
+	public boolean isSexNull() {
+		return sex == null;
+	}
+	
 	public Character getSex() {
 		return sex;
 	}

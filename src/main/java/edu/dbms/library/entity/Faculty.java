@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="faculty")
 @PrimaryKeyJoinColumn(name="faculty_id", referencedColumnName="patron_id")
-@DiscriminatorValue("P")
+@DiscriminatorValue("F")
 public class Faculty extends Patron {
 	
 	@ManyToOne
