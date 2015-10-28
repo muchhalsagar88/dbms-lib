@@ -21,15 +21,16 @@ public class PatronScreen extends BaseScreen {
 	@Override
 	public void execute() {
 		displayOptions();
-		readInputLabel();
+		/*readInputLabel();
 		Object o = readInput();
 		while(!(o instanceof Integer)) {
 			System.out.println("Incorrect input.");
 			readInputLabel();
 			o = readInput();
-		}
+		}*/
+		int option = readOptionNumber("Enter your choice", 1, options.size());
 		
-		BaseScreen nextScreen = getNextScreen(options.get((Integer)o).getRouteKey());
+		BaseScreen nextScreen = getNextScreen(options.get(option).getRouteKey());
 		nextScreen.execute();
 	}
 
@@ -70,9 +71,4 @@ public class PatronScreen extends BaseScreen {
 		tt.printTable();
 	}
 	
-	/*public static void main(String []args) {
-		SessionUtils.init("patron_id", true);
-		SessionUtils.updateCurrentRoute("/patron");
-		new PatronScreen().execute();
-	}*/
 }

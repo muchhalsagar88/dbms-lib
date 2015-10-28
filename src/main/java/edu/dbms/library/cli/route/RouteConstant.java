@@ -30,4 +30,7 @@ public class RouteConstant {
 	
 	public static final String EXIT = "/exit";
 	
+	public static final String PUBLICATION_BOOKS = "/patron/resources/publications/books";
+	public static final String PUBLICATIONS_JOURNALS = "/patron/resources/publications/journals" ;
+	public static final String PUBLICATIONS_CONFPAPERS = "/patron/resources/publications/confpapers";
 }

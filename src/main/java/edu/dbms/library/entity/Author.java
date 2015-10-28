@@ -19,7 +19,7 @@ public class Author extends AbsEntity {
 	
 	private String name;
 
-	@ManyToMany
+	@ManyToMany(mappedBy="authors")
 	private Collection<Publication> publications;
 	
 	public Author() {

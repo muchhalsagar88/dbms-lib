@@ -7,9 +7,11 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.JoinColumn;
 
 import edu.dbms.library.entity.Author;
 import edu.dbms.library.entity.Library;
@@ -29,7 +31,11 @@ public class Publication extends Asset {
 
 	private int publicationYear;
 
-	@ManyToMany(mappedBy="publications")
+	@ManyToMany
+	@JoinTable(
+		      name="PUBLICATION_AUTHOR",
+		      joinColumns={@JoinColumn(name="PUBLICATIONS_ASSET_ID", referencedColumnName="publication_id")},
+		      inverseJoinColumns={@JoinColumn(name="AUTHORS_ID", referencedColumnName="ID")})
 	private Collection<Author> authors;
 	
 	public Publication() {
