@@ -72,5 +72,4 @@ public class AssetPatronConstraint extends AbsEntity {
 		this.duration = duration;
 		this.fine = fine;
 	}
-	
 }

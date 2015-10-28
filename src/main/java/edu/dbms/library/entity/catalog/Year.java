@@ -4,24 +4,29 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import edu.dbms.library.entity.AbsEntity;
+import edu.dbms.library.entity.Patron;
 
 @Entity
 @Table(name="year")
 public class Year extends AbsEntity {
 	
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
 	private String name;
 
-	@ManyToMany(mappedBy="years")
-	private Collection<DegreeProgram> degreePrograms;
-
+	@OneToMany(mappedBy="year")
+	private Collection<DegreeYear> degreeYears;
+	
 	public long getId() {
 		return id;
 	}
@@ -45,17 +50,17 @@ public class Year extends AbsEntity {
 
 	public Year() {}
 
-	public Collection<DegreeProgram> getDegreePrograms() {
-		return degreePrograms;
+	public Collection<DegreeYear> getDegreeYears() {
+		return degreeYears;
 	}
 
-	public void setDegreePrograms(Collection<DegreeProgram> degreePrograms) {
-		this.degreePrograms = degreePrograms;
+	public void setDegreeYears(Collection<DegreeYear> degreeYears) {
+		this.degreeYears = degreeYears;
 	}
 
-	public void setDegreeProgram(DegreeProgram degreeProgram) {
-		if(this.degreePrograms == null)
-			this.degreePrograms = new ArrayList<DegreeProgram>();
-		this.degreePrograms.add(degreeProgram);
+	public void setDegreeYear(DegreeYear degreeYear) {
+		if(this.degreeYears == null)
+			this.degreeYears = new ArrayList<DegreeYear>();
+		this.degreeYears.add(degreeYear);
 	}
 }
