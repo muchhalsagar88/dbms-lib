@@ -9,10 +9,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import edu.dbms.library.entity.reserve.CameraReservation;
 import edu.dbms.library.entity.resource.Asset;
 
 @Entity
@@ -43,7 +45,24 @@ public class AssetCheckout {
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="return_date")
-	private Date returnDate;	
+	private Date returnDate;
+	
+	@Column(name="fine")
+	private float fine;
+	
+	@OneToOne(mappedBy="checkOut")
+	private RoomReserve roomReserve;
+	
+	@OneToOne(mappedBy="assetCheckout")
+	private CameraReservation cameraReservation;
+	
+	public RoomReserve getRoomReserve() {
+		return roomReserve;
+	}
+
+	public void setRoomReserve(RoomReserve roomReserve) {
+		this.roomReserve = roomReserve;
+	}
 
 	public Date getIssueDate() {
 		return issueDate;
@@ -96,4 +115,21 @@ public class AssetCheckout {
 	public long getId() {
 		return id;
 	}
+
+	public CameraReservation getCameraReservation() {
+		return cameraReservation;
+	}
+
+	public void setCameraReservation(CameraReservation cameraReservation) {
+		this.cameraReservation = cameraReservation;
+	}
+
+	public float getFine() {
+		return fine;
+	}
+
+	public void setFine(float fine) {
+		this.fine = fine;
+	}
+
 }

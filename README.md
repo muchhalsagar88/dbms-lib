@@ -64,3 +64,54 @@ Individual unit tests can be run via
 ```
 mvn test -Dtest={name_of_unit_test_class} test
 ```
+
+## Before running the application:
+### Maven test for Entity to Table generation
+mvn test
+
+### Creating the Minimum Camera Reservation View
+This is for creating a view, needs to be run after tables are created:
+
+CREATE OR REPLACE VIEW ?USERNAME?.min_reservation_view (camera_id, issue_date, min_reserve_date) AS 
+  SELECT c.camera_Id as id, c.issue_Date, MIN(c.reserve_Date) as res_date
+				FROM ?USERNAME?.Camera_Reservation c
+				WHERE c.reservation_status='ACTIVE'
+        GROUP BY c.camera_Id, c.issue_date
+
+To create this view, replace ?USERNAME? by the username used for creating the schema. Login as 'system'  user and run the query.
+
+CREATE OR REPLACE VIEW ?USERNAME?.ongoing_checkouts (ID, DUE_DATE, ISSUE_DATE, RETURN_DATE, ASSET_ID, PATRON_ID) AS
+  SELECT c.ID, c.DUE_DATE, c.ISSUE_DATE, c.RETURN_DATE, c.ASSET_ASSET_ID, c.PATRON_ID 
+  FROM ?USERNAME?.Asset_Checkout c 
+  WHERE c.Due_Date < SYSDATE
+    AND c.Return_Date IS NULL
+    
+To create this view, replace ?USERNAME? by the username used for creating the schema. Login as 'system'  user and run the query.
+
+### Creating the stored procedures for Salt
+This is for storing password as Salt Values:
+
+CREATE OR REPLACE FUNCTION ?USERNAME?.MY_HASH(X IN VARCHAR2, y IN NUMBER, z IN NUMBER) RETURN NUMBER IS
+  RETVAL NUMBER;
+BEGIN
+  SELECT ORA_HASH(X,y,z) INTO RETVAL FROM DUAL;
+  RETURN RETVAL;
+END;
+
+CREATE OR REPLACE TRIGGER ?USERNAME?.LOGIN_PASSWORD
+BEFORE INSERT OR UPDATE
+OF PASSWORD
+ON ?USERNAME?.LOGIN_DETAILS
+REFERENCING NEW AS New OLD AS Old
+FOR EACH ROW
+BEGIN
+  :new.PASSWORD := MY_HASH(:new.PASSWORD, 100000, 57643);
+END;
+
+To create this trigger, replace ?USERNAME? by the username used for creating the schema. 
+
+### Data Insertion Scripts
+Run the table install scripts using the command
+```
+dummy_command
+```

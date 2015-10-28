@@ -16,6 +16,7 @@ import org.joda.time.LocalDate;
 
 import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
+import edu.dbms.library.cli.route.Route;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.AssetCheckout;
@@ -23,33 +24,43 @@ import edu.dbms.library.entity.Patron;
 import edu.dbms.library.entity.reserve.CameraReservation;
 import edu.dbms.library.entity.resource.Camera;
 import edu.dbms.library.session.SessionUtils;
+import edu.dbms.library.utils.DateUtils;
 
 public class CameraListScreen extends AssetListScreen<Camera> {
 
+	public CameraListScreen() {
+		options.put(3, new Route(RouteConstant.BACK));
+	}
+	
 	@Override
 	public void execute() {
 		
 		displayReserveCheckoutOpts();
-		Object o = readInput();
-		while(!(o instanceof Integer)) {
-			System.out.println("Incorrect input.");
-			readInputLabel();
-			o = readInput();
-		}
-		
-		if((int)o == 1){
+		int option = readOptionNumber("Enter your choice", 1, 3);
+		String nextScreenUrl = "";
+		switch (option) {
+		case 3:
+			nextScreenUrl = RouteConstant.BACK;
+			break;
+
+		case 2: 
+			checkout();
+			nextScreenUrl = RouteConstant.PATRON_BASE;
+			break;
 			
+		case 1:
 			reserveOption();
 			System.out.println("The item has been reserved!!");
+			nextScreenUrl = RouteConstant.PATRON_BASE;
+			break;
+			
+		default:
+			nextScreenUrl = RouteConstant.BACK;
+			break;
 		}
-		else if((int)o == 2){
-			// call checkout methods
-			checkout();
-			System.out.println("The item has been checked out!!");
-		}	
 		
 		// Redirect to Base screen after checkout notification
-		BaseScreen nextScreen = getNextScreen(RouteConstant.PATRON_BASE);
+		BaseScreen nextScreen = getNextScreen(nextScreenUrl);
 		nextScreen.execute();
 	}
 	
@@ -87,19 +98,61 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 	/*
 	 * TODO:	Write code to persist this asset against this patron
 	 */
+	@SuppressWarnings("unchecked")
 	private void checkout() {
 		
-		System.out.println("Logic to checkout");
-		// Check camera reservation table for patron id and time
-		// If time is still valid and patron has reserved item then let the man checkout  
-		/*Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
+		if(! DateUtils.isCameraCheckoutFriday()) {
+			System.out.println("Cameras can only be checked out on Fridays between 9:00am to 12:00pm");
+			return;
+		}
 		
-		AssetCheckout assetCheckout = new AssetCheckout();
-		// TODO: find camera from reserve list
-		Camera c = new Camera();
-		assetCheckout.setAsset(c);
-		assetCheckout.setPatron(loggedInPatron);
-		assetCheckout.setIssueDate(new Date());*/
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+		EntityManager em = emfactory.createEntityManager();
+		
+		Date currDate = DateUtils.formatToQueryDate(LocalDate.now());
+		System.out.println(currDate.toString());
+		
+		Query query = em.createNativeQuery("SELECT res.* FROM Camera_Reservation res, Min_Reservation_View TEMP "
+				+"WHERE res.camera_Id=TEMP.camera_id AND " 
+				+"res.reserve_Date=TEMP.min_reserve_date AND "
+				+"res.reservation_status='ACTIVE' AND "
+				+"TEMP.issue_date=?1  AND "
+				+"res.patron_Id=?2 ", CameraReservation.class);
+		query.setParameter(2, SessionUtils.getPatronId());
+		query.setParameter(1, currDate);
+		
+		List<CameraReservation> currReservations = (List<CameraReservation>)query.getResultList();
+		if(currReservations == null || currReservations.size()==0) {
+			System.out.println("No cameras can be checked out");
+			return;
+		}
+		
+		int cam;
+		if(currReservations.size() > 1){
+			System.out.println("You have "+currReservations.size()+" cameras to be checked out");
+			System.out.println("Please enter your choice starting from 1");
+			cam = readOptionNumber("Enter your choice", 1, currReservations.size());
+		} else {
+			cam = 1;
+		}
+		
+		CameraReservation c = currReservations.get(cam-1);
+		em.getTransaction().begin();
+		c.setStatus("CLOSED");
+		
+		AssetCheckout checkout = new AssetCheckout();
+		checkout.setAsset(c.getCamera());
+		checkout.setPatron(c.getPatron());
+		checkout.setCameraReservation(c);
+		checkout.setIssueDate(new Date());
+		checkout.setDueDate(DateUtils.getNextThursday(LocalDate.now()));
+		em.persist(checkout);
+		c.setAssetCheckout(checkout);
+		
+		em.getTransaction().commit();
+		em.clear();em.close();
+		System.out.println("The item has been checked out!!");
 	}
 	
 	private String reserve(Camera camera, String selectedFriday) {
@@ -118,7 +171,7 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 		 
 		CameraReservation reservation = new CameraReservation();
 		reservation.setReserveDate(new Date());
-		reservation.setIssueDate(date);
+		reservation.getCameraReservationKey().setIssueDate(date);
 		reservation.setCamera(camera);
 		reservation.setPatron(loggedInPatron);
 		
@@ -132,7 +185,7 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 			
 			Query query = entitymanager.createQuery("SELECT COUNT(res.cameraReservationKey.cameraId) FROM CameraReservation res"
 					+ " WHERE res.cameraReservationKey.cameraId=:cameraId"
-					+ " AND res.issueDate=:issueDate");
+					+ " AND res.cameraReservationKey.issueDate=:issueDate");
 			query.setParameter("cameraId", camera.getId());
 			query.setParameter("issueDate", date);
 			long waitlistNumber = (long)query.getSingleResult();
@@ -211,8 +264,8 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 		String[] title = {""};
 		String[][] options = { 
 							{Constant.OPTION_ASSET_RESERVE},
-							{Constant.OPTION_ASSET_CHECKOUT}//,
-							//{Constant.OPTION_BACK}
+							{Constant.OPTION_ASSET_CHECKOUT},
+							{Constant.OPTION_BACK}
 							};
 		TextTable tt = new TextTable(title, options);
 		tt.setAddRowNumbering(true);

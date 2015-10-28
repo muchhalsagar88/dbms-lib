@@ -1,6 +1,7 @@
 package edu.dbms.library.entity.catalog;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -10,10 +11,8 @@ import edu.dbms.library.entity.AbsEntity;
 @Table(name="asset_patron_constraint")
 public class AssetPatronConstraint extends AbsEntity {
 	
-	private int assetType;
-	
-	@Column(name="patron_type")
-	private char patronType;
+	@EmbeddedId
+	private AssetPatronConstaintPK key;
 	
 	// duration will be in hours
 	private int duration;
@@ -25,28 +24,20 @@ public class AssetPatronConstraint extends AbsEntity {
 	
 	private float fine;
 	
+	public AssetPatronConstaintPK getKey() {
+		return key;
+	}
+
+	public void setKey(AssetPatronConstaintPK key) {
+		this.key = key;
+	}
+
 	public int getFineDuration() {
 		return fineDuration;
 	}
 
 	public void setFineDuration(int fineDuration) {
 		this.fineDuration = fineDuration;
-	}
-
-	public int getAssetType() {
-		return assetType;
-	}
-
-	public void setAssetType(int assetType) {
-		this.assetType = assetType;
-	}
-
-	public char getPatronType() {
-		return patronType;
-	}
-
-	public void setPatronType(char patronType) {
-		this.patronType = patronType;
 	}
 
 	public int getDuration() {
@@ -67,10 +58,13 @@ public class AssetPatronConstraint extends AbsEntity {
 
 	public AssetPatronConstraint(int assetType, char patronType, int duration, int fineDuration, float fine) {
 		super();
-		this.assetType = assetType;
-		this.patronType = patronType;
+		this.key = new AssetPatronConstaintPK(assetType, patronType);
 		this.duration = duration;
 		this.fine = fine;
+		this.fineDuration = fineDuration;
 	}
 	
+	public AssetPatronConstraint() {
+		// TODO Auto-generated constructor stub
+	}
 }

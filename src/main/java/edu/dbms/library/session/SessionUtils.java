@@ -27,4 +27,11 @@ public class SessionUtils {
 	public static void kill() {
 		instance = null;
 	}
+	
+	public static boolean checkForNullSession() {
+		
+		if(instance == null)
+			return true;
+		return false;
+	}
 }

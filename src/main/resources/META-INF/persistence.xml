@@ -27,22 +27,24 @@
 		<class>edu.dbms.library.entity.catalog.Classification</class>
 		<class>edu.dbms.library.entity.catalog.DegreeProgram</class>
 		<class>edu.dbms.library.entity.catalog.Year</class>
+		<class>edu.dbms.library.entity.catalog.AssetPatronConstraint</class>
+		<class>edu.dbms.library.entity.catalog.AssetType</class>
 		
 		<class>edu.dbms.library.entity.Course</class>
 		<class>edu.dbms.library.entity.ReserveBook</class>
 		<class>edu.dbms.library.entity.AssetCheckout</class>
 		<class>edu.dbms.library.entity.AssetCheckoutConstraint</class>
-		
+		<class>edu.dbms.library.entity.RoomReserve</class>
 		<class>edu.dbms.library.entity.reserve.CameraReservation</class>
 		<class>edu.dbms.library.entity.reserve.PublicationWaitlist</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:xe"/>
-			<property name="javax.persistence.jdbc.user" value="rap"/>
-			<property name="javax.persistence.jdbc.password" value="pass123"/>
+			<property name="javax.persistence.jdbc.user" value="sagar"/>
+			<property name="javax.persistence.jdbc.password" value="password"/>
 			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
 			
-			<property name="eclipselink.logging.level" value="INFO"/>
+			<property name="eclipselink.logging.level" value="FINE"/>
 			<!-- For SQL query debug  -->
 			<property name="eclipselink.logging.level.sql" value="FINE"/>
 			<property name="eclipselink.logging.parameters" value="true"/>

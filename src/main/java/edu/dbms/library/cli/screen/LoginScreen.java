@@ -7,7 +7,9 @@ import edu.dbms.library.session.SessionUtils;
 import edu.dbms.library.to.LoginTO;
 
 public class LoginScreen extends BaseScreen {
-
+	private final int bucketSize = 100000;
+	private final int salt = 57643;
+	
 	public LoginScreen() {
 		super();
 		options.put(1, new Route(RouteConstant.PATRON_BASE));
@@ -17,11 +19,15 @@ public class LoginScreen extends BaseScreen {
 	public void execute() {
 		boolean validUser = false;
 		do {
-			inputUsernameLabel();
-			String username = readInput();
-			inputPasswordLabel();
-			String password =  readInput();
-			
+			String username = readInput("Enter Username");
+			String password = null;
+			try{
+				password = new String(System.console().readPassword("Enter Password: "));
+			}
+			catch(Exception e){
+				password = readInput("Enter Password");
+			}
+			password = LoginManager.getOraHash(password, bucketSize, salt);
 			validUser = validateCredentials(username, password);
 			if(!validUser)
 				System.out.println("Username password combination is incorrect");
@@ -44,14 +50,6 @@ public class LoginScreen extends BaseScreen {
 		return option;
 	}
 	
-	private void inputUsernameLabel() {
-		System.out.println("Enter username: ");
-	}
-	
-	private void inputPasswordLabel() {
-		System.out.println("Enter password: ");
-	}
-
 	/*
 	 * TODO: 	Validate the username and password and return patron_id
 	 * 			and also boolean for isStudent
