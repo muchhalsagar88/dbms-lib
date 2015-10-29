@@ -3,7 +3,6 @@
  */
 package edu.dbms.library.cli.screen;
 
-import java.awt.Container;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -225,12 +224,12 @@ public class RoomsScreen extends BaseScreen {
 			return;
 		}
 		Library library = libs.get(choice-1);
-		int occupents = readOptionNumber("Enter number of occupents", 1, 20);
 		//int occupents = 9;
 		while(true){
+			int occupents = readOptionNumber("Enter number of occupents", 1, 25);
 			String date = readInput("Enter Date in MM/DD/YYYY Format");
 			int startTime = readOptionNumber("Enter start time Hours(24 hours format)", 0, 23);
-			int endTime = readOptionNumber("Enter End time Hours(24 hours format, Use 24 for mid-night)", startTime, 24);
+			int endTime = readOptionNumber("Enter End time Hours(24 hours format, Use 24 for mid-night)", startTime+1, 24);
 //			String date = "10/31/2015";
 //			int startTime = 12;
 //			int endTime = 14;

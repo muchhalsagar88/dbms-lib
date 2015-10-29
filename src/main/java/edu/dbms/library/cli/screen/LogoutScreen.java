@@ -18,15 +18,9 @@ public class LogoutScreen extends BaseScreen {
 	public void execute() {
 		SessionUtils.kill();
 		displayOptions();
-		Object o = readInput();
-		while(!(o instanceof Integer)) {
-			System.out.println("Incorrect input.");
-			readInputLabel();
-			o = readInput();
-		}
-		
+		int o = readOptionNumber("Enter Choice", 1, 2);
 		// Check for EXIT option, will appear only once in the application
-		if((Integer)o == 2) {
+		if(o == 2) {
 			System.exit(0);
 		}
 		BaseScreen nextScreen = getNextScreen(options.get((Integer)o).getRouteKey());

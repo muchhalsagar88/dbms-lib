@@ -16,6 +16,7 @@ import edu.dbms.library.entity.Department;
 import edu.dbms.library.entity.Faculty;
 import edu.dbms.library.entity.FacultyCategory;
 import edu.dbms.library.entity.Library;
+import edu.dbms.library.entity.LoginDetails;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.entity.RoomReserve;
 import edu.dbms.library.entity.Student;
@@ -41,21 +42,24 @@ public class RoomsManager extends DBManager {
 		
 		EntityManager entitymanager = emfactory.createEntityManager( );
 		
-		Query q = entitymanager.createNativeQuery("SELECT R.*, AT.SUB_CATEGORY FROM ROOM R, ASSET A, ROOM_RESERVATION RR, ASSET_TYPE AT "
-				+ "WHERE R.ROOM_ID = RR.ROOM_ASSET_ID(+) "
-				+ "AND R.CAPACITY >= ? AND R.ROOM_ID = A.ASSET_ID "
-				+ "AND A.LIBRARY_ID = ? "
-				+ "AND A.ASSET_TYPE  = AT.ASSETTYPEID "
-				+ "AND AT.CATEGORY = 'Room' "
-				+ "AND (AT.SUB_CATEGORY = 'Study Room' OR AT.SUB_CATEGORY = DECODE(?, '1', 'Conference Room','XX'))"
-				+ "AND ((RR.START_TIME IS NULL) OR (( ? < RR.START_TIME OR ? > RR.END_TIME) AND ( ? < RR.START_TIME OR ? > RR.END_TIME))) ORDER BY R.ROOMNO");
+		Query q = entitymanager.createNativeQuery("SELECT R.*, AT.SUB_CATEGORY FROM ROOM R, ASSET A, ROOM_RESERVATION RR, ASSET_TYPE AT " 
+									+ "WHERE R.ROOM_ID = RR.ROOM_ASSET_ID(+)  "
+									+ "AND R.CAPACITY >= ? AND R.ROOM_ID = A.ASSET_ID "  
+									+ "AND A.ASSET_TYPE  = AT.ASSETTYPEID  "
+									+ "AND AT.CATEGORY = 'Room'  "
+									+ "AND A.LIBRARY_ID = ?  "
+									+ "AND (AT.SUB_CATEGORY = 'Study Room' OR AT.SUB_CATEGORY = DECODE(?, '1', 'Conference Room','XX')) "
+									+ "AND ((RR.START_TIME IS NULL) "
+									+ "		OR (TO_DATE(TO_CHAR(RR.START_TIME,'YYYY-MM-DD'),'YYYY-MM-DD') = TO_DATE(SYSDATE) "
+									+ "			AND ((? <= RR.START_TIME) "
+									+ "					OR (? >= RR.END_TIME))) "
+									+ "		OR (RR.CHECKOUT_ID IS NULL AND (RR.START_TIME+60/(24*60)) < SYSDATE)) " 
+									+ "ORDER BY R.ROOMNO");
 		q.setParameter(1, occupants);
 		q.setParameter(2, l.getLibraryId());
 		q.setParameter(3, SessionUtils.isStudent()?"0":"1");
-		q.setParameter(4, start);
+		q.setParameter(4, end);
 		q.setParameter(5, start);
-		q.setParameter(6, end);
-		q.setParameter(7, end);
 		
 		List rooms = q.getResultList();
 		return rooms;
@@ -176,7 +180,7 @@ public class RoomsManager extends DBManager {
 	private static List<Faculty> testFaculty;
 	
 	
-	public static void mai1n(String[] args){
+	public static void main(String[] args){
 		int i = 100;
 		
 		testDepartments = new ArrayList<Department>();
@@ -251,6 +255,15 @@ public class RoomsManager extends DBManager {
 				s2.setDepartment(d2);
 				DBUtils.persist(s2);
 
+		LoginDetails l = new LoginDetails("arpit","tyagi");
+		l.setPatron(s1);
+		
+		DBUtils.persist(l);
+		
+		LoginDetails l2 = new LoginDetails("ravi","patel");
+		l2.setPatron(f1);
+		
+		DBUtils.persist(l2);
 		
 		List<Library> list = (List<Library>) DBUtils.fetchAllEntities("select l from Library l");
 		while(i-->0){

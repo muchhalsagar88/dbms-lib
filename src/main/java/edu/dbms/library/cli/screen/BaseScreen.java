@@ -2,6 +2,7 @@ package edu.dbms.library.cli.screen;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import dnl.utils.text.table.TextTable;
@@ -41,10 +42,15 @@ public abstract class BaseScreen {
 
 	public String readInput(String prompt){
 		System.out.print(prompt+": ");
+		try{
 		while(true){
 			String s = inputScanner.nextLine();
 			if(s.length()>0)
 				return s;
+		}}
+		catch(NoSuchElementException e){
+			System.out.println("No input received...\nExiting...");
+			return "";
 		}
 	}
 
@@ -65,7 +71,7 @@ public abstract class BaseScreen {
 		}
 		catch (final Exception e)
 		{
-			//  Handle any exceptions.
+			System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n");
 		}
 	}
 
@@ -125,6 +131,7 @@ public abstract class BaseScreen {
 
 			e.printStackTrace();
 		}
+		clearConsole();
 		return nextScreen;
 	}
 
