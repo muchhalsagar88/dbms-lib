@@ -28,8 +28,8 @@ public class LoginScreen extends BaseScreen {
 				password = readInput("Enter Password");
 			}
 			password = LoginManager.getOraHash(password, bucketSize, salt);
-//			String username = "arpit";
-//			String password = "tyagi";
+//			//String username = "arpit";
+//			//String password = "tyagi";
 			validUser = validateCredentials(username, password);
 			if(!validUser)
 				System.out.println("Username password combination is incorrect");
