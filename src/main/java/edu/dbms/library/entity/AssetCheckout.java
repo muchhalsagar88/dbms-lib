@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import edu.dbms.library.entity.reserve.CameraReservation;
 import edu.dbms.library.entity.resource.Asset;
 
 @Entity
@@ -48,6 +49,9 @@ public class AssetCheckout {
 	
 	@OneToOne(mappedBy="checkOut")
 	private RoomReserve roomReserve;
+	
+	@OneToOne(mappedBy="assetCheckout")
+	private CameraReservation cameraReservation;
 	
 	public RoomReserve getRoomReserve() {
 		return roomReserve;
@@ -108,4 +112,13 @@ public class AssetCheckout {
 	public long getId() {
 		return id;
 	}
+
+	public CameraReservation getCameraReservation() {
+		return cameraReservation;
+	}
+
+	public void setCameraReservation(CameraReservation cameraReservation) {
+		this.cameraReservation = cameraReservation;
+	}
+
 }
