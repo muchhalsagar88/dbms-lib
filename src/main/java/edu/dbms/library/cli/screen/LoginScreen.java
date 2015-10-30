@@ -56,14 +56,6 @@ public class LoginScreen extends BaseScreen {
 		return option;
 	}
 	
-	private void inputUsernameLabel() {
-		System.out.println("Enter username: ");
-	}
-	
-	private void inputPasswordLabel() {
-		System.out.println("Enter password: ");
-	}
-
 	/*
 	 * TODO: 	Validate the username and password and return patron_id
 	 * 			and also boolean for isStudent

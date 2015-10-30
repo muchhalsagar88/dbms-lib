@@ -108,13 +108,15 @@ public abstract class BaseScreen {
 	@SuppressWarnings({ "static-access", "rawtypes" })
 	protected BaseScreen getNextScreen(String routeKey) {
 
-		// Handle Back option differently
-		if(routeKey.equalsIgnoreCase(RouteConstant.BACK)) {
-			// point the routeKey to the previous screen from session
-			routeKey = SessionUtils.getCurrentRoute();
-			routeKey = routeKey.substring(0, routeKey.lastIndexOf('/'));
+		if(! SessionUtils.checkForNullSession()) {
+			// Handle Back option differently
+			if(routeKey.equalsIgnoreCase(RouteConstant.BACK)) {
+				// point the routeKey to the previous screen from session
+				routeKey = SessionUtils.getCurrentRoute();
+				routeKey = routeKey.substring(0, routeKey.lastIndexOf('/'));
+			}
+			SessionUtils.updateCurrentRoute(routeKey);
 		}
-		SessionUtils.updateCurrentRoute(routeKey);
 		Class t = RouteController.getInstance().getScreen(routeKey);
 		BaseScreen nextScreen = null;
 		try {
