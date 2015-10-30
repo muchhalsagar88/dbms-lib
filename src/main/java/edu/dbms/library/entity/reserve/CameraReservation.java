@@ -5,17 +5,22 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import edu.dbms.library.entity.AbsEntity;
+import edu.dbms.library.entity.AssetCheckout;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.entity.resource.Camera;
+import edu.dbms.library.listener.CameraReservationListener;
 
 @Entity
+@EntityListeners({CameraReservationListener.class})
 @Table(name="camera_reservation")
 public class CameraReservation extends AbsEntity {
 
@@ -34,10 +39,12 @@ public class CameraReservation extends AbsEntity {
 	@Column(name="reserve_date")
 	private Date reserveDate;
 	
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="issue_date")
-	// The Friday when the patron wants the camera
-	private Date issueDate;
+	@Column(name="reservation_status", columnDefinition="VARCHAR2(20) DEFAULT 'ACTIVE'")
+	private String status;
+	
+	@OneToOne
+	@JoinColumn(name="checkout_id", referencedColumnName="id")
+	private AssetCheckout assetCheckout;
 
 	public CameraReservationPK getCameraReservationKey() {
 		return cameraReservationKey;
@@ -71,24 +78,41 @@ public class CameraReservation extends AbsEntity {
 		this.camera = camera;
 	}
 
-	public Date getIssueDate() {
-		return issueDate;
+	public String getStatus() {
+		return status;
 	}
 
-	public void setIssueDate(Date issueDate) {
-		this.issueDate = issueDate;
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public AssetCheckout getAssetCheckout() {
+		return assetCheckout;
+	}
+
+	public void setAssetCheckout(AssetCheckout assetCheckout) {
+		this.assetCheckout = assetCheckout;
 	}
 
 	public CameraReservation(String cameraId, String patronId, Patron patron, Date reserveDate,
 			Date issueDate) {
-		this.cameraReservationKey.setCameraId(cameraId);
-		this.cameraReservationKey.setPatronId(patronId);
+		this();
+		this.getCameraReservationKey().setCameraId(cameraId);
+		this.getCameraReservationKey().setIssueDate(issueDate);
 		this.patron = patron;
 		this.reserveDate = reserveDate;
-		this.issueDate = issueDate;
 	}
 	
 	public CameraReservation() {
-		// TODO Auto-generated constructor stub
+		this.status = "ACTIVE";
+		this.cameraReservationKey = new CameraReservationPK();
 	}
+
+	@Override
+	public String toString() {
+		return "CameraReservation [cameraReservationKey=" + cameraReservationKey + ", reserveDate=" + reserveDate
+				+ ", status=" + status + "]";
+	}
+	
+	
 }
