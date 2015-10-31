@@ -21,6 +21,14 @@ public class Book extends Publication {
 		super();
 	}
 
+	public BookDetail getDetail() {
+		return detail;
+	}
+
+	public void setDetail(BookDetail detail) {
+		this.detail = detail;
+	}
+
 	/*public Object[] toObjectArray() {
 		List<Object> objects = new LinkedList<Object>();
 		objects.add(this.isbnNumber);
