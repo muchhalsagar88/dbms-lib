@@ -34,8 +34,11 @@ public class Patron extends AbsEntity {
 
 	@Column(name="email_address")
 	private String emailAddress;
-	
+
 	private String nationality;
+
+	@Column(updatable= true, columnDefinition="CHAR(1) DEFAULT 'N'")
+	private char hold;
 
 	@ManyToOne
 	private Department department;
@@ -61,6 +64,7 @@ public class Patron extends AbsEntity {
 	}
 
 	public Patron() {
+		this.hold = 'N';
 		this.id = UUID.randomUUID().toString();
 	}
 
@@ -103,7 +107,7 @@ public class Patron extends AbsEntity {
 	public void setDepartment(Department department) {
 		this.department = department;
 	}
-	
+
 	public boolean isEmailAddresNull() {
 		return emailAddress == null;
 	}
@@ -115,4 +119,23 @@ public class Patron extends AbsEntity {
 	public void setEmailAddress(String emailAddress) {
 		this.emailAddress = emailAddress;
 	}
+
+	public boolean getHold() {
+		return hold == 'Y';
+	}
+
+	public void setHold(boolean toSet) {
+		if(toSet)
+			this.hold = 'Y';
+		else
+			this.hold = 'N';
+	}
+
+	@Override
+	public String toString() {
+		return "Patron [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", emailAddress="
+				+ emailAddress + ", nationality=" + nationality + ", hold=" + hold
+				+ ", loginDetails=" + loginDetails + "]";
+	}
+
 }
