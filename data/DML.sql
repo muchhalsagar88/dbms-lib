@@ -1,7 +1,10 @@
 SET DEFINE OFF;
+
 --------------------------------------------------------------------------------
 --      DISABLE CONSTRAINTS
 --------------------------------------------------------------------------------
+--select 'ALTER TABLE '||table_name||' DISABLE CONSTRAINT '||constraint_name||';' from user_constraints where Constraint_TYPE = 'R'; 
+
 ALTER TABLE DEGREE_PROGRAM DISABLE CONSTRAINT DEGREEPROGRAMCLASSIFICATION_ID;
 ALTER TABLE DEGREE_YEAR DISABLE CONSTRAINT DEGREE_YEAR_DEGREE_PROGRAM_ID;
 ALTER TABLE DEGREE_YEAR DISABLE CONSTRAINT FK_DEGREE_YEAR_YEAR_ID;
