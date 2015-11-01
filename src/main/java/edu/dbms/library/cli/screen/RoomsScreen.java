@@ -3,6 +3,7 @@
  */
 package edu.dbms.library.cli.screen;
 
+import java.awt.Container;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -224,37 +225,75 @@ public class RoomsScreen extends BaseScreen {
 			return;
 		}
 		Library library = libs.get(choice-1);
+		int occupents = readOptionNumber("Enter number of occupents", 1, 20);
 		//int occupents = 9;
 		while(true){
-			int occupents = readOptionNumber("Enter number of occupents", 1, 25);
+			int startTime = 0;
+			int endTime = 0;
 			String date = readInput("Enter Date in MM/DD/YYYY Format");
-			int startTime = readOptionNumber("Enter start time Hours(24 hours format)", 0, 23);
-			int endTime = readOptionNumber("Enter End time Hours(24 hours format, Use 24 for mid-night)", startTime+1, 24);
+			String _startTime = readInput("Enter start time HH:MM(24 hours format, MM can be 00 or 30)");
+			String _endTime = readInput("Enter end time HH:MM(24 hours format,MM can be 00 or 30, Use 24:00 for mid-night)");
+			if(_startTime.length()==5 && _startTime.indexOf(':')==2){
+				try{
+					int hh = Integer.parseInt(_startTime.substring(0,2));
+					int mm = Integer.parseInt(_startTime.substring(3));
+					if(hh<0||hh>23||mm%30!=0){
+						System.out.println("Invalid Time Entered...\nPlease enter a valid time");
+						continue;
+					}
+					startTime = hh*100+mm;
+				}
+				catch(NumberFormatException e){
+					System.out.println("Invalid Time Entered...\nPlease enter a valid time");
+					continue;
+				}
+			}
+			else{
+				System.out.println("Invalid Time Entered...\nPlease enter a valid time");
+				continue;
+			}
+			if(_endTime.length()==5 && _endTime.indexOf(':')==2){
+				try{
+					int hh = Integer.parseInt(_endTime.substring(0,2));
+					int mm = Integer.parseInt(_endTime.substring(3));
+					if(hh<0||hh>24||(hh==24&&mm>0)||mm%30!=0){
+						System.out.println("Invalid Time Entered...\nPlease enter a valid time");
+						continue;
+					}
+					endTime = hh*100+mm;
+					if(endTime-startTime<30){
+						System.out.println("Rooms can be booked for minimum 30 minutes\nInvalid Time Entered...\nPlease enter a valid time");
+						continue;
+					}
+					if(endTime-startTime>300){
+						System.out.println("Rooms can be booked for maximum 30 minutes\nInvalid Time Entered...\nPlease enter a valid time");
+						continue;
+					}
+				}
+				catch(NumberFormatException e){
+					System.out.println("Invalid Time Entered...\nPlease enter a valid time");
+					continue;
+				}
+			}
+			else{
+				System.out.println("Invalid Time Entered...\nPlease enter a valid time");
+				continue;
+			}
 //			String date = "10/31/2015";
 //			int startTime = 12;
 //			int endTime = 14;
-			if(endTime-startTime>3)
-			{
-				System.out.println("Max duration for room booking is 3 hours");
-				continue;
-			}
-			if(endTime-startTime<1)
-			{
-				System.out.println("Min duration for room booking is 1 hours");
-				continue;
-			}
-			Date startDate = DBUtils.validateDate(date+" "+(startTime<10?("0"+startTime):startTime)+":00", "MM/dd/yyyy HH:mm", true);
+			Date startDate = DBUtils.validateDate(date+" "+_startTime, "MM/dd/yyyy HH:mm", true);
 			if(startDate==null){
 				System.out.println("Enter a valid start date(future date/time)");
 				continue;
 			}
 			boolean adjust = false;
-			if(endTime==24)
+			if(endTime==2400)
 			{
-				endTime=0;
+				_endTime="00:00";
 				adjust = true;
 			}
-			Date endDate = DBUtils.validateDate(date+" "+(endTime<10?("0"+endTime):endTime)+":00", "MM/dd/yyyy HH:mm", true);
+			Date endDate = DBUtils.validateDate(date+" "+_endTime, "MM/dd/yyyy HH:mm", true&&!adjust);
 			if(endDate==null){
 				System.out.println("Enter a valid future date/time for end time");
 				continue;
