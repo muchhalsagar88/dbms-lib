@@ -49,7 +49,7 @@ public class DueDateReminders implements Runnable {
 			System.out.println("Sending mail to "+mailId);
 			System.out.println("Subject: "+_subject.toString());
 			System.out.println("Content: "+_message.toString());
-			MailUtils.sendMail(mailId, _message.toString());
+			MailUtils.sendMail(mailId, _subject.toString() ,_message.toString());
 		}
 	}
 	
