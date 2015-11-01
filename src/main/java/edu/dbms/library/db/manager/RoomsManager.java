@@ -176,7 +176,7 @@ public class RoomsManager extends DBManager {
 	private static List<Faculty> testFaculty;
 	
 	
-	public static void mai1n(String[] args){
+	public static void mai_n(String[] args){
 		int i = 100;
 		
 		testDepartments = new ArrayList<Department>();
@@ -263,7 +263,7 @@ public class RoomsManager extends DBManager {
 			r.setCapacity(5+((i%4)*5));
 			r.setFloorLevel((i%4)+1);
 			r.setLibrary(list.get(i%list.size()));
-			r.setRoomNo(101+(100-i));
+			r.setRoomNo(""+(101+(100-i)));
 			
 			DBUtils.persist(r);
 		}
