@@ -3,6 +3,7 @@ package edu.dbms.library.cli.screen;
 import edu.dbms.library.cli.route.Route;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.manager.LoginManager;
+import edu.dbms.library.init.Initializer;
 import edu.dbms.library.session.SessionUtils;
 import edu.dbms.library.to.LoginTO;
 
@@ -75,6 +76,7 @@ public class LoginScreen extends BaseScreen {
 
 	public static void main(String []args) {
 
+		Initializer.initSystem();
 		new LoginScreen().execute();
 	}
 

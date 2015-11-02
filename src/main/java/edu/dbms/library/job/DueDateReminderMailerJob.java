@@ -12,15 +12,11 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import edu.dbms.library.runner.FineDueUpdateMailer;
+import edu.dbms.library.runner.DueDateReminders;
 import edu.dbms.library.utils.DateUtils;
 
-public class FineDueReminderMailerJob implements Runnable {
-
-final static Logger logger = LoggerFactory.getLogger(FineDueReminderMailerJob.class);
+public class DueDateReminderMailerJob implements Runnable {
 
 	@Override
 	public void run() {
@@ -31,35 +27,9 @@ final static Logger logger = LoggerFactory.getLogger(FineDueReminderMailerJob.cl
 		Scheduler scheduler;
 		try {
 			scheduler = StdSchedulerFactory.getDefaultScheduler();
-			if(! scheduler.isStarted())
-				scheduler.start();
-
-	        JobDetail jobDetail = newJob(FineDueUpdateMailer.class).build();
-
-	        Trigger trigger = newTrigger()
-	        		.withSchedule(repeatHourlyForever(24))
-	        		.startAt(time.toDate())
-	                .build();
-
-	        scheduler.scheduleJob(jobDetail, trigger);
-
-		} catch (SchedulerException e) {
-
-			e.printStackTrace();
-		}
-    }
-
-	public static void main(String []args) {
-
-		LocalDate localDate = DateUtils.getNextFriday();
-		LocalDateTime time = localDate.toLocalDateTime(LocalTime.MIDNIGHT);
-
-		Scheduler scheduler;
-		try {
-			scheduler = StdSchedulerFactory.getDefaultScheduler();
 			scheduler.start();
 
-	        JobDetail jobDetail = newJob(FineDueUpdateMailer.class).build();
+	        JobDetail jobDetail = newJob(DueDateReminders.class).build();
 
 	        Trigger trigger = newTrigger()
 	        		.withSchedule(repeatHourlyForever(24))
@@ -72,6 +42,7 @@ final static Logger logger = LoggerFactory.getLogger(FineDueReminderMailerJob.cl
 
 			e.printStackTrace();
 		}
+
 	}
 
 }
