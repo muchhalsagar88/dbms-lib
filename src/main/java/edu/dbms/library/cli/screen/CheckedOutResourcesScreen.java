@@ -254,6 +254,93 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 		System.out.println("Enter code here to renew / waitlist");
 	}
 	
+private void executeReturnPublications() {
+		
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("main");
+		EntityManager entityManager = emFactory.createEntityManager();
+		
+		Query viewRenewBookQuery = entityManager.createNativeQuery(viewRenewBookString).setParameter(1, SessionUtils.getPatronId());
+		List booksResult = viewRenewBookQuery.getResultList();
+		int numBooks = booksResult.size();
+		
+		Query viewRenewConfProcQuery = entityManager.createNativeQuery(viewRenewConfProcString).setParameter(1, SessionUtils.getPatronId());
+		List confProcsResult = viewRenewConfProcQuery.getResultList();
+		int numConfProcs = confProcsResult.size();
+		
+		Query viewRenewJournalQuery = entityManager.createNativeQuery(viewRenewJournalString).setParameter(1, SessionUtils.getPatronId());
+		List journalsResult = viewRenewJournalQuery.getResultList();
+		int numJournals = journalsResult.size();
+		
+		entityManager.close();
+		emFactory.close();
+		
+		int i = 0;
+		int j = 0;
+		Object[][] publications  = new Object[numBooks + numConfProcs + numJournals][6];
+		Object[][] books = new Object[numBooks][];
+		Object[][] confProcs = new Object[numConfProcs][];
+		Object[][] journals = new Object[numJournals][];
+		
+		while(j < numBooks){
+			Object[] arr = (Object[]) booksResult.get(j);
+			books[j] = arr;
+			publications[i][0] = arr[2];
+			publications[i][1]=  arr[3];
+			publications[i][2]=  arr[5];
+			publications[i][3]=  arr[7];
+			publications[i][4]=  arr[8];
+			i++;
+			j++;
+		}
+		
+		j = 0;
+		while(j < numConfProcs){
+			Object[] arr = (Object[]) confProcsResult.get(j);
+			confProcs[j] = arr;
+			publications[i][0] = arr[3];
+			publications[i][1]=  arr[4];
+			publications[i][2]=  arr[6];
+			publications[i][3]=  arr[7];
+			publications[i][4]=  arr[8];
+			i++;
+			j++;
+		}
+		
+		j = 0;
+		while(j < numJournals){
+			Object[] arr = (Object[]) journalsResult.get(j);
+			journals[j] = arr;
+			publications[i][0] = arr[2];
+			publications[i][1]=  "";
+			publications[i][2]=  arr[4];
+			publications[i][3]=  arr[5];
+			publications[i][4]=  arr[6];
+			i++;
+			j++;
+		}
+		System.out.println("Choose the publication:");
+		
+		String[] title = {"Title","Edition OR Conf. Name", "Publication Format", "Authors", "Status"};
+		TextTable tt = new TextTable(title, publications);
+		tt.setAddRowNumbering(true);
+		tt.printTable();
+		
+		int option = readOptionNumber("Enter a publication you want to return (or 0 to go back):", 0, numBooks + numConfProcs + numJournals);
+		
+		if(option == 0) {
+			return;
+		}
+		
+		runReturnPublicationCode(SessionUtils.getPatronId(), (String) publications[option - 1][0]);
+	}
+	
+	private void runReturnPublicationCode(String patronId, String assetId) {
+		String updateReturnString = "update ASSET_CHECKOUT asc1 set ASC1.RETURN_DATE = SYSDATE"
+				+ " WHERE ASC1.PATRON_ID = ?"
+				+ " AND ASC1.ASSET_ASSET_ID = ?"
+				+ " AND ASC1.RETURN_DATE is NULL";
+	}
+
 	private void executeCheckedoutPublicationOptions() {
 		OptionRange publicationOptionRange = displayCheckedOutPublicationOptions();
 		int option = readOptionNumber("Enter an option", publicationOptionRange.getRangeMin(), publicationOptionRange.getRangeMax());
@@ -264,7 +351,7 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 			nextScreenUrl = RouteConstant.BACK;
 			break;
 		case 2:
-			//executeReturnPublications();
+			executeReturnPublications();
 			nextScreenUrl = RouteConstant.PATRON_BASE;
 			break;
 		case 1:
