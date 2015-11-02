@@ -14,24 +14,21 @@ import javax.persistence.Table;
 @PrimaryKeyJoinColumn(name="room_id", referencedColumnName="asset_id")
 public class Room extends Asset {
 	
-	private int roomNo;
+	private String roomNo;
 	
 	private int floorLevel;
 	
 	private int capacity;
 
-	//@Column(name="room_type")
-	//private char roomType;
-	
 	public Room() {
 		super();
 	}
 	
-	public int getRoomNo() {
+	public String getRoomNo() {
 		return roomNo;
 	}
 
-	public void setRoomNo(int roomNo) {
+	public void setRoomNo(String roomNo) {
 		this.roomNo = roomNo;
 	}
 

@@ -7,7 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import edu.dbms.library.entity.resource.Book;
+import edu.dbms.library.entity.resource.BookDetail;
 
 @Entity
 @Table(name="publisher")
@@ -42,5 +42,5 @@ public class Publisher extends AbsEntity {
 	}
 	
 	@OneToMany(mappedBy="publisher")
-	private Collection<Book> books;
+	private Collection<BookDetail> books;
 }

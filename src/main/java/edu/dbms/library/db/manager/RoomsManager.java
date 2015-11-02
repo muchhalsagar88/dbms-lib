@@ -16,7 +16,6 @@ import edu.dbms.library.entity.Department;
 import edu.dbms.library.entity.Faculty;
 import edu.dbms.library.entity.FacultyCategory;
 import edu.dbms.library.entity.Library;
-import edu.dbms.library.entity.LoginDetails;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.entity.RoomReserve;
 import edu.dbms.library.entity.Student;
@@ -180,7 +179,7 @@ public class RoomsManager extends DBManager {
 	private static List<Faculty> testFaculty;
 	
 	
-	public static void main(String[] args){
+	public static void mai_n(String[] args){
 		int i = 100;
 		
 		testDepartments = new ArrayList<Department>();
@@ -255,15 +254,6 @@ public class RoomsManager extends DBManager {
 				s2.setDepartment(d2);
 				DBUtils.persist(s2);
 
-		LoginDetails l = new LoginDetails("arpit","tyagi");
-		l.setPatron(s1);
-		
-		DBUtils.persist(l);
-		
-		LoginDetails l2 = new LoginDetails("ravi","patel");
-		l2.setPatron(f1);
-		
-		DBUtils.persist(l2);
 		
 		List<Library> list = (List<Library>) DBUtils.fetchAllEntities("select l from Library l");
 		while(i-->0){
@@ -276,7 +266,7 @@ public class RoomsManager extends DBManager {
 			r.setCapacity(5+((i%4)*5));
 			r.setFloorLevel((i%4)+1);
 			r.setLibrary(list.get(i%list.size()));
-			r.setRoomNo(101+(100-i));
+			r.setRoomNo(""+(101+(100-i)));
 			
 			DBUtils.persist(r);
 		}

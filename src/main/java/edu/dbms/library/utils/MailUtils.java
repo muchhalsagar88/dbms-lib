@@ -25,7 +25,7 @@ public class MailUtils {
 		return props;
 	}
 	
-	public static void sendMail(String emailAddress, String messageBody) {
+	public static void sendMail(String emailAddress, String subject, String messageBody) {
 		
 		final String username = "csc540.009@gmail.com";
 		final String password = "dbms1234";
@@ -44,7 +44,7 @@ public class MailUtils {
 			message.setFrom(new InternetAddress("from-email@gmail.com"));
 			message.setRecipients(Message.RecipientType.TO,
 				InternetAddress.parse(emailAddress));
-			message.setSubject("Availability of reserved camera");
+			message.setSubject(subject);
 			message.setText(messageBody);
 
 			Transport.send(message);

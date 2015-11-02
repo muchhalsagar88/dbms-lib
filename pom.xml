@@ -15,6 +15,28 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>edu.dbms.library.cli.screen.LoginScreen</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<properties>
@@ -28,9 +50,9 @@
 			<url>https://code.lds.org/nexus/content/groups/main-repo</url>
 		</repository>
 		<repository>
-                <id>d-maven</id>
-                <url>http://d-maven.googlecode.com/svn/trunk/repo</url>
-        </repository>
+			<id>d-maven</id>
+			<url>http://d-maven.googlecode.com/svn/trunk/repo</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -65,25 +87,25 @@
 			<version>1.2</version>
 		</dependency>
 		<dependency>
-	        <groupId>dnl.utils</groupId>
-	        <artifactId>j-text-utils</artifactId>
-	        <version>0.3.3</version>
+			<groupId>dnl.utils</groupId>
+			<artifactId>j-text-utils</artifactId>
+			<version>0.3.3</version>
 		</dependency>
 		<dependency>
-		  <groupId>joda-time</groupId>
-		  <artifactId>joda-time</artifactId>
-		  <version>2.9</version>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.9</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4</version>
 		</dependency>
-		<!-- Quartz API -->		
+		<!-- Quartz API -->
 		<dependency>
-		    <groupId>org.quartz-scheduler</groupId>
-		    <artifactId>quartz</artifactId>
-		    <version>2.1.5</version>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.1.5</version>
 		</dependency>
 	</dependencies>
 </project>
