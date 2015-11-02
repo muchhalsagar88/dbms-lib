@@ -11,6 +11,7 @@ import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.Address;
 import edu.dbms.library.entity.Library;
 import edu.dbms.library.entity.resource.Camera;
+import edu.dbms.library.entity.resource.CameraDetail;
 import junit.framework.Assert;
 
 public class CameraTest extends BaseTest {
@@ -22,15 +23,27 @@ public static final long DEFAULT_CAMERA_COUNT = 2;
 		Library lib = new Library(); 
 		lib.setLibraryName("James Hunt Library");
 		lib.setLibraryAddress(new Address("101 Partner's Drive", null, "Raleigh", 27606));
-		
 		DBUtils.persist(lib);
 		
+		CameraDetail details = new CameraDetail();
+		details.setMaker("Canon");
+		details.setModel("Model 1");
+		details.setLensDetail("Lens Detail 1");
+		details.setMemoryAvailable(4);
+		DBUtils.persist(details);
+		
 		List<Camera> bookList = new ArrayList<Camera>();
-		Camera b1 = new Camera(lib, "Canon", "Model1", "Lens Detail 1", 4);
+		Camera b1 = new Camera(lib, details);
 		bookList.add(b1);
 		
-				
-		Camera b2 = new Camera(lib, "Canon", "Model2", "Lens Detail 2", 8);
+		details = new CameraDetail();
+		details.setMaker("Olympus");
+		details.setModel("Model X");
+		details.setLensDetail("Lens Detail 2");
+		details.setMemoryAvailable(8);
+		DBUtils.persist(details);
+		
+		Camera b2 = new Camera(lib, details);
 		bookList.add(b2);
 		
 		return bookList;
@@ -56,6 +69,7 @@ public static final long DEFAULT_CAMERA_COUNT = 2;
 	public void clearTestData() {
 		
 		removeAllEntities(Camera.class);
+		removeAllEntities(CameraDetail.class);
 		removeAllEntities(Library.class);
 		
         System.out.println("@After: executedAfterEach");

@@ -21,6 +21,15 @@ public class Journal extends Publication {
 		super();
 	}
 
+	public JournalDetail getDetails() {
+		return details;
+	}
+
+	public void setDetails(JournalDetail details) {
+		this.details = details;
+	}
+
+	
 	/*public Object[] toObjectArray() {
 		List<Object> objects = new LinkedList<Object>();
 		objects.add(this.issnNumber);

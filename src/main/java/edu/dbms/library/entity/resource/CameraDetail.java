@@ -1,10 +1,13 @@
 package edu.dbms.library.entity.resource;
 
+import java.util.Collection;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import edu.dbms.library.entity.AbsEntity;
@@ -25,6 +28,9 @@ public class CameraDetail extends AbsEntity {
 	private String lensDetail;
 	
 	private int memoryAvailable;
+	
+	@OneToMany(mappedBy="detail")
+	private Collection<Camera> cameras;
 	
 	public String getId() {
 		return id;

@@ -15,6 +15,7 @@ import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
+import edu.dbms.library.db.manager.LoginManager;
 import edu.dbms.library.entity.AssetCheckout;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.entity.reserve.PublicationWaitlist;
@@ -95,10 +96,9 @@ public class ResourceJournals extends BaseScreen {
 
 		String[] title = {""};
 		String[][] options = { 
-				{Constant.OPTION_ASSET_CHECKOUT},
-				{Constant.OPTION_EXIT},
-				{"0 to exit the menu."},
-				{"Enter the book number to checkout the book"}
+				{"To Checkout: Enter the order Nummber"},
+				{"0 For Main Menu."},
+				
 		};
 		TextTable tt = new TextTable(title, options);
 		tt.setAddRowNumbering(true);
@@ -115,12 +115,12 @@ public class ResourceJournals extends BaseScreen {
 		// opt1: Display only those books tht a patron can checkout. 
 		// if the patron has been issued some books. remove thos ISBN number wala books from the display list..
 		// Display conditions for REserved books??
-//		journals = getJournalList(); // publisher is not joined with books yet.
-		
-		String[] title = {"ISSN", "TITLE",  "AUTHOR(S)", "PUB_YEAR"};
+		//		journals = getJournalList(); // publisher is not joined with books yet.
+
+		String[] title = {"ISSN", "TITLE",  "AUTHOR(S)", "PUB_YEAR", "FORMAT", "STATUS"};
 
 		Object[][] jrnls = getJournalList(); 
-		
+
 		TextTable tt = new TextTable(title, jrnls);
 		tt.setAddRowNumbering(true);
 		tt.printTable();
@@ -135,49 +135,36 @@ public class ResourceJournals extends BaseScreen {
 				"main");
 		EntityManager entitymanager = emfactory.createEntityManager( );
 
-		String query = "SELECT jour1.journal_id, jour1.ISSNNUMBER, pub1.TITLE, pub1.PUBLICATIONFORMAT, pub1.PUBLICATIONYEAR,  " 
-				+" rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS   "
-				+" FROM asset ast1, journal jour1, publication pub1 , Author auth1, PUBLICATION_AUTHOR pa1 "
-				+" WHERE jour1.journal_id = ast1.asset_id "
-				+" AND pub1.publication_id = ast1.asset_id "
-				+" AND pub1.publication_id = ast1.asset_id "
-				+" AND ast1.asset_type = 3 "
-				+" AND AUTH1.ID = PA1.AUTHORS_ID " 
-				+" AND PA1.PUBLICATIONS_ASSET_ID = jour1.journal_id " 
-				+" Group By jour1.journal_id, jour1.ISSNNUMBER, pub1.TITLE, pub1.PUBLICATIONFORMAT ,pub1.PUBLICATIONYEAR"
-				+" MINUS "
-				+" SELECT jour1.journal_id, jour1.ISSNNUMBER, pub1.TITLE, pub1.PUBLICATIONFORMAT , pub1.PUBLICATIONYEAR," 
-				+" rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS "
-				+" FROM asset ast1, journal jour1, publication pub1 , Author auth1, PUBLICATION_AUTHOR pa1 "
-				+" WHERE  jour1.journal_id = ast1.asset_id  "
-				+" AND pub1.publication_id = ast1.asset_id "
-				+" AND pub1.publication_id = ast1.asset_id "
-				+" AND AUTH1.ID = PA1.AUTHORS_ID "
-				+" AND PA1.PUBLICATIONS_ASSET_ID = jour1.journal_id " 
-				+" AND ast1.asset_type = 3 "
-				+" AND jour1.ISSNNUMBER IN "
-				+"     (SELECT wtlist.PUBSECONDARYID " 
-				+"         FROM publication_waitlist wtlist " 
-				+"         WHERE (wtlist.PATRONID = ?)) "
-				+" Group By jour1.journal_id, jour1.ISSNNUMBER, pub1.TITLE, pub1.PUBLICATIONFORMAT,pub1.PUBLICATIONYEAR "
-				+" MINUS "
-				+" SELECT jour1.journal_id, jour1.ISSNNUMBER, pub1.TITLE, pub1.PUBLICATIONFORMAT , pub1.PUBLICATIONYEAR," 
-				+" rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS "
-				+" FROM asset ast1, journal jour1, publication pub1 , Author auth1, PUBLICATION_AUTHOR pa1 "
-				+" WHERE ( EXISTS "
-				+"         (SELECT * FROM asset_checkout astchkt, publication_waitlist wtlist, asset_checkout_constraint astchkcon " 
-				+"             WHERE (((((astchkt.asset_secondary_id = jour1.ISSNNUMBER) "
-				+"                 AND (astchkt.patron_id = ?)) " 
-				+"                 AND (wtlist.PATRONID <> ?)) "
-				+"                 AND (wtlist.PUBSECONDARYID = jour1.ISSNNUMBER)) "
-				+" AND (astchkt.ID = astchkcon.ASSETCHECKOUT_ID)))  "
-				+" AND (((jour1.journal_id = ast1.asset_id) "
-				+" AND ((pub1.publication_id = ast1.asset_id) " 
-				+" AND (pub1.publication_id = ast1.asset_id))) " 
-				+" AND (ast1.asset_type = 3))) "
-				+" AND AUTH1.ID = PA1.AUTHORS_ID " 
-				+" AND PA1.PUBLICATIONS_ASSET_ID = jour1.journal_id " 
-				+" Group By jour1.journal_id, jour1.ISSNNUMBER, pub1.TITLE, pub1.PUBLICATIONFORMAT, pub1.PUBLICATIONYEAR"; 
+		String query = 
+				" SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT     " 
+						+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS   " 
+						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   " 
+						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
+						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
+						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   " 
+						+" 						 		  AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	  )    " 
+						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
+						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
+						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID						  " 
+						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID   " 
+						+"  MINUS " 
+						+"  SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT      " 
+						+"  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS   " 
+						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   " 
+						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
+						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
+						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   " 
+						+" 						 		  AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	  )    " 
+						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
+						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
+						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID " 
+						+" 						 		  AND J1.ISSN_NUMBER IN    " 
+						+"                                         (SELECT PUBSECONDARYID FROM PUBLICATION_WAITLIST WHERE PATRONID = ? " 
+						+" 						 					UNION  " 
+						+"                                          SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     " 
+						+"                                          AND (astchkt.RETURN_DATE is NULL  OR astchkt.RETURN_DATE=astchkt.ISSUE_DATE) )    " 
+						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID   " ;				
+
 
 		Query q = entitymanager.createNativeQuery(query);
 
@@ -189,22 +176,28 @@ public class ResourceJournals extends BaseScreen {
 
 		entitymanager.close();
 		emfactory.close();
-		
+
 		int i =0;
-		jrnls  = new Object[obj1.size()][4];
+		jrnls  = new Object[obj1.size()][6];
 		jrnls1 = new Object[obj1.size()][];
 		while(i<obj1.size()){
-		Object[] arr = (Object[]) obj1.get(i);
-		jrnls1[i] =  arr;
-		jrnls[i][0]=  arr[1];
-		jrnls[i][1]=  arr[2];
-		jrnls[i][2]=  arr[5];
-		jrnls[i][3]=  arr[4];
-				
-		i++;
+			Object[] arr = (Object[]) obj1.get(i);
+			jrnls1[i] =  arr;
+			jrnls[i][0]=  arr[1];
+			jrnls[i][1]=  arr[2];
+			jrnls[i][2]=  arr[5];
+			jrnls[i][3]=  arr[3];
+			jrnls[i][4]=  arr[4];
+			if(arr[4].toString().equals("Electronic copy"))
+				jrnls[i][5]=  " ";
+			else
+				jrnls[i][5]=  arr[6];
+			
+
+			i++;
 		}
-		
-		
+
+
 		return jrnls ;
 
 
@@ -213,19 +206,26 @@ public class ResourceJournals extends BaseScreen {
 
 
 	public void checkout(int bookNo) {
+		
+		if(LoginManager.isPatronAccountOnHold(SessionUtils.getPatronId())) {
+			System.out.println("Your library privileges have been suspended. Please pay your dues to checkout assets.");
+			return;
+		}
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("main");
 		EntityManager entitymanager = emfactory.createEntityManager( );
 
 
-//		Journal journal = journals.get(bookNo-1);
+		//		Journal journal = journals.get(bookNo-1);
 		String journalId  = (String)jrnls1[bookNo-1][0];
+		String pub_format = (String)jrnls1[bookNo-1][4];
+
 		String query = "SELECT cp FROM "+AssetCheckout.class.getName()
 				+" cp where cp.asset.id = :num and cp.returnDate IS NULL";
 		Query q = entitymanager.createQuery(query);
-		
+
 		q.setParameter("num", journalId);
-		
+
 		List<AssetCheckout> asc = (List<AssetCheckout>) q.getResultList();
 
 		long count = asc.size();
@@ -235,7 +235,7 @@ public class ResourceJournals extends BaseScreen {
 		emfactory.close();
 
 		Journal journal = (Journal) DBUtils.findEntity(Journal.class, journalId, String.class);
-		
+
 		boolean isStudent = SessionUtils.isStudent();
 
 		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
@@ -245,20 +245,39 @@ public class ResourceJournals extends BaseScreen {
 			Date issueDate = new Date();
 			DateTime dt1 = new DateTime(issueDate);
 			DateTime dt2;
-			if (isStudent)
-				dt2 = dt1.plusDays(14);
-			else
-				dt2 = dt1.plusMonths(1);
 
-			Date dueDate = dt2.toDate();
+			if(pub_format.equals("Physical copy")){
 
-			astChkOut.setAssetSecondaryId(journal.getIssnNumber());
-			astChkOut.setAsset(journal);
-			astChkOut.setIssueDate(issueDate );
-			astChkOut.setDueDate(dueDate);
-			astChkOut.setPatron(loggedInPatron);
-			DBUtils.persist(astChkOut);
-			System.out.println("The item has been checked out: The return time is :"+ dueDate);
+				if (isStudent)
+					dt2 = dt1.plusHours(12);
+				else
+					dt2 = dt1.plusHours(12);
+
+				Date dueDate = dt2.toDate();
+
+				astChkOut.setAssetSecondaryId(journal.getDetails().getIssnNumber());
+				astChkOut.setAsset(journal);
+				astChkOut.setIssueDate(issueDate );
+				astChkOut.setDueDate(dueDate);
+				astChkOut.setPatron(loggedInPatron);
+				DBUtils.persist(astChkOut);
+				System.out.println("The item has been checked out: The return time is :"+ dueDate);
+
+			}
+			else{
+				System.out.println("SOFT\n\n\n");
+				dt2= dt1.plusMinutes(0);
+
+				astChkOut.setAssetSecondaryId(journal.getDetails().getIssnNumber());
+				astChkOut.setAsset(journal);
+				astChkOut.setIssueDate(issueDate );
+				astChkOut.setDueDate(issueDate);
+				astChkOut.setReturnDate(issueDate);
+				astChkOut.setPatron(loggedInPatron);
+				DBUtils.persist(astChkOut);
+
+				System.out.println("The item has been checked out: The return time is : N/A");
+			}
 
 		}
 		else{
@@ -283,11 +302,11 @@ public class ResourceJournals extends BaseScreen {
 			else{ // reosurce nt avlble.. add to the waitlist.
 				int flag = 0;
 				if (isStudent) flag =1;
-				PublicationWaitlist pb = new PublicationWaitlist(loggedInPatron.getId(),journal.getIssnNumber(), new Date(), flag );
+				PublicationWaitlist pb = new PublicationWaitlist(loggedInPatron.getId(),journal.getDetails().getIssnNumber(), new Date(), flag );
 
 				DBUtils.persist(pb); 
 
-				System.out.println("The item you have requested is not avlble. You are on waitlist");
+				System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
 
 			}
 

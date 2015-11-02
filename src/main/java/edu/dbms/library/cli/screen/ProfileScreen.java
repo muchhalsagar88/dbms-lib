@@ -17,7 +17,7 @@ import edu.dbms.library.session.SessionUtils;
 
 /*
  *  TODO: 	Fire a query based on the PATRON table for details
- *  	  	Pass back some flag or parameter to differentiate between 
+ *  	  	Pass back some flag or parameter to differentiate between
  *  	  	Student and Faculty
  */
 public class ProfileScreen extends BaseScreen {
@@ -28,7 +28,7 @@ public class ProfileScreen extends BaseScreen {
 		options.put(2, new Route(RouteConstant.LOGOUT));
 		getPatronDetails();
 	}
-	
+
 	@Override
 	public void execute() {
 		displayOptions();
@@ -39,8 +39,8 @@ public class ProfileScreen extends BaseScreen {
 			readInputLabel();
 			o = readInput();
 		}
-		
-		BaseScreen nextScreen = getNextScreen(options.get((Integer)o).getRouteKey());
+
+		BaseScreen nextScreen = getNextScreen(options.get(o).getRouteKey());
 		nextScreen.execute();
 	}
 
@@ -48,9 +48,9 @@ public class ProfileScreen extends BaseScreen {
 		Patron patronObj;
 		Student studentObj;
 		Faculty facultyObj;
-		
+
 		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		/*EntityManager entitymanager = emFactory.createEntityManager();
 		Query query = entitymanager.createQuery("SELECT p, d.departmentName"
 				+ " FROM Patron p, Department d"
@@ -59,14 +59,14 @@ public class ProfileScreen extends BaseScreen {
 		query.setParameter("patronId", SessionUtils.getPatronId());
 		patronDataObj = query.getSingleResult();*/
 		patronObj = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
-		
+
 		if(SessionUtils.isStudent()) {
 			/*Query patronTypeQuery = entitymanager.createQuery("SELECT s.student_id, s.phone_no, s.alt_phone_no, s.dob, s.sex, s.addressLineOne, s.addressLineTwo, s.cityName, s.pinCode"
 					+ " FROM Student s"
 					+ " WHERE s.student_id=:patronId");
 			patronTypeQuery.setParameter("patronId", SessionUtils.getPatronId());
 			patronTypeQuery.getSingleResult();*/
-			
+
 		} else {
 			/*Query patronTypeQuery = entitymanager.createQuery("SELECT f.faculty_id, fc.name AS cat_name"
 					+ " FROM Faculty f, Faculty_Category fc"
@@ -74,9 +74,9 @@ public class ProfileScreen extends BaseScreen {
 					+ " AND fc.id=f.category_id");
 			patronTypeQuery.setParameter("patronId", SessionUtils.getPatronId());
 			patronTypeDataObj = patronTypeQuery.getSingleResult();*/
-			
+
 		}
-		
+
 		System.out.println("Name: " + patronObj.getFirstName() + " " + patronObj.getLastName());
 		System.out.println("Email Address: " + (patronObj.isEmailAddresNull() ? "--" : patronObj.getEmailAddress()));
 		if(SessionUtils.isStudent())
@@ -96,29 +96,29 @@ public class ProfileScreen extends BaseScreen {
 		System.out.println("Nationality: " + patronObj.getNationality());
 		System.out.println("Department: " + patronObj.getDepartment().getDepartmentName());
 	}
-	
+
 	@Override
 	public void displayOptions() {
-		
+
 		System.out.println("Your Profile:");
 		displayPatronDetails();
 		System.out.println("-------------------------------------------");
-		
+
 		String[] title = {""};
-		String[][] options = { 
+		String[][] options = {
 							{Constant.OPTION_BACK},
 							{Constant.OPTION_LOGOUT}
 							};
 		TextTable tt = new TextTable(title, options);
 		tt.setAddRowNumbering(true);
 		tt.printTable();
-		
+
 	}
-	
+
 	public void readInputLabel() {
 		System.out.print("Enter your choice: ");
 	}
-	
+
 	public Object readInput() {
 		int option = inputScanner.nextInt();
 		return option;
@@ -126,8 +126,8 @@ public class ProfileScreen extends BaseScreen {
 
 	// Implement the internal logic for this method
 	private Object getPatronDetails() {
-		
+
 		return null;
 	}
-	
+
 }

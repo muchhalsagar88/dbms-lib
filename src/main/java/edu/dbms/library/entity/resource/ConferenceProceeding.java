@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="conf_proceeding")
 @PrimaryKeyJoinColumn(name="conf_proc_id", referencedColumnName="asset_id")
-@DiscriminatorValue("2")
+@DiscriminatorValue("3")
 public class ConferenceProceeding extends Publication {
 
 	@ManyToOne
@@ -19,6 +19,14 @@ public class ConferenceProceeding extends Publication {
 		
 	public ConferenceProceeding() {
 		super();
+	}
+
+	public ConferenceProceedingDetail getDetails() {
+		return details;
+	}
+
+	public void setDetails(ConferenceProceedingDetail details) {
+		this.details = details;
 	}
 	
 	

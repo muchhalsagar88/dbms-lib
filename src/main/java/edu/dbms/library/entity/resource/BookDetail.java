@@ -44,6 +44,14 @@ public class BookDetail extends AbsEntity {
 	@OneToMany(mappedBy="detail")
 	private Collection<Book> books;
 	
+	public String getIsbnNumber() {
+		return isbnNumber;
+	}
+
+	public void setIsbnNumber(String isbnNumber) {
+		this.isbnNumber = isbnNumber;
+	}
+
 	public String getTitle() {
 		return title;
 	}
