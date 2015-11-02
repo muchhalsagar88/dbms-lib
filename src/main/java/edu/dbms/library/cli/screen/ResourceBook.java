@@ -18,8 +18,13 @@ import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.Route;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
+import edu.dbms.library.db.manager.LoginManager;
 import edu.dbms.library.entity.AssetCheckout;
+import edu.dbms.library.entity.Course;
+import edu.dbms.library.entity.Faculty;
 import edu.dbms.library.entity.Patron;
+import edu.dbms.library.entity.ReserveBook;
+import edu.dbms.library.entity.ReserveBookKey;
 import edu.dbms.library.entity.reserve.PublicationWaitlist;
 import edu.dbms.library.entity.resource.Book;
 import edu.dbms.library.entity.resource.Camera;
@@ -67,7 +72,7 @@ public class ResourceBook extends BaseScreen {
 			// checkout possible only for available items
 			// if resource not available..put the request in waitlist
 			// checkout rnew possible only if waitlist is empty -- update the due dates nd relevant data.
-			System.out.println("The item has been checked out!!");
+//			System.out.println("The item has been checked out!!");
 		}
 
 
@@ -121,6 +126,7 @@ public class ResourceBook extends BaseScreen {
 		// if the patron has been issued some books. remove those ISBN number wala books from the display list if they are not in waitlist
 		// Display conditions for REserved books??
 		//		books = getBookList(); // publisher is not joined with books yet.
+		clearConsole();
 		String[] title = {"ISBN", "TITLE", "EDITION", "AUTHOR(S)", "PUB_YEAR", "PUBLISHER", "FORMAT", "STATUS"};
 
 		bks = getBookList(); 
@@ -141,7 +147,7 @@ public class ResourceBook extends BaseScreen {
 		EntityManager entitymanager = emfactory.createEntityManager( );
 		String qer1 =
 				"SELECT A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME   "
-						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS "
+						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS, a1.ASSET_TYPE "
 						+"		  from Book b1, Publication p1,   BOOK_DETAIL bd1, Asset a1 ,Publisher pb1 ,  Author auth1, BOOK_AUTHOR BA1 , ASSET_CHECKOUT asc1 "
 						+"		  WHERE B1.BOOK_ID = a1.ASSET_ID "
 						+"		  AND a1.ASSET_ID = P1.PUBLICATION_ID "
@@ -153,10 +159,10 @@ public class ResourceBook extends BaseScreen {
 						+"		  AND AUTH1.ID = BA1.AUTHOR_ID "
 						+"		  AND  B1.ISBN_NUMBER  NOT in  "
 						+"		  (SELECT R.BOOK_ISBN ISBN FROM RESERVE_BOOK R)  "
-						+"		  GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME,  ASC1.ID "
+						+"		  GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME,  ASC1.ID, a1.ASSET_TYPE "
 						+" UNION "
 						+" SELECT A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME    "
-						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS "
+						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS, a1.ASSET_TYPE "
 						+"		  from Book b1, Publication p1,   BOOK_DETAIL bd1, Asset a1 ,Publisher pb1 ,  Author auth1, BOOK_AUTHOR BA1 , ASSET_CHECKOUT asc1 "
 						+"		  WHERE B1.BOOK_ID = a1.ASSET_ID "
 						+"		  AND a1.ASSET_ID = P1.PUBLICATION_ID "
@@ -170,10 +176,10 @@ public class ResourceBook extends BaseScreen {
 						+"		  (SELECT R.BOOK_ISBN ISBN FROM RESERVE_BOOK R, ENROLL en  "
 						+"           WHERE SYSDATE between R.FROM_DATE AND R.TODATE "
 						+"          AND R.COURSE_ID = en.COURSE_ID AND en.STUDENT_ID = ?  )   "
-						+"		  GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME,  ASC1.ID "
+						+"		  GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME,  ASC1.ID, a1.ASSET_TYPE "
 						+" MINUS "
 						+" SELECT A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME    "
-						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) "
+						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS,  a1.ASSET_TYPE "
 						+"		  from Book b1, Publication p1,   BOOK_DETAIL bd1, Asset a1 ,Publisher pb1 ,  Author auth1, BOOK_AUTHOR BA1 , ASSET_CHECKOUT asc1 "
 						+"		  WHERE B1.BOOK_ID = a1.ASSET_ID "
 						+"		  AND a1.ASSET_ID = P1.PUBLICATION_ID "
@@ -188,7 +194,7 @@ public class ResourceBook extends BaseScreen {
 						+" 					UNION "
 						+" 				SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ? "   
 						+" 					AND (astchkt.RETURN_DATE is NULL  OR astchkt.RETURN_DATE=astchkt.ISSUE_DATE) )    "
-						+"        GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME,  ASC1.ID ";
+						+"        GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME,  ASC1.ID , a1.ASSET_TYPE";
 		//						+" MINUS		   "
 		//						+" SELECT A1.ASSET_ID ,    B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME   "
 		//						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS , A1.ASSET_TYPE"
@@ -249,14 +255,19 @@ public class ResourceBook extends BaseScreen {
 
 	public void checkout(int bookNo) {
 
-
+		if(LoginManager.isPatronAccountOnHold(SessionUtils.getPatronId())) {
+			System.out.println("Your library privileges have been suspended. Please pay your dues to checkout assets.");
+			return;
+		}
+		
+try{
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
 				"main");
 		EntityManager entitymanager = emfactory.createEntityManager( );
 
 		//	Book book = books.get(bookNo-1);
 		String bookId  = (String)bks1[bookNo-1][0];
-		BigDecimal ast_type = (BigDecimal)bks1[bookNo-1][8];
+		BigDecimal ast_type = (BigDecimal)bks1[bookNo-1][9];
 		String pub_format = (String)bks1[bookNo-1][5];
 
 		String query = "SELECT cp FROM "+AssetCheckout.class.getName()
@@ -269,7 +280,8 @@ public class ResourceBook extends BaseScreen {
 
 		List<AssetCheckout> asc = (List<AssetCheckout>) q.getResultList();
 		if(asc.size()>1){
-			System.out.println("Error...more than 1 entry found");
+			throw new Exception("Error01");
+//			System.out.println("Error...more than 1 entry found");
 		}
 
 
@@ -289,7 +301,7 @@ public class ResourceBook extends BaseScreen {
 			Date dueDate ;
 
 			if(pub_format.equals("Physical copy")){
-				System.out.println("HARD\n\n\n");
+//				System.out.println("HARD\n\n\n");
 				if (isStudent ){
 					if(ast_type.intValue() == 4)
 						dt2 = dt1.plusHours(4);
@@ -307,12 +319,12 @@ public class ResourceBook extends BaseScreen {
 				astChkOut.setDueDate(dueDate);
 				astChkOut.setPatron(loggedInPatron);
 				DBUtils.persist(astChkOut);
-
+				clearConsole();
 				System.out.println("The item has been checked out: The return time is :"+ dueDate);
 
 			}
 			else{
-				System.out.println("SOFT\n\n\n");
+//				System.out.println("SOFT\n\n\n");
 				dt2= dt1.plusMinutes(0);
 
 				astChkOut.setAssetSecondaryId(book.getDetail().getIsbnNumber());
@@ -322,7 +334,7 @@ public class ResourceBook extends BaseScreen {
 				astChkOut.setReturnDate(issueDate);
 				astChkOut.setPatron(loggedInPatron);
 				DBUtils.persist(astChkOut);
-
+				clearConsole();
 				System.out.println("The item has been checked out: The return time is : N/A");
 			}
 
@@ -355,7 +367,7 @@ public class ResourceBook extends BaseScreen {
 
 				DBUtils.persist(pb); 
 
-				System.out.println("The item you have requested is not avlble. You are on waitlist");
+				System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
 
 			}
 
@@ -366,7 +378,10 @@ public class ResourceBook extends BaseScreen {
 		entitymanager.close();
 		emfactory.close();
 
-
+}
+catch(Exception e){
+	System.out.println("Error..Asset reserved More than one time by the same patron");
+}
 
 		//check of the book is already issues?
 		// if issued by the same patron - check the waitlist for renew condition
@@ -382,4 +397,113 @@ public class ResourceBook extends BaseScreen {
 	}
 
 
+//	public void reserveBook(int bookNo){
+//
+//		
+//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+//				"main");
+//		EntityManager entitymanager = emfactory.createEntityManager( );
+//		
+//		
+//		
+//		String sdate = null;
+//		Date startDate = null;
+//		String edate = null;
+//		Date endDate = null;
+//		String faculty_id =  SessionUtils.getPatronId();
+//		boolean is_stud =  SessionUtils.isStudent();
+//		
+//		Faculty faculty = (Faculty) DBUtils.findEntity(Faculty.class, faculty_id, String.class);
+//		ArrayList<Course> cList = (ArrayList<Course>) faculty.getCourses();
+//		String query1 = "SELECT bk FROM Book bk"	;
+//		Query q = entitymanager.createQuery(query1);
+//
+//		List<Book> asc = (List<Book>) q.getResultList();
+//		
+//		
+//		while(true){
+//			
+//			sdate = readInput("Enter Start Date in MM/DD/YYYY Format");
+//
+//			startDate = DBUtils.validateDate(sdate, "MM/dd/yyyy", true);
+//
+//			if(startDate==null){
+//				System.out.println("Enter a valid Start date(future date/time)");
+//				continue;
+//			}
+//			else
+//				break;
+//		}
+//
+//		while(true){
+//			edate = readInput("Enter End Date in MM/DD/YYYY Format");
+//
+//			endDate = DBUtils.validateDate(edate, "MM/dd/yyyy", true);
+//DateTime 
+//			if(endDate==null){
+//				System.out.println("Enter a valid End date(future date/time)");
+//				continue;
+//			}
+//			else
+//				break;
+//		}
+//
+//		System.out.print("COURSE #: ");
+//		for(Course c:cList)
+//			System.out.print(c.getCourseId()+ " / ");
+//		
+//		System.out.println("\n");
+//		
+//		System.out.print("BOOK ISBN#: ");
+//		for(Book b:asc)
+//			System.out.print(b.getDetail().getIsbnNumber()+ " / ");
+//		
+//		String crs_id = readInput("Enter CourseID");
+//		String book_id = readInput("Enter Book ISBN No");
+//		
+//		
+//		
+//		
+//			String insertStmnt = "Insert into RESERVE_BOOK (FROM_DATE, TODATE, BOOK_ISBN, COURSE_ID, FACULTY_ID)"
+//						+ "Values ( ?,?,?,?,?) ";
+//		  
+//				Query query = entitymanager.createNativeQuery(insertStmnt);
+//				
+//				entitymanager.getTransaction( ).begin( );
+//
+//				query.setParameter(1, startDate);
+//				query.setParameter(2, endDate);
+//				query.setParameter(3, book_id);
+//				query.setParameter(4, crs_id);
+//				query.setParameter(5, faculty_id);
+//				
+//				entitymanager.getTransaction().commit();
+//				
+//				
+//				entitymanager.close();
+//				emfactory.close();
+//		
+//		
+//		
+//		Course c1 = new Course();
+//		
+//		
+//		Faculty f1 = new Faculty();
+//
+//
+//		
+//		Book b1 = new Book();
+//
+//			
+//
+//				
+////		ReserveBookKey key1 = new ReserveBookKey();
+////		key1.setCourseId(c1.getCourseId());
+////		key1.setFacultyId(f1.getId());
+////		key1.setIsbnNumber(b1.getDetail().getIsbnNumber());
+////		
+////		ReserveBook rb = new ReserveBook(key1, new Date(),new Date(), c1, f1);
+////		DBUtils.persist(rb);
+//
+//	}
 }
