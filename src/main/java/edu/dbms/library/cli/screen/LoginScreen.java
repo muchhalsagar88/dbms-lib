@@ -19,6 +19,7 @@ public class LoginScreen extends BaseScreen {
 	public void execute() {
 		boolean validUser = false;
 		do {
+			clearConsole();
 			String username = readInput("Enter Username");
 			String password = null;
 			try{
@@ -35,6 +36,7 @@ public class LoginScreen extends BaseScreen {
 		} while(!validUser);
 
 		// Hard coding input to 1 for Base Patron Screen
+		clearConsole();
 		BaseScreen nextScreen = getNextScreen(options.get(1).getRouteKey());
 		nextScreen.execute();
 	}
