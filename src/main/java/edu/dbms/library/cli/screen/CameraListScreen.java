@@ -271,5 +271,4 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 		tt.setAddRowNumbering(true);
 		tt.printTable();
 	}
-	
 }
