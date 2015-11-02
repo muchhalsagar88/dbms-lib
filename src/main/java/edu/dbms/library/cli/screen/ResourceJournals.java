@@ -15,6 +15,7 @@ import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
+import edu.dbms.library.db.manager.LoginManager;
 import edu.dbms.library.entity.AssetCheckout;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.entity.reserve.PublicationWaitlist;
@@ -205,6 +206,11 @@ public class ResourceJournals extends BaseScreen {
 
 
 	public void checkout(int bookNo) {
+		
+		if(LoginManager.isPatronAccountOnHold(SessionUtils.getPatronId())) {
+			System.out.println("Your library privileges have been suspended. Please pay your dues to checkout assets.");
+			return;
+		}
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("main");
 		EntityManager entitymanager = emfactory.createEntityManager( );
@@ -300,7 +306,7 @@ public class ResourceJournals extends BaseScreen {
 
 				DBUtils.persist(pb); 
 
-				System.out.println("The item you have requested is not avlble. You are on waitlist");
+				System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
 
 			}
 

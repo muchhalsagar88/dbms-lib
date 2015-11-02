@@ -17,6 +17,7 @@ import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.Route;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
+import edu.dbms.library.db.manager.LoginManager;
 import edu.dbms.library.entity.AssetCheckout;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.entity.reserve.PublicationWaitlist;
@@ -65,7 +66,7 @@ public class ResourceConfPapers extends BaseScreen {
 			// checkout possible only for available items
 			// if resource not available..put the request in waitlist
 			// checkout rnew possible only if waitlist is empty -- update the due dates nd relevant data.
-			System.out.println("The item has been checked out!!");
+//			System.out.println("The item has been checked out!!");
 		}
 
 
@@ -210,6 +211,12 @@ public class ResourceConfPapers extends BaseScreen {
 
 
 	public void checkout(int bookNo) {
+		
+		if(LoginManager.isPatronAccountOnHold(SessionUtils.getPatronId())) {
+			System.out.println("Your library privileges have been suspended. Please pay your dues to checkout assets.");
+			return;
+		}
+		
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("main");
 		EntityManager entitymanager = emfactory.createEntityManager( );
@@ -306,7 +313,7 @@ public class ResourceConfPapers extends BaseScreen {
 
 				DBUtils.persist(pb); 
 
-				System.out.println("The item you have requested is not avlble. You are on waitlist");
+				System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
 
 			}
 
