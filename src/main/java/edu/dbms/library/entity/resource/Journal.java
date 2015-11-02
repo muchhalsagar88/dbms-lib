@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="journal")
 @PrimaryKeyJoinColumn(name="journal_id", referencedColumnName="asset_id")
-@DiscriminatorValue("3")
+@DiscriminatorValue("2")
 public class Journal extends Publication {
 
 	@ManyToOne

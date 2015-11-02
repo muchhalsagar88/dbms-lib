@@ -137,24 +137,26 @@ public class ResourceJournals extends BaseScreen {
 
 		String query = 
 				" SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT     " 
-						+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS   " 
+						+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  "
+						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS   " 
 						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   " 
 						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
 						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
 						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   " 
-						+" 						 		  AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	  )    " 
+						+" 						 		  	  )    " 
 						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
 						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
 						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID						  " 
-						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID   " 
+						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID ,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID   " 
 						+"  MINUS " 
 						+"  SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT      " 
-						+"  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS   " 
+						+"  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  "
+						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS   " 
 						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   " 
 						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
 						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
 						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   " 
-						+" 						 		  AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	  )    " 
+						+" 						 		   )    " 
 						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
 						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
 						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID " 
@@ -162,8 +164,8 @@ public class ResourceJournals extends BaseScreen {
 						+"                                         (SELECT PUBSECONDARYID FROM PUBLICATION_WAITLIST WHERE PATRONID = ? " 
 						+" 						 					UNION  " 
 						+"                                          SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     " 
-						+"                                          AND (astchkt.RETURN_DATE is NULL  OR astchkt.RETURN_DATE=astchkt.ISSUE_DATE) )    " 
-						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID   " ;				
+						+"                                          AND (astchkt.RETURN_DATE is NULL ) )    " 
+						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID    " ;				
 
 
 		Query q = entitymanager.createNativeQuery(query);

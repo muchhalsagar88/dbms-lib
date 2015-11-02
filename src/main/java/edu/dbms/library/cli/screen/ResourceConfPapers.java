@@ -139,24 +139,26 @@ public class ResourceConfPapers extends BaseScreen {
 		EntityManager entitymanager = emfactory.createEntityManager( );
 
 		String query = " SELECT A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT  "
-				+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS   "
+				+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  "
+				+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS   "
 				+" from CONF_PROCEEDING conf1, Publication p1,   CONFERENCE_PROCEEDING_DETAIL cpd1 , Asset a1 ,  Author auth1, CONF_PROC_AUTHOR cpa1 , ASSET_CHECKOUT asc1   "
 				+"						 		  WHERE CONF1.CONF_PROC_ID = a1.ASSET_ID   "
 				+"						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   "
 				+"						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   "
-				+"						 		  AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	  )    "
+				+"						 		  	  )    "
 				+"						 		  AND CONF1.CONF_NUM = CPD1.CONF_NUM   "
 				+"						 		  AND CPA1.CONF_NUM = CONF1.CONF_NUM		     "
 				+"						 		  AND AUTH1.ID = CPA1.AUTHOR_ID    "
-				+"						 		  GROUP BY A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT, ASC1.ID   "
+				+"						 		  GROUP BY A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT, ASC1.ID ,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID  "
 				+" MINUS "
 				+" SELECT A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT      "
-				+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS   "
+				+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  "
+				+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS   "
 				+" from CONF_PROCEEDING conf1, Publication p1,   CONFERENCE_PROCEEDING_DETAIL cpd1 , Asset a1 ,  Author auth1, CONF_PROC_AUTHOR cpa1 , ASSET_CHECKOUT asc1   "
 				+"						 		  WHERE CONF1.CONF_PROC_ID = a1.ASSET_ID   "
 				+"						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   "
 				+"						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   "
-				+"						 		  AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	  )    "
+				+"						 		  	  )    "
 				+"						 		  AND CONF1.CONF_NUM = CPD1.CONF_NUM   "
 				+"						 		  AND CPA1.CONF_NUM = CONF1.CONF_NUM		     "
 				+"						 		  AND AUTH1.ID = CPA1.AUTHOR_ID    "
@@ -164,8 +166,8 @@ public class ResourceConfPapers extends BaseScreen {
 				+"						 		  			   (SELECT PUBSECONDARYID FROM PUBLICATION_WAITLIST WHERE PATRONID = ? "
 				+"						 					UNION  "
 				+"						 				SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     "
-				+"						 					AND (astchkt.RETURN_DATE is NULL  OR astchkt.RETURN_DATE=astchkt.ISSUE_DATE) )     "
-				+"						 		  GROUP BY A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT, ASC1.ID  " ;		
+				+"						 					AND (astchkt.RETURN_DATE is NULL  )  )   "
+				+"						 		  GROUP BY A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT, ASC1.ID ,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID " ;		
 
 
 		Query q = entitymanager.createNativeQuery(query);

@@ -1,5 +1,6 @@
 package edu.dbms.library.cli.screen;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,17 +11,20 @@ import javax.persistence.Query;
 import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.RouteConstant;
+import edu.dbms.library.db.DBUtils;
+import edu.dbms.library.entity.Patron;
 import edu.dbms.library.session.SessionUtils;
 
 public class CheckedOutResourcesScreen extends BaseScreen{
 
 	String viewRenewBookString = "SELECT  A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME"
-			+ " ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS"
+			+ " ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, "
+			+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS, ASC1.ID"
 			+ " from Book b1, Publication p1, BOOK_DETAIL bd1, Asset a1, Publisher pb1, Author auth1, BOOK_AUTHOR BA1 , ASSET_CHECKOUT asc1"
 			+ " WHERE B1.BOOK_ID = a1.ASSET_ID"
 			+ " AND a1.ASSET_ID = P1.PUBLICATION_ID"
 			+ " AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID" 
-			+ " AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE))"
+			+ " )"
 			+ " AND B1.ISBN_NUMBER = BD1.ISBN_NUMBER"
 			+ " AND BD1.PUBLISHER_ID = PB1.ID"
 			+ " AND BA1.BOOK_ID = B1.ISBN_NUMBER"
@@ -28,37 +32,39 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 			+ " AND  (ASC1.ASSET_ASSET_ID = A1.ASSET_ID"
 			+ " AND ASC1.PATRON_ID = ?"
 			+ " AND ASC1.RETURN_DATE is NULL	 )"
-			+ "GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME,  ASC1.ID ";
+			+ "GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME,  ASC1.ID ,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID ";
 
 	String viewRenewConfProcString = "SELECT unique  A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT"     
-			+ " ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS"  
+			+ " ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  "
+			+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS, ASC1.ID"  
 			+ " from CONF_PROCEEDING conf1, Publication p1,   CONFERENCE_PROCEEDING_DETAIL cpd1 , Asset a1 ,  Author auth1, CONF_PROC_AUTHOR cpa1 , ASSET_CHECKOUT asc1"  
 			+ " WHERE CONF1.CONF_PROC_ID = a1.ASSET_ID" 
 			+ " AND a1.ASSET_ID = P1.PUBLICATION_ID"  
 			+ " AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID"
-			+ " AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	 )"
+			+ "  )"
 			+ " AND CONF1.CONF_NUM = CPD1.CONF_NUM"
 			+ " AND CPA1.CONF_NUM = CONF1.CONF_NUM"
 			+ " AND AUTH1.ID = CPA1.AUTHOR_ID"
 			+ " AND  (ASC1.ASSET_ASSET_ID = A1.ASSET_ID"
 			+ " AND ASC1.PATRON_ID = ?"	
 			+ " AND ASC1.RETURN_DATE is NULL)"
-			+ " GROUP BY A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT, ASC1.ID";
+			+ " GROUP BY A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT, ASC1.ID,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID ";
 	
 	String viewRenewJournalString = "SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT"
-			+ " ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS"
+			+ " ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  "
+			+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS, ASC1.ID"
 			+ " from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1"
 			+ "  WHERE J1.JOURNAL_ID = a1.ASSET_ID"
 			+ " AND a1.ASSET_ID = P1.PUBLICATION_ID"
 			+ " AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID"
-			+ " AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	 )"
+			+ "  )"
 			+ " AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER"
 			+ " AND JA1.JOURNAL_ID = J1.ISSN_NUMBER"
 			+ " AND AUTH1.ID = JA1.AUTHOR_ID"
 			+ " AND  (ASC1.ASSET_ASSET_ID =   A1.ASSET_ID"
 			+ " AND ASC1.PATRON_ID = ?"
 			+ " AND ASC1.RETURN_DATE is NULL	 )"
-			+ " GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID";
+			+ " GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID ";
 	
 	public class OptionRange {
 		private int rangeMin;
@@ -249,7 +255,8 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 		if(option == 0) {
 			return;
 		}
-		
+		else
+			executeReturnPublications();
 		//ENTER CODE TO RENEW/PUT INTO WAITLIST
 		System.out.println("Enter code here to renew / waitlist");
 	}
@@ -331,15 +338,71 @@ private void executeReturnPublications() {
 			return;
 		}
 		
-		runReturnPublicationCode(SessionUtils.getPatronId(), (String) publications[option - 1][0]);
+		if(option <= numBooks) {
+			runReturnPublicationCode(SessionUtils.getPatronId(), (String) books[option - 1][0], (BigDecimal) books[option - 1][9]);
+		} else if( option <= numConfProcs) {
+			runReturnPublicationCode(SessionUtils.getPatronId(), (String) confProcs[option - numBooks - 1][0],(BigDecimal) confProcs[option - numBooks - 1][9]);
+		} else {
+			runReturnPublicationCode(SessionUtils.getPatronId(), (String) journals[option - numBooks - numConfProcs - 1][0],(BigDecimal)journals[option - numBooks - numConfProcs - 1][7]);
+		}
+		
+		
 	}
 	
-	private void runReturnPublicationCode(String patronId, String assetId) {
-		String updateReturnString = "update ASSET_CHECKOUT asc1 set ASC1.RETURN_DATE = SYSDATE"
-				+ " WHERE ASC1.PATRON_ID = ?"
-				+ " AND ASC1.ASSET_ASSET_ID = ?"
-				+ " AND ASC1.RETURN_DATE is NULL";
+	private void runReturnPublicationCode(String patronId, String assetId, BigDecimal chkoutId) {
+		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
+
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				"main");
+		EntityManager entitymanager = emfactory.createEntityManager( );
+
+			
+		String updateReturnString = "UPDATE ASSET_CHECKOUT asc1 "
+				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine from FINE_SNAPSHOT where checkout_id = ?) "
+				+"	WHERE ASC1.ID = ? "; 
+		
+		entitymanager.getTransaction().begin();
+		
+		Query q = entitymanager.createNativeQuery(updateReturnString).setParameter(1, chkoutId).setParameter(2, chkoutId);
+		int outNo = q.executeUpdate();
+
+		entitymanager.getTransaction().commit();
+
+
+		entitymanager.close();
+		emfactory.close();
+
+		
 	}
+	
+	private void runRenewPublicationCode(String patronId, String assetId, BigDecimal chkoutId) {
+		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
+
+		boolean is_student = SessionUtils.isStudent();
+		
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				"main");
+		EntityManager entitymanager = emfactory.createEntityManager( );
+
+			
+		String updateReturnString = "UPDATE ASSET_CHECKOUT asc1 "
+				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine from FINE_SNAPSHOT where checkout_id = ?) "
+				+"	WHERE ASC1.ID = ? "; 
+		
+		entitymanager.getTransaction().begin();
+		
+		Query q = entitymanager.createNativeQuery(updateReturnString).setParameter(1, chkoutId).setParameter(2, chkoutId);
+		int outNo = q.executeUpdate();
+
+		entitymanager.getTransaction().commit();
+
+
+		entitymanager.close();
+		emfactory.close();
+
+		
+	}
+	
 
 	private void executeCheckedoutPublicationOptions() {
 		OptionRange publicationOptionRange = displayCheckedOutPublicationOptions();
