@@ -17,6 +17,17 @@ import edu.dbms.library.session.SessionUtils;
 
 public class CheckedOutResourcesScreen extends BaseScreen{
 
+	String viewCheckedOutCamerasString = "SELECT A.ASSET_ID, AC.ID AS CHECKOUT_ID, AC.ISSUE_DATE, AC.DUE_DATE, CD.LENSDETAIL, CD.MEMORYAVAILABLE, CD.MAKER, CD.MODEL"
+			+ " FROM ASSET A, ASSET_CHECKOUT AC, CAMERA C, CAMERA_DETAIL CD, ASSET_TYPE AT"
+			+ " WHERE AC.PATRON_ID = ?"
+			+ " AND AC.RETURN_DATE IS NULL"
+			+ " AND A.ASSET_ID = AC.ASSET_ASSET_ID"
+			+ " AND AT.CATEGORY = 'Device'"
+			+ " AND AT.SUB_CATEGORY = 'Camera'"
+			+ " AND A.ASSET_TYPE = AT.ASSETTYPEID"
+			+ " AND C.CAMERA_ID = A.ASSET_ID"
+			+ " AND CD.CAMERA_DETAIL_ID = C.CAMERA_DETAIL_ID";
+	
 	String viewRenewBookString = "SELECT  A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME"
 			+ " ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, "
 			+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS, ASC1.ID"
@@ -162,11 +173,11 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 			nextScreenUrl = RouteConstant.BACK;
 			break;
 		case 2:
-			//executeViewAndRenewCameras();
+			executeViewCameras();
 			nextScreenUrl = RouteConstant.PATRON_BASE;
 			break;
 		case 1:
-			//executeReturnCameras();
+			executeReturnCameras();
 			nextScreenUrl = RouteConstant.PATRON_BASE;
 			break;
 		default:
@@ -179,6 +190,111 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 		nextScreen.execute();
 	}
 	
+	private void executeViewCameras() {
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("main");
+		EntityManager entityManager = emFactory.createEntityManager();
+		
+		Query viewCameraQuery = entityManager.createNativeQuery(viewCheckedOutCamerasString).setParameter(1, SessionUtils.getPatronId());
+		List camerasResult = viewCameraQuery.getResultList();
+		int numCameras = camerasResult.size();
+		
+		entityManager.close();
+		emFactory.close();
+		
+		int i = 0;
+		Object[][] cameraDisplayDetails  = new Object[numCameras][6];
+		Object[][] cameraDetails = new Object[numCameras][];
+		
+		while(i < numCameras){
+			Object[] arr = (Object[]) camerasResult.get(i);
+			cameraDetails[i] = arr;
+			cameraDisplayDetails[i][0] = arr[6];
+			cameraDisplayDetails[i][1]=  arr[7];
+			cameraDisplayDetails[i][2]=  arr[4];
+			cameraDisplayDetails[i][3]=  arr[5];
+			cameraDisplayDetails[i][4]=  arr[2];
+			cameraDisplayDetails[i][4]=  arr[3];
+			i++;
+		}
+		
+		System.out.println("Checked out cameras:");
+		
+		String[] title = {"Maker","Model", "Lens Details", "Available Memory", "Issue Date", "Due Date"};
+		TextTable tt = new TextTable(title, cameraDisplayDetails);
+		tt.setAddRowNumbering(true);
+		tt.printTable();
+		
+		int option = readOptionNumber("Enter 0 to go back", 0, 0);
+		
+		if(option == 0) {
+			return;
+		}
+	}
+	
+	
+	private void executeReturnCameras() {
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
+		EntityManager entityManager = emFactory.createEntityManager();
+		
+		Query viewCameraQuery = entityManager.createNativeQuery(viewCheckedOutCamerasString).setParameter(1, SessionUtils.getPatronId());
+		List camerasResult = viewCameraQuery.getResultList();
+		int numCameras = camerasResult.size();
+		
+		int i = 0;
+		Object[][] cameraDisplayDetails  = new Object[numCameras][6];
+		Object[][] cameraDetails = new Object[numCameras][];
+		
+		while(i < numCameras){
+			Object[] arr = (Object[]) camerasResult.get(i);
+			cameraDetails[i] = arr;
+			cameraDisplayDetails[i][0] = arr[6];
+			cameraDisplayDetails[i][1]=  arr[7];
+			cameraDisplayDetails[i][2]=  arr[4];
+			cameraDisplayDetails[i][3]=  arr[5];
+			cameraDisplayDetails[i][4]=  arr[2];
+			cameraDisplayDetails[i][5]=  arr[3];
+			i++;
+		}
+		
+		System.out.println("Checked out cameras:");
+		
+		String[] title = {"Maker","Model", "Lens Details", "Available Memory", "Issue Date", "Due Date"};
+		TextTable tt = new TextTable(title, cameraDisplayDetails);
+		tt.setAddRowNumbering(true);
+		tt.printTable();
+		
+		int option = readOptionNumber("Enter the number of the camera you want to return (or 0 to go back)", 0, numCameras);
+		
+		if(option == 0) {
+			return;
+		}
+		
+		BigDecimal chkoutId = (BigDecimal) cameraDetails[option - 1][1];
+		String updateReturnString = "UPDATE ASSET_CHECKOUT asc1 "
+				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine_amount from FINE_SNAPSHOT where checkout_id = ?) "
+				+"	WHERE ASC1.ID = ? ";
+		
+		entityManager.getTransaction().begin();
+		
+		Query q = entityManager.createNativeQuery(updateReturnString).setParameter(1, chkoutId).setParameter(2, chkoutId);
+		int outNo = q.executeUpdate();
+
+		entityManager.getTransaction().commit();
+
+		Query getFineQuery = entityManager.createQuery("SELECT fine"
+					+ " FROM AssetCheckout"
+					+ " WHERE id = ?");
+		getFineQuery.setParameter(1, chkoutId);
+		float fineAmount = (float) getFineQuery.getSingleResult();
+		
+		if(fineAmount != 0)
+			System.out.print("You have successfully returned the camera. You have incurred a fine of $" + fineAmount + " on this device.");
+		else
+			System.out.print("You have successfully returned the camera.");
+
+		entityManager.close();
+		emFactory.close();
+	}
 	private void executeViewAndRenewPublications() {
 		
 		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("main");
@@ -250,7 +366,7 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 		tt.setAddRowNumbering(true);
 		tt.printTable();
 		
-		int option = readOptionNumber("Enter a publication you want to renew/waitlist (or 0 to go back):", 0, numBooks + numConfProcs + numJournals);
+		int option = readOptionNumber("Enter a publication you want to renew/waitlist (or 0 to go back)", 0, numBooks + numConfProcs + numJournals);
 		
 		if(option == 0) {
 			return;
@@ -358,8 +474,8 @@ private void executeReturnPublications() {
 
 			
 		String updateReturnString = "UPDATE ASSET_CHECKOUT asc1 "
-				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine from FINE_SNAPSHOT where checkout_id = ?) "
-				+"	WHERE ASC1.ID = ? "; 
+				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine_amount from FINE_SNAPSHOT where checkout_id = ?) "
+				+"	WHERE ASC1.ID = ? ";
 		
 		entitymanager.getTransaction().begin();
 		
@@ -386,7 +502,7 @@ private void executeReturnPublications() {
 
 			
 		String updateReturnString = "UPDATE ASSET_CHECKOUT asc1 "
-				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine from FINE_SNAPSHOT where checkout_id = ?) "
+				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine_amount from FINE_SNAPSHOT where checkout_id = ?) "
 				+"	WHERE ASC1.ID = ? "; 
 		
 		entitymanager.getTransaction().begin();
@@ -466,7 +582,7 @@ private void executeReturnPublications() {
 		System.out.println("Choose what you want to do with checked out cameras:");
 		String[] title = {""};
 		String[][] options = { 
-							{Constant.OPTION_ASSET_VIEW_OR_RENEW},
+							{Constant.OPTION_ASSET_VIEW},
 							{Constant.OPTION_ASSET_RETURN},
 							{Constant.OPTION_BACK}
 							};
