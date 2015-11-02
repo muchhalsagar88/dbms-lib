@@ -28,7 +28,7 @@ public class RoomsManager extends DBManager {
 
 	public static List<Library> getLibraryList(){
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DEFAULT_PERSISTENCE_UNIT_NAME);
+				DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager entitymanager = emfactory.createEntityManager( );
 
 		List<Library> libraries = entitymanager.createQuery("select l from Library l").getResultList();
@@ -37,7 +37,7 @@ public class RoomsManager extends DBManager {
 
 	public static List<Object[]> getAvailableRooms(int occupants, Library l, Date start, Date end) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DEFAULT_PERSISTENCE_UNIT_NAME);
+				DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		
 		EntityManager entitymanager = emfactory.createEntityManager( );
 		
@@ -82,7 +82,7 @@ public class RoomsManager extends DBManager {
 	
 	public static List<Object[]> getBookedRooms() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DEFAULT_PERSISTENCE_UNIT_NAME);
+				DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		
 		EntityManager entitymanager = emfactory.createEntityManager( );
 		
@@ -112,7 +112,7 @@ public class RoomsManager extends DBManager {
 			DBUtils.persist(ac);
 			
 			EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-					DEFAULT_PERSISTENCE_UNIT_NAME);
+					DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 			
 			EntityManager entitymanager = emfactory.createEntityManager( );
 			entitymanager.getTransaction().begin();
@@ -140,7 +140,7 @@ public class RoomsManager extends DBManager {
 
 	public static List<Object[]> getCheckedOutRooms() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DEFAULT_PERSISTENCE_UNIT_NAME);
+				DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		
 		EntityManager entitymanager = emfactory.createEntityManager( );
 		
@@ -157,7 +157,7 @@ public class RoomsManager extends DBManager {
 
 	public static boolean checkIn(long checkoutId) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DEFAULT_PERSISTENCE_UNIT_NAME);
+				DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		
 		EntityManager entitymanager = emfactory.createEntityManager( );
 		entitymanager.getTransaction().begin();
@@ -170,106 +170,4 @@ public class RoomsManager extends DBManager {
 		return r==1;
 	}
 
-	public int DEFAULT_FACULTY_COUNT;
-	
-	private static List<Department> testDepartments;
-	
-	private static FacultyCategory testFacultyCategory;
-	
-	private static List<Faculty> testFaculty;
-	
-	
-	public static void mai_n(String[] args){
-		int i = 100;
-		
-		testDepartments = new ArrayList<Department>();
-		testFaculty = new ArrayList<Faculty>();
-	
-		
-		List<Library> libraries = new ArrayList<Library>();
-		
-		Library lib = new Library(); 
-		lib.setLibraryName("James Hunt Library");
-		lib.setLibraryAddress(new Address("101 Partner's Drive", null, "Raleigh", 27606));
-		libraries.add(lib);
-		
-		lib = new Library();
-		lib.setLibraryName("D.H. Hill Library");
-		lib.setLibraryAddress(new Address("3420 Hillsborough Street",
-				null, "Raleigh", 27606));
-		libraries.add(lib);
-		for(Library lib1: libraries)
-			DBUtils.persist(lib1);
-		
-		// Persist dependencies
-				Department d = new Department("Faculty Department 1");
-				DBUtils.persist(d);
-				testDepartments.add(d);
-				
-				d = new Department("Faculty Department 2");
-				DBUtils.persist(d);
-				testDepartments.add(d);
-				
-				testFacultyCategory = new FacultyCategory("Faculty Category 1");
-				DBUtils.persist(testFacultyCategory);
-				
-				Faculty f1 = new Faculty();
-				f1.setFirstName("John");
-				f1.setLastName("Hancock");
-				f1.setNationality("American");
-				f1.setDepartment(testDepartments.get(0));
-				f1.setCategory(testFacultyCategory);
-				DBUtils.persist(f1);
-				testFaculty.add(f1);
-				
-				Faculty f2 = new Faculty();
-				f2.setFirstName("Bruce");
-				f2.setLastName("Wayne");
-				f2.setNationality("Canadian");
-				f2.setDepartment(testDepartments.get(1));
-				f2.setCategory(testFacultyCategory);
-				DBUtils.persist(f2);
-				testFaculty.add(f2);
-
-				Department d1 = new Department("Student Department 1");
-				Department d2 = new Department("Student Department 2");
-				DBUtils.persist(d1);
-				DBUtils.persist(d2);
-						
-				Student s1 = new Student("919-985-9848", null, 
-						new Address("2520 Avent Ferry Road", "Apt 102", "Raleigh", 27606), 
-						new Date(), 'M');
-				s1.setFirstName("Barry");
-				s1.setLastName("Allen");
-				s1.setNationality("American");
-				s1.setDepartment(d1);
-				DBUtils.persist(s1);
-				
-				Student s2 = new Student("919-985-9848", null, 
-						new Address("2522 Avent Ferry Road", "Apt 104", "Raleigh", 27606), 
-						new Date(), 'M');
-				s2.setFirstName("Oliver");
-				s2.setLastName("Queen");
-				s2.setNationality("American");
-				s2.setDepartment(d2);
-				DBUtils.persist(s2);
-
-		
-		List<Library> list = (List<Library>) DBUtils.fetchAllEntities("select l from Library l");
-		while(i-->0){
-			Room r = null;
-			if(i%3!=0)
-				r = new StudyRoom();
-			else
-				r = new ConferenceRoom();
-		
-			r.setCapacity(5+((i%4)*5));
-			r.setFloorLevel((i%4)+1);
-			r.setLibrary(list.get(i%list.size()));
-			r.setRoomNo(""+(101+(100-i)));
-			
-			DBUtils.persist(r);
-		}
-		
-	}
 }
