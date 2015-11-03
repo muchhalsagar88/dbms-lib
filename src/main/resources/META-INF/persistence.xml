@@ -48,8 +48,6 @@
 			<property name="javax.persistence.jdbc.user" value="RAP"/>
 			<property name="javax.persistence.jdbc.password" value="pass123"/>
 			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
-			
-			<property name="eclipselink.logging.level" value="OFF"/>
 			<!-- For SQL query debug  -->
 			<property name="eclipselink.logging.level.sql" value="OFF"/>
 			<property name="eclipselink.logging.parameters" value="true"/>

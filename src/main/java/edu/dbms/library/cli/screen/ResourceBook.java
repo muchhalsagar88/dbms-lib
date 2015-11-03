@@ -1,6 +1,7 @@
 package edu.dbms.library.cli.screen;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -31,6 +32,7 @@ import edu.dbms.library.entity.resource.Camera;
 import edu.dbms.library.entity.resource.Journal;
 import edu.dbms.library.entity.resource.PublicationFormat;
 import edu.dbms.library.session.SessionUtils;
+import edu.dbms.library.utils.MailUtils;
 
 public class ResourceBook extends BaseScreen {
 
@@ -142,8 +144,7 @@ public class ResourceBook extends BaseScreen {
 
 		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
 
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				"main");
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager entitymanager = emfactory.createEntityManager( );
 
 		String _fin_q = "SELECT A1.ASSET_ID, B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, PB1.NAME,"
@@ -222,6 +223,46 @@ public class ResourceBook extends BaseScreen {
 		return bks;
 	}
 
+	//Delete all expired waitlisted entries
+	private void removedExpiredWaitlists() {
+		
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
+		EntityManager entityManager = emFactory.createEntityManager();
+		
+		String deleteExpiredWaitlistsString = "DELETE FROM PUBLICATION_WAITLIST"
+				+ " WHERE START_TIME IS NOT NULL"
+				+ " AND END_TIME IS NOT NULL"
+				+ " AND END_TIME < SYSDATE()";
+		
+		Query viewRenewBookQuery = entityManager.createNativeQuery(deleteExpiredWaitlistsString);
+		viewRenewBookQuery.executeUpdate();
+		
+		entityManager.close();
+		emFactory.close();
+	}
+	
+	private void sendWaitlistMailforSecondaryId(String pubSecondaryId) {
+		
+		String getPubWaitlistDetailsForEmailString = "SELECT"
+				+ " FROM PUBLICATION_WAITLIST PW, BOOK_DETAIL BD, ";
+	}
+	
+	private void sendWaitlistMail(String patronName, String patronEmailId, String pubDescription, Date startTime, Date endTime) {
+		
+		String emailSubject = "Waitlisted book " + pubDescription + " is now available!";
+		String emailBody = "Hello " + patronName + ", \n"
+				+ "The book: " + pubDescription + " that you requested for is currently available for checkout.\n"
+				+ "You can now checkout this book between " 
+				+ (new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(startTime)) 
+				+ " and " 
+				+ (new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(startTime)) 
+				+ ".\n"
+				+ "Note: The availability of the book is subject to other ahead of you in the waitlist.\n\n"
+				+ "Have a great day,\n"
+				+ "The Library Team";
+		MailUtils.sendMail(patronEmailId, emailSubject, emailBody);
+	}
+	
 	public void checkout(int bookNo) {
 
 		//Remove Expired TODO
