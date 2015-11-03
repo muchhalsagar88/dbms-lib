@@ -5,9 +5,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -15,22 +14,19 @@ import javax.persistence.TemporalType;
 
 import edu.dbms.library.entity.AbsEntity;
 import edu.dbms.library.entity.Patron;
-import edu.dbms.library.entity.resource.Publication;
 
 @Entity
 @Table(name="publication_waitlist")
-@IdClass(PubWaitlistPK.class)
 public class PublicationWaitlist extends AbsEntity {
 
-	
-	
-	@Id
-	private String patronId;
-	
-	@Id 
-	private String pubSecondaryId;
-	
-	
+	@EmbeddedId
+	private PubWaitlistPK key;
+
+	@MapsId("patronId")
+    @JoinColumn(name ="patron_id", referencedColumnName = "patron_id")
+	@ManyToOne
+	private Patron patron;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="request_date")
 	private Date requestDate;
@@ -39,20 +35,20 @@ public class PublicationWaitlist extends AbsEntity {
 	private int isStudent;
 
 
-	public String getPatronId() {
-		return patronId;
+	public PubWaitlistPK getKey() {
+		return key;
 	}
 
-	public void setPatronId(String patronId) {
-		this.patronId = patronId;
+	public void setKey(PubWaitlistPK key) {
+		this.key = key;
 	}
 
-	public String getPubSecondaryId() {
-		return pubSecondaryId;
+	public Patron getPatron() {
+		return patron;
 	}
 
-	public void setPubSecondaryId(String pubSecondaryId) {
-		this.pubSecondaryId = pubSecondaryId;
+	public void setPatron(Patron patron) {
+		this.patron = patron;
 	}
 
 	public Date getRequestDate() {
@@ -73,8 +69,7 @@ public class PublicationWaitlist extends AbsEntity {
 
 	public PublicationWaitlist(String patronId, String pubSecondaryId, Date requestDate, int isStudent) {
 		super();
-		this.patronId = patronId;
-		this.pubSecondaryId = pubSecondaryId;
+		this.key = new PubWaitlistPK(patronId, pubSecondaryId);
 		this.requestDate = requestDate;
 		this.isStudent = isStudent;
 	}
@@ -82,8 +77,5 @@ public class PublicationWaitlist extends AbsEntity {
 	public PublicationWaitlist() {
 		super();
 	}
-	
-	
-			
-	
+
 }

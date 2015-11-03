@@ -83,7 +83,7 @@ public class ResourceConfPapers extends BaseScreen {
 	public Object readInput() {
 		/*
 		 * Buggy!! Returns incorrect input without any input
-		 * 
+		 *
 		 * String option = inputScanner.nextLine();
 		try {
 			int correct = Integer.parseInt(option);
@@ -99,10 +99,10 @@ public class ResourceConfPapers extends BaseScreen {
 	public void displayOptions() {
 
 		String[] title = {""};
-		String[][] options = { 
+		String[][] options = {
 				{"To Checkout: Enter the order Nummber"},
 				{"0 For Main Menu."},
-				
+
 		};
 		TextTable tt = new TextTable(title, options);
 		tt.setAddRowNumbering(true);
@@ -116,13 +116,13 @@ public class ResourceConfPapers extends BaseScreen {
 	}*/
 
 	public void displayConfProcs() {
-		// opt1: Display only those books tht a patron can checkout. 
+		// opt1: Display only those books tht a patron can checkout.
 		// if the patron has been issued some books. remove thos ISBN number wala books from the display list..
 		// Display conditions for REserved books??
 		//		confPapers = getPapersList(); // publisher is not joined with books yet.
 		String[] title = {"CONF_NUM", "TITLE", "CONF NAME", "AUTHOR(S)", "PUB_YEAR", "Format","STATUS"};
 
-		Object[][] cp = getPapersList();  
+		Object[][] cp = getPapersList();
 
 		TextTable tt = new TextTable(title, cp);
 		tt.setAddRowNumbering(true);
@@ -163,11 +163,11 @@ public class ResourceConfPapers extends BaseScreen {
 				+"						 		  AND CPA1.CONF_NUM = CONF1.CONF_NUM		     "
 				+"						 		  AND AUTH1.ID = CPA1.AUTHOR_ID    "
 				+"						 		  AND conf1.CONF_NUM IN   "
-				+"						 		  			   (SELECT PUBSECONDARYID FROM PUBLICATION_WAITLIST WHERE PATRONID = ? "
+				+"						 		  			   (SELECT pub_secondary_id FROM PUBLICATION_WAITLIST WHERE PATRONID = ? "
 				+"						 					UNION  "
 				+"						 				SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     "
 				+"						 					AND (astchkt.RETURN_DATE is NULL  )  )   "
-				+"						 		  GROUP BY A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT, ASC1.ID ,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID " ;		
+				+"						 		  GROUP BY A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT, ASC1.ID ,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID " ;
 
 
 		Query q = entitymanager.createNativeQuery(query);
@@ -200,7 +200,7 @@ public class ResourceConfPapers extends BaseScreen {
 				confPprs[i][6]=  " ";
 			else
 				confPprs[i][6]=  arr[8];
-			
+
 			i++;
 		}
 
@@ -213,12 +213,12 @@ public class ResourceConfPapers extends BaseScreen {
 
 
 	public void checkout(int bookNo) {
-		
+
 		if(LoginManager.isPatronAccountOnHold(SessionUtils.getPatronId())) {
 			System.out.println("Your library privileges have been suspended. Please pay your dues to checkout assets.");
 			return;
 		}
-		
+
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("main");
 		EntityManager entitymanager = emfactory.createEntityManager( );
@@ -234,7 +234,7 @@ public class ResourceConfPapers extends BaseScreen {
 
 		q.setParameter("num", cpId);
 
-		List<AssetCheckout> asc = (List<AssetCheckout>) q.getResultList();
+		List<AssetCheckout> asc = q.getResultList();
 
 		long count = asc.size();
 
@@ -292,7 +292,7 @@ public class ResourceConfPapers extends BaseScreen {
 		else{
 
 			AssetCheckout asc1 = asc.get(0);
-			if(asc.size()==1 && loggedInPatron.getId() == asc1.getPatron().getId()){ 
+			if(asc.size()==1 && loggedInPatron.getId() == asc1.getPatron().getId()){
 				//renewe condition
 				Date issueDate = new Date();
 				DateTime dt1 = new DateTime(issueDate);
@@ -313,7 +313,7 @@ public class ResourceConfPapers extends BaseScreen {
 				if (isStudent) flag =1;
 				PublicationWaitlist pb = new PublicationWaitlist(loggedInPatron.getId(),cp1.getDetails().getConfNumber(), new Date(), flag );
 
-				DBUtils.persist(pb); 
+				DBUtils.persist(pb);
 
 				System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
 
@@ -331,8 +331,8 @@ public class ResourceConfPapers extends BaseScreen {
 			// checkout Rules:
 			//	1. Reserved books can be checked out for maximum of 4hrs and by only students of the class for which the book is reserved.
 			//	2. Electronic publications Have	no checkout duration.
-			//	3. Journals and Conference Proceedings can be checked out for a period of 12 hours 
+			//	3. Journals and Conference Proceedings can be checked out for a period of 12 hours
 			//	4. Every other book Students: 2 weeks // faculty : 1 month.
 		}
-	}	
+	}
 }
