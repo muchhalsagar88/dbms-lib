@@ -285,6 +285,15 @@ public class ResourceBook extends BaseScreen {
 			boolean isStudent = SessionUtils.isStudent();
 			Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
 
+						String bookAvlbl = "SELECT cp FROM "+AssetCheckout.class.getName()
+								+" cp where cp.asset.id = :num and cp.returnDate IS NULL";
+			
+						Query qbkAvlbl = entitymanager.createQuery(bookAvlbl);
+			
+						qbkAvlbl.setParameter("num", bookId);
+			
+						List<AssetCheckout> asc = qbkAvlbl.getResultList();
+			
 
 
 			String query = "SELECT cp FROM PublicationWaitlist cp"
@@ -297,13 +306,13 @@ public class ResourceBook extends BaseScreen {
 
 			List<PublicationWaitlist> wtList = q.getResultList();
 
-			if(wtList.size() == 0){
+			if(wtList.size() == 0 && asc.size()==0){
 				//Add to checkout
 				
-				String chkquery = "SELECT cp FROM AssetCheckout asc "
-						+ " where asc.patron.id = :pat_id and asc.asset.id = :ast_id and asc.returnDate is NULL";
+				String chkquery = "SELECT asc1 FROM AssetCheckout asc1 "
+						+ " where asc1.patron.id = :pat_id and asc1.asset.id = :ast_id and asc1.returnDate is NULL";
 						
-					Query chkq = entitymanager.createQuery(query);
+					Query chkq = entitymanager.createQuery(chkquery);
 						
 					chkq.setParameter("pat_id", loggedInPatron.getId()).setParameter("ast_id", bookId);
 						
@@ -333,7 +342,7 @@ public class ResourceBook extends BaseScreen {
 					}
 				}
 				if(!isCurrUserinWaitList){	//User is not in waitlist
-					addToWaitList(isStudent, loggedInPatron.getId(), book.getDetail().getIsbnNumber());
+					addToWaitList(isStudent, loggedInPatron.getId(),loggedInPatron, book.getDetail().getIsbnNumber());
 				}
 				else{ // user is in waitlist....check if book avlble then chkout else donothing
 
@@ -344,8 +353,8 @@ public class ResourceBook extends BaseScreen {
 
 					q0.setParameter("num", bookId);
 
-					List<AssetCheckout> asc = q.getResultList();
-					if(asc.size()==0){ //book is avlble
+					List<AssetCheckout> asc1 = q.getResultList();
+					if(asc1.size()==0){ //book is avlble
 						Date startTime = waitingUSer.getStartTime();
 						Date endTime = waitingUSer.getEndTime();
 						Date currTime = new Date();
@@ -432,6 +441,7 @@ public class ResourceBook extends BaseScreen {
 
 		}
 		catch(Exception e){
+			e.printStackTrace();
 			System.out.println("Error..Asset reserved More than one time by the same patron");
 		}
 
@@ -495,7 +505,7 @@ entitymanager.getTransaction().commit();
 		
 	}
 
-	private void addToWaitList(boolean isStudent, String patronid, String isbnNumber) {
+	private void addToWaitList(boolean isStudent, String patronid, Patron loggedInPatron, String isbnNumber) {
 		// TODO Auto-generated method stub
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
@@ -505,7 +515,7 @@ entitymanager.getTransaction().commit();
 		if (isStudent) flag =1;
 
 		String query = "SELECT cp FROM PublicationWaitlist cp"
-				+" where cp.key.pubSecondaryId = :sec_id ORDER BY cp.requestDate desc, isStudent desc";
+				+" where cp.key.pubSecondaryId = :sec_id ORDER BY cp.requestDate desc, cp.isStudent desc";
 
 
 		Query q = entitymanager.createQuery(query);
@@ -518,8 +528,11 @@ entitymanager.getTransaction().commit();
 		emfactory.close();
 
 		PublicationWaitlist pb = new PublicationWaitlist(patronid,isbnNumber, new Date(), flag );
-
-
+		pb.setPatron(loggedInPatron);
+if(wtList.size() == 0){
+	DBUtils.persist(pb);
+}
+else{
 		PublicationWaitlist wl = wtList.get(0);
 		Date maxDate  = wl.getEndTime();
 		if(maxDate == null){
@@ -538,7 +551,7 @@ entitymanager.getTransaction().commit();
 
 
 		DBUtils.persist(pb);
-
+}
 		System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
 
 	}

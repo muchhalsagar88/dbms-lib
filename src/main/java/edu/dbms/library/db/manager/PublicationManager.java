@@ -18,50 +18,52 @@ import edu.dbms.library.utils.MailUtils;
 
 public class PublicationManager {
 
-	public static void returnBook(String assetCheckoutId) {
+	public static void returnBook(EntityManager entityManager, int assetCheckoutId) {
 
-		String assetSecId = checkinBook(assetCheckoutId);
-		checkForWaitlistedPatrons(assetSecId);
+		String assetSecId = checkinBook(entityManager,assetCheckoutId);
+		checkForWaitlistedPatrons(entityManager,assetSecId);
 	}
 
-	private static String checkinBook(String assetCheckoutId) {
+	private static String checkinBook(EntityManager em, int assetCheckoutId) {
 
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
-		EntityManager em = emfactory.createEntityManager();
-
-		Query query = em.createQuery("SELECT a AssetCheckout a WHERE a.id=:checkoutId");
+		
+		Query query = em.createQuery("SELECT a FROM AssetCheckout a WHERE a.id=:checkoutId");
 		query.setParameter("checkoutId", assetCheckoutId);
 
 		AssetCheckout checkout = (AssetCheckout)query.getSingleResult();
 
 
-		Query fineQuery = em.createNativeQuery("SELECT fine_amount from FINE_SNAPSHOT where checkout_id = :checkoutId");
-		fineQuery.setParameter("checkoutId", assetCheckoutId);
-		float fineDue = ((BigDecimal)fineQuery.getSingleResult()).floatValue();
+//		Query fineQuery = em.createNativeQuery("SELECT fine_amount from FINE_SNAPSHOT where checkout_id = ?");
+//		fineQuery.setParameter(1, assetCheckoutId);
+//		float fineDue = ((BigDecimal)fineQuery.getSingleResult()).floatValue();
 
+//		em.getTransaction().begin();
+//		checkout.setReturnDate(new Date());
+//		checkout.setFine(fineDue);
+//		em.getTransaction().commit();
+		
+		
+		String updateReturnString = "UPDATE ASSET_CHECKOUT asc1 "
+				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine_amount from FINE_SNAPSHOT where checkout_id = ?) "
+				+"	WHERE ASC1.ID = ? ";
+		
 		em.getTransaction().begin();
-		checkout.setReturnDate(new Date());
-		checkout.setFine(fineDue);
+		
+		Query q = em.createNativeQuery(updateReturnString).setParameter(1, assetCheckoutId).setParameter(2, assetCheckoutId);
+		int outNo = q.executeUpdate();
+		
 		em.getTransaction().commit();
-
-		em.close();
-		emfactory.close();
-
+		
+		
 		return checkout.getAssetSecondaryId();
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void checkForWaitlistedPatrons(String secAssetId) {
+	private static void checkForWaitlistedPatrons(EntityManager em, String secAssetId) {
 
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
-		EntityManager em = emfactory.createEntityManager();
-
-		Query query = em.createQuery("SELECT w FROM PublicationWaitlist w, Patron p"
-				+ "WHERE w.key.patronId=p.patronId AND "
-				+ "w.key.pubSecondaryId=:secAssetId "
-				+ "ORDER BY w.requestDate, w.isStudent ");
+		Query query = em.createQuery("SELECT w FROM PublicationWaitlist w"
+				+ " WHERE  w.key.pubSecondaryId=:secAssetId "
+				+ " ORDER BY w.requestDate, w.isStudent ");
 		query.setParameter("secAssetId", secAssetId);
 
 		List<PublicationWaitlist> waitlistedPatrons = query.getResultList();
