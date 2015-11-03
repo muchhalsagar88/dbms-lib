@@ -1,6 +1,9 @@
 package edu.dbms.library.cli.screen;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -12,11 +15,21 @@ import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
+import edu.dbms.library.db.manager.RoomsManager;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.session.SessionUtils;
 
 public class CheckedOutResourcesScreen extends BaseScreen{
 
+	String viewCheckedOutRoomsString = "SELECT A.ASSET_ID, AC.ID AS CHECKOUT_ID, AC.ISSUE_DATE, AC.DUE_DATE, R.FLOORLEVEL, R.ROOMNO, R.CAPACITY"
+			+ " FROM ASSET A, ASSET_CHECKOUT AC, ROOM R, ASSET_TYPE AT"
+			+ " WHERE AC.PATRON_ID = ?"
+			+ " AND AC.RETURN_DATE IS NULL"
+			+ " AND A.ASSET_ID = AC.ASSET_ASSET_ID"
+			+ " AND AT.CATEGORY = 'Room'"
+			+ " AND A.ASSET_TYPE = AT.ASSETTYPEID"
+			+ " AND R.ROOM_ID = A.ASSET_ID";
+	
 	String viewCheckedOutCamerasString = "SELECT A.ASSET_ID, AC.ID AS CHECKOUT_ID, AC.ISSUE_DATE, AC.DUE_DATE, CD.LENSDETAIL, CD.MEMORYAVAILABLE, CD.MAKER, CD.MODEL"
 			+ " FROM ASSET A, ASSET_CHECKOUT AC, CAMERA C, CAMERA_DETAIL CD, ASSET_TYPE AT"
 			+ " WHERE AC.PATRON_ID = ?"
@@ -146,11 +159,11 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 			nextScreenUrl = RouteConstant.BACK;
 			break;
 		case 2:
-			//executeViewAndRenewRooms();
+			executeReturnRooms();
 			nextScreenUrl = RouteConstant.PATRON_BASE;
 			break;
 		case 1:
-			//executeReturnRooms();
+			executeViewRooms();
 			nextScreenUrl = RouteConstant.PATRON_BASE;
 			break;
 		default:
@@ -163,6 +176,92 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 		nextScreen.execute();
 	}
 	
+	private void executeViewRooms() {
+		List roomsResult = RoomsManager.getCheckedOutRooms();
+		int numRooms = roomsResult.size();
+		
+		int i = 0;
+		Object[][] roomDisplayDetails  = new Object[numRooms][6];
+		Object[][] roomDetails = new Object[numRooms][];
+		
+		while(i < numRooms){
+			Object[] arr = (Object[]) roomsResult.get(i);
+			roomDetails[i] = arr;
+			roomDisplayDetails[i][0] = arr[3];
+			roomDisplayDetails[i][1]=  arr[2];
+			roomDisplayDetails[i][2]=  arr[1];
+			roomDisplayDetails[i][3]=  new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)arr[4]).getTime()));
+			roomDisplayDetails[i][4]=  new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)arr[5]).getTime()));
+			i++;
+		}
+		
+		System.out.println("Checked out rooms:");
+		
+		String[] title = {"Room Number","Floor Number", "Capacity", "Issue Date", "Due Date"};
+		TextTable tt = new TextTable(title, roomDisplayDetails);
+		tt.setAddRowNumbering(true);
+		tt.printTable();
+		
+		int option = readOptionNumber("Enter 0 to go back", 0, 0);
+		
+		if(option == 0) {
+			return;
+		}
+	}
+	
+	private void executeReturnRooms() {
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
+		EntityManager entityManager = emFactory.createEntityManager();
+		
+		List roomsResult = RoomsManager.getCheckedOutRooms();
+		int numRooms = roomsResult.size();
+		
+		int i = 0;
+		Object[][] roomDisplayDetails  = new Object[numRooms][6];
+		Object[][] roomDetails = new Object[numRooms][];
+		
+		while(i < numRooms){
+			Object[] arr = (Object[]) roomsResult.get(i);
+			roomDetails[i] = arr;
+			roomDisplayDetails[i][0] = arr[3];
+			roomDisplayDetails[i][1]=  arr[2];
+			roomDisplayDetails[i][2]=  arr[1];
+			roomDisplayDetails[i][3]=  new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)arr[4]).getTime()));
+			roomDisplayDetails[i][4]=  new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)arr[5]).getTime()));
+			i++;
+		}
+		
+		System.out.println("Checked out rooms:");
+		
+		String[] title = {"Room Number","Floor Number", "Capacity", "Issue Date", "Due Date"};
+		TextTable tt = new TextTable(title, roomDisplayDetails);
+		tt.setAddRowNumbering(true);
+		tt.printTable();
+		
+		int option = readOptionNumber("Enter the number for the room you want to return (or 0 to go back)", 0, numRooms);
+		
+		if(option == 0) {
+			return;
+		}
+		
+		BigDecimal chkoutId = (BigDecimal) roomDetails[option - 1][7];
+		String updateReturnString = "UPDATE ASSET_CHECKOUT asc1 "
+				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine_amount from FINE_SNAPSHOT where checkout_id = ?) "
+				+"	WHERE ASC1.ID = ? ";
+		
+		entityManager.getTransaction().begin();
+		
+		Query q = entityManager.createNativeQuery(updateReturnString).setParameter(1, chkoutId).setParameter(2, chkoutId);
+		int outNo = q.executeUpdate();
+
+		entityManager.getTransaction().commit();
+
+		System.out.print("You have successfully returned the room.");
+
+		entityManager.close();
+		emFactory.close();
+	}
+	
 	private void executeCheckedoutCameraOptions() {
 		OptionRange cameraOptionRange = displayCheckedOutCameraOptions();
 		int option = readOptionNumber("Enter an option", cameraOptionRange.getRangeMin(), cameraOptionRange.getRangeMax());
@@ -173,11 +272,11 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 			nextScreenUrl = RouteConstant.BACK;
 			break;
 		case 2:
-			executeViewCameras();
+			executeReturnCameras();
 			nextScreenUrl = RouteConstant.PATRON_BASE;
 			break;
 		case 1:
-			executeReturnCameras();
+			executeViewCameras();
 			nextScreenUrl = RouteConstant.PATRON_BASE;
 			break;
 		default:
@@ -191,7 +290,7 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 	}
 	
 	private void executeViewCameras() {
-		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("main");
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager entityManager = emFactory.createEntityManager();
 		
 		Query viewCameraQuery = entityManager.createNativeQuery(viewCheckedOutCamerasString).setParameter(1, SessionUtils.getPatronId());
@@ -212,8 +311,8 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 			cameraDisplayDetails[i][1]=  arr[7];
 			cameraDisplayDetails[i][2]=  arr[4];
 			cameraDisplayDetails[i][3]=  arr[5];
-			cameraDisplayDetails[i][4]=  arr[2];
-			cameraDisplayDetails[i][4]=  arr[3];
+			cameraDisplayDetails[i][4]=  new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)arr[2]).getTime()));
+			cameraDisplayDetails[i][5]=  new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)arr[3]).getTime()));
 			i++;
 		}
 		
@@ -251,8 +350,8 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 			cameraDisplayDetails[i][1]=  arr[7];
 			cameraDisplayDetails[i][2]=  arr[4];
 			cameraDisplayDetails[i][3]=  arr[5];
-			cameraDisplayDetails[i][4]=  arr[2];
-			cameraDisplayDetails[i][5]=  arr[3];
+			cameraDisplayDetails[i][4]=  new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)arr[2]).getTime()));
+			cameraDisplayDetails[i][5]=  new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new Date(((Timestamp)arr[3]).getTime()));;
 			i++;
 		}
 		
@@ -280,24 +379,26 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 		int outNo = q.executeUpdate();
 
 		entityManager.getTransaction().commit();
-
-		Query getFineQuery = entityManager.createQuery("SELECT fine"
-					+ " FROM AssetCheckout"
-					+ " WHERE id = ?");
-		getFineQuery.setParameter(1, chkoutId);
+		entityManager.getTransaction().begin();
+		
+		Query getFineQuery = entityManager.createQuery("SELECT ac.fine"
+					+ " FROM AssetCheckout ac"
+					+ " WHERE ac.id = :id");
+		getFineQuery.setParameter("id", chkoutId);
 		float fineAmount = (float) getFineQuery.getSingleResult();
+		entityManager.getTransaction().commit();
 		
 		if(fineAmount != 0)
-			System.out.print("You have successfully returned the camera. You have incurred a fine of $" + fineAmount + " on this device.");
+			System.out.println("You have successfully returned the camera. You have incurred a fine of $" + fineAmount + " on this device.");
 		else
-			System.out.print("You have successfully returned the camera.");
+			System.out.println("You have successfully returned the camera.");
 
 		entityManager.close();
 		emFactory.close();
 	}
 	private void executeViewAndRenewPublications() {
 		
-		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("main");
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager entityManager = emFactory.createEntityManager();
 		
 		Query viewRenewBookQuery = entityManager.createNativeQuery(viewRenewBookString).setParameter(1, SessionUtils.getPatronId());
@@ -371,15 +472,22 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 		if(option == 0) {
 			return;
 		}
-		else
-			executeReturnPublications();
 		//ENTER CODE TO RENEW/PUT INTO WAITLIST
+		
+		if(option <= numBooks) {
+			runRenewPublicationCode(SessionUtils.getPatronId(), (String) books[option - 1][0], (BigDecimal) books[option - 1][9]);
+		} else if( option <= numConfProcs) {
+			runRenewPublicationCode(SessionUtils.getPatronId(), (String) confProcs[option - numBooks - 1][0],(BigDecimal) confProcs[option - numBooks - 1][9]);
+		} else {
+			runRenewPublicationCode(SessionUtils.getPatronId(), (String) journals[option - numBooks - numConfProcs - 1][0],(BigDecimal)journals[option - numBooks - numConfProcs - 1][7]);
+		}
+		
 		System.out.println("Enter code here to renew / waitlist");
 	}
 	
 private void executeReturnPublications() {
 		
-		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory("main");
+		EntityManagerFactory emFactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager entityManager = emFactory.createEntityManager();
 		
 		Query viewRenewBookQuery = entityManager.createNativeQuery(viewRenewBookString).setParameter(1, SessionUtils.getPatronId());
@@ -468,8 +576,7 @@ private void executeReturnPublications() {
 	private void runReturnPublicationCode(String patronId, String assetId, BigDecimal chkoutId) {
 		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
 
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				"main");
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager entitymanager = emfactory.createEntityManager( );
 
 			
@@ -489,36 +596,7 @@ private void executeReturnPublications() {
 		emfactory.close();
 
 		
-	}
-	
-	private void runRenewPublicationCode(String patronId, String assetId, BigDecimal chkoutId) {
-		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
-
-		boolean is_student = SessionUtils.isStudent();
-		
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				"main");
-		EntityManager entitymanager = emfactory.createEntityManager( );
-
-			
-		String updateReturnString = "UPDATE ASSET_CHECKOUT asc1 "
-				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine_amount from FINE_SNAPSHOT where checkout_id = ?) "
-				+"	WHERE ASC1.ID = ? "; 
-		
-		entitymanager.getTransaction().begin();
-		
-		Query q = entitymanager.createNativeQuery(updateReturnString).setParameter(1, chkoutId).setParameter(2, chkoutId);
-		int outNo = q.executeUpdate();
-
-		entitymanager.getTransaction().commit();
-
-
-		entitymanager.close();
-		emfactory.close();
-
-		
-	}
-	
+	}	
 
 	private void executeCheckedoutPublicationOptions() {
 		OptionRange publicationOptionRange = displayCheckedOutPublicationOptions();
@@ -597,7 +675,7 @@ private void executeReturnPublications() {
 		System.out.println("Choose what you want to do with checked out rooms:");
 		String[] title = {""};
 		String[][] options = { 
-							{Constant.OPTION_ASSET_VIEW_OR_RENEW},
+							{Constant.OPTION_ASSET_VIEW},
 							{Constant.OPTION_ASSET_RETURN},
 							{Constant.OPTION_BACK}
 							};
