@@ -144,14 +144,30 @@ public class PublicationManager {
 	}
 	}
 		
+	public static void sendBookAvailabilityMail(String emailAddress, String startTime, String endTime, String publicationTitle) {
+		sendPublicationAvailabilityMail(emailAddress, startTime, endTime, publicationTitle, "book");
+	}
+	
+	public static void sendConfProcAvailabilityMail(String emailAddress, String startTime, String endTime, String publicationTitle) {
+		sendPublicationAvailabilityMail(emailAddress, startTime, endTime, publicationTitle, "conference proceeding");
+	}
+	
+	public static void sendJournalAvailabilityMail(String emailAddress, String startTime, String endTime, String publicationTitle) {
+		sendPublicationAvailabilityMail(emailAddress, startTime, endTime, publicationTitle, "journal");
+	}
+	
 	public static void sendAvailabilityMail(String emailAddress, String startTime, String endTime, String publicationTitle) {
+		sendPublicationAvailabilityMail(emailAddress, startTime, endTime, publicationTitle, "publication");
+	}
+	
+	private static void sendPublicationAvailabilityMail(String emailAddress, String startTime, String endTime, String publicationTitle, String assetName) {
 
 		StringBuilder builder = new StringBuilder();
-		builder.append("The book ").append(publicationTitle)
-		.append(" that you had requested for is now available. You can check out the book from the library between ")
+		builder.append("The " + assetName + " ").append(publicationTitle)
+		.append(" that you had requested for is now available. You can check out the " + assetName + " from the library between ")
 		.append(startTime).append(" and ").append(endTime);
 
-		MailUtils.sendMail(emailAddress, "Status of waitlisted publication: "+publicationTitle,
+		MailUtils.sendMail(emailAddress, "Status of waitlisted " + assetName + ": "+publicationTitle,
 				builder.toString());
 	}
 }
