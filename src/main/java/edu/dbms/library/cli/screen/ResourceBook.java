@@ -145,60 +145,79 @@ public class ResourceBook extends BaseScreen {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
 				"main");
 		EntityManager entitymanager = emfactory.createEntityManager( );
-		String qer1 =
-				"SELECT A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME   "
-						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, "
-						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS, A1.ASSET_TYPE "
-						+"		  from Book b1, Publication p1,   BOOK_DETAIL bd1, Asset a1 ,Publisher pb1 ,  Author auth1, BOOK_AUTHOR BA1 , ASSET_CHECKOUT asc1 "
-						+"		  WHERE B1.BOOK_ID = a1.ASSET_ID "
-						+"		  AND a1.ASSET_ID = P1.PUBLICATION_ID "
-						+"		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID "
-						+"		  	  )  "
-						+"		  AND B1.ISBN_NUMBER = BD1.ISBN_NUMBER "
-						+"		  AND BD1.PUBLISHER_ID = PB1.ID "
-						+"		  AND BA1.BOOK_ID = B1.ISBN_NUMBER		   "
-						+"		  AND AUTH1.ID = BA1.AUTHOR_ID "
-						+"		  AND  B1.ISBN_NUMBER  NOT in  "
-						+"		  (SELECT R.BOOK_ISBN ISBN FROM RESERVE_BOOK R)  "
-						+"		  GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME, ASC1.ASSET_ASSET_ID, ASC1.ID, A1.ASSET_TYPE, ASC1.RETURN_DATE, ASC1.ISSUE_DATE "
-						+" UNION "
-						+" SELECT A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME    "
-						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, "
-						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS, A1.ASSET_TYPE "
-						+"		  from Book b1, Publication p1,   BOOK_DETAIL bd1, Asset a1 ,Publisher pb1 ,  Author auth1, BOOK_AUTHOR BA1 , ASSET_CHECKOUT asc1 "
-						+"		  WHERE B1.BOOK_ID = a1.ASSET_ID "
-						+"		  AND a1.ASSET_ID = P1.PUBLICATION_ID "
-						+"		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID "
-						+"		  	  ) "
-						+"		  AND B1.ISBN_NUMBER = BD1.ISBN_NUMBER "
-						+"		  AND BD1.PUBLISHER_ID = PB1.ID "
-						+"		  AND BA1.BOOK_ID = B1.ISBN_NUMBER		   "
-						+"		  AND AUTH1.ID = BA1.AUTHOR_ID "
-						+"		  AND  B1.ISBN_NUMBER  in  "
-						+"		  (SELECT R.BOOK_ISBN ISBN FROM RESERVE_BOOK R, ENROLL en  "
-						+"           WHERE SYSDATE between R.FROM_DATE AND R.TODATE "
-						+"          AND R.COURSE_ID = en.COURSE_ID AND en.STUDENT_ID = ?  )   "
-						+"		  GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME, ASC1.ASSET_ASSET_ID, ASC1.ID, A1.ASSET_TYPE, ASC1.RETURN_DATE, ASC1.ISSUE_DATE "
-						+" MINUS "
-						+" SELECT A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME    "
-						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, "
-						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS, A1.ASSET_TYPE "
-						+"		  from Book b1, Publication p1,   BOOK_DETAIL bd1, Asset a1 ,Publisher pb1 ,  Author auth1, BOOK_AUTHOR BA1 , ASSET_CHECKOUT asc1 "
-						+"		  WHERE B1.BOOK_ID = a1.ASSET_ID "
-						+"		  AND a1.ASSET_ID = P1.PUBLICATION_ID "
-						+"		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID "
-						+"		  	  ) "
-						+"		  AND B1.ISBN_NUMBER = BD1.ISBN_NUMBER "
-						+"		  AND BD1.PUBLISHER_ID = PB1.ID "
-						+"		  AND BA1.BOOK_ID = B1.ISBN_NUMBER		   "
-						+"		  AND AUTH1.ID = BA1.AUTHOR_ID   "
-						+"            AND  B1.ISBN_NUMBER IN   "
-						+"			   (SELECT PUBSECONDARYID FROM PUBLICATION_WAITLIST WHERE PATRONID = ? " 
-						+" 					UNION "
-						+" 				SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ? "   
-						+" 					AND (astchkt.RETURN_DATE is NULL ) )    "
-						+"        GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME, ASC1.ASSET_ASSET_ID, ASC1.ID, A1.ASSET_TYPE, ASC1.RETURN_DATE, ASC1.ISSUE_DATE";
-		//						+" MINUS		   "
+		
+		String _fin_q = "SELECT A1.ASSET_ID, B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, PB1.NAME,"
+				 +"Rtrim (Xmlagg (XMLELEMENT (e, AUTH1.NAME|| ',')).extract ('//text()'), ',') AUTHORS, A1.ASSET_TYPE "
+				 +" FROM   BOOK b1, PUBLICATION p1, BOOK_DETAIL bd1, ASSET a1,  PUBLISHER pb1,  AUTHOR auth1, BOOK_AUTHOR BA1 "
+				 +" WHERE  B1.BOOK_ID = a1.ASSET_ID AND a1.ASSET_ID = P1.PUBLICATION_ID  "
+				 +"       AND B1.ISBN_NUMBER = BD1.ISBN_NUMBER AND BD1.PUBLISHER_ID = PB1.ID  AND BA1.BOOK_ID = B1.ISBN_NUMBER "
+				 +"       AND AUTH1.ID = BA1.AUTHOR_ID "
+				 +"       AND B1.ISBN_NUMBER IN "
+				 +"       (  (  (  (SELECT ISBN_NUMBER FROM  BOOK_DETAIL"
+				 +"                                 MINUS "
+				 +"                                 SELECT R.BOOK_ISBN ISBN FROM   RESERVE_BOOK R ) "
+				 +"                               UNION "
+				 +"                         SELECT R.BOOK_ISBN ISBN FROM   RESERVE_BOOK R, ENROLL en "
+				 +"                                WHERE  SYSDATE BETWEEN R.FROM_DATE AND R.TODATE "
+				 +"                                       AND R.COURSE_ID = en.COURSE_ID "
+				 +"                                       AND en.STUDENT_ID = ?    ) "
+				 +"                        MINUS "
+				 +"                     (SELECT ASSET_SECONDARY_ID FROM   ASSET_CHECKOUT astchkt "
+				 +"                              WHERE  astchkt.PATRON_ID = ? AND ( astchkt.RETURN_DATE IS NULL )    )   )    ) "
+				 +" GROUP  BY A1.ASSET_ID, B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, PB1.NAME, A1.ASSET_TYPE";
+
+//		String qer1 =
+//				"SELECT A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME   "
+//						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, "
+//						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS, A1.ASSET_TYPE "
+//						+"		  from Book b1, Publication p1,   BOOK_DETAIL bd1, Asset a1 ,Publisher pb1 ,  Author auth1, BOOK_AUTHOR BA1 , ASSET_CHECKOUT asc1 "
+//						+"		  WHERE B1.BOOK_ID = a1.ASSET_ID "
+//						+"		  AND a1.ASSET_ID = P1.PUBLICATION_ID "
+//						+"		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID "
+//						+"		  	  )  "
+//						+"		  AND B1.ISBN_NUMBER = BD1.ISBN_NUMBER "
+//						+"		  AND BD1.PUBLISHER_ID = PB1.ID "
+//						+"		  AND BA1.BOOK_ID = B1.ISBN_NUMBER		   "
+//						+"		  AND AUTH1.ID = BA1.AUTHOR_ID "
+//						+"		  AND  B1.ISBN_NUMBER  NOT in  "
+//						+"		  (SELECT R.BOOK_ISBN ISBN FROM RESERVE_BOOK R)  "
+//						+"		  GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME, ASC1.ASSET_ASSET_ID, ASC1.ID, A1.ASSET_TYPE, ASC1.RETURN_DATE, ASC1.ISSUE_DATE "
+//						+" UNION "
+//						+" SELECT A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME    "
+//						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, "
+//						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS, A1.ASSET_TYPE "
+//						+"		  from Book b1, Publication p1,   BOOK_DETAIL bd1, Asset a1 ,Publisher pb1 ,  Author auth1, BOOK_AUTHOR BA1 , ASSET_CHECKOUT asc1 "
+//						+"		  WHERE B1.BOOK_ID = a1.ASSET_ID "
+//						+"		  AND a1.ASSET_ID = P1.PUBLICATION_ID "
+//						+"		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID "
+//						+"		  	  ) "
+//						+"		  AND B1.ISBN_NUMBER = BD1.ISBN_NUMBER "
+//						+"		  AND BD1.PUBLISHER_ID = PB1.ID "
+//						+"		  AND BA1.BOOK_ID = B1.ISBN_NUMBER		   "
+//						+"		  AND AUTH1.ID = BA1.AUTHOR_ID "
+//						+"		  AND  B1.ISBN_NUMBER  in  "
+//						+"		  (SELECT R.BOOK_ISBN ISBN FROM RESERVE_BOOK R, ENROLL en  "
+//						+"           WHERE SYSDATE between R.FROM_DATE AND R.TODATE "
+//						+"          AND R.COURSE_ID = en.COURSE_ID AND en.STUDENT_ID = ?  )   "
+//						+"		  GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME, ASC1.ASSET_ASSET_ID, ASC1.ID, A1.ASSET_TYPE, ASC1.RETURN_DATE, ASC1.ISSUE_DATE "
+//						+" MINUS "
+//						+" SELECT A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME    "
+//						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS, "
+//						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS, A1.ASSET_TYPE "
+//						+"		  from Book b1, Publication p1,   BOOK_DETAIL bd1, Asset a1 ,Publisher pb1 ,  Author auth1, BOOK_AUTHOR BA1 , ASSET_CHECKOUT asc1 "
+//						+"		  WHERE B1.BOOK_ID = a1.ASSET_ID "
+//						+"		  AND a1.ASSET_ID = P1.PUBLICATION_ID "
+//						+"		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID "
+//						+"		  	  ) "
+//						+"		  AND B1.ISBN_NUMBER = BD1.ISBN_NUMBER "
+//						+"		  AND BD1.PUBLISHER_ID = PB1.ID "
+//						+"		  AND BA1.BOOK_ID = B1.ISBN_NUMBER		   "
+//						+"		  AND AUTH1.ID = BA1.AUTHOR_ID   "
+//						+"            AND  B1.ISBN_NUMBER IN   "
+//						+"			   ( SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ? "   
+//						+" 					AND (astchkt.RETURN_DATE is NULL ) )    "
+//						+"        GROUP BY A1.ASSET_ID ,  B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME, ASC1.ASSET_ASSET_ID, ASC1.ID, A1.ASSET_TYPE, ASC1.RETURN_DATE, ASC1.ISSUE_DATE";
+//		//						+" MINUS		   "
 		//						+" SELECT A1.ASSET_ID ,    B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME   "
 		//						+"		  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS , A1.ASSET_TYPE"
 		//						+"		  from Book b1, Publication p1,   BOOK_DETAIL bd1, Asset a1 ,Publisher pb1 ,  Author auth1, BOOK_AUTHOR BA1  "
@@ -221,8 +240,22 @@ public class ResourceBook extends BaseScreen {
 
 		//1- list of books checkout by me but not waitlisted can be renewd.
 		//2- list of books 	not checked out by me (minus) reserved books (plus) books reserved for my courses 
-		Query q = entitymanager.createNativeQuery(qer1).setParameter(1, loggedInPatron.getId()).setParameter(2, loggedInPatron.getId()).setParameter(3, loggedInPatron.getId()).setParameter(4, loggedInPatron.getId());
+		Query q = entitymanager.createNativeQuery(_fin_q).setParameter(1, loggedInPatron.getId()).setParameter(2, loggedInPatron.getId());
 		List obj1 = q.getResultList();
+
+		String query0 = "SELECT cp.asset.id FROM "+AssetCheckout.class.getName()
+				+" cp where cp.returnDate IS NULL";
+
+		String query1 = "SELECT cp.asset.id FROM "+AssetCheckout.class.getName()
+				+" cp where cp.returnDate IS NULL AND cp.patron.id = :id1";
+
+		Query q1 = entitymanager.createQuery(query0);
+		Query q2 = entitymanager.createQuery(query1).setParameter("id1", loggedInPatron.getId());
+		
+		
+		//list of all issued assets
+		List<String> chkoutList = (List<String>) q1.getResultList();
+		List<String> myChkoutList = (List<String>) q2.getResultList();
 
 
 
@@ -234,6 +267,13 @@ public class ResourceBook extends BaseScreen {
 		bks1 = new Object[obj1.size()][];
 		while(i<obj1.size()){
 			Object[] arr = (Object[]) obj1.get(i);
+			if(myChkoutList.contains((String)arr[0])){
+				i++;
+				continue;
+			}
+			else if(chkoutList.contains((String)arr[0])){
+				bks[i][7] = "ISSUED";
+			}
 			bks1[i] =  arr;
 			bks[i][0]=  arr[1];
 			bks[i][1]=  arr[2];
@@ -242,12 +282,7 @@ public class ResourceBook extends BaseScreen {
 			bks[i][4]=  arr[4];
 			bks[i][5]=  arr[6];
 			bks[i][6]=  arr[5];
-			if(arr[5].toString().equals("Electronic copy"))
-				bks[i][7] = " ";
-			else
-				bks[i][7]=  arr[8];
 			
-
 			i++;
 		}
 
@@ -270,7 +305,7 @@ try{
 
 		//	Book book = books.get(bookNo-1);
 		String bookId  = (String)bks1[bookNo-1][0];
-		BigDecimal ast_type = (BigDecimal)bks1[bookNo-1][9];
+		BigDecimal ast_type = (BigDecimal)bks1[bookNo-1][8];
 		String pub_format = (String)bks1[bookNo-1][5];
 
 		String query = "SELECT cp FROM "+AssetCheckout.class.getName()

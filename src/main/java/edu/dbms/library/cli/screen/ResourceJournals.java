@@ -137,41 +137,53 @@ public class ResourceJournals extends BaseScreen {
 
 		String query = 
 				" SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT     " 
-						+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  "
-						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS   " 
-						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   " 
+						+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS  "
+						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 " 
 						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
 						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
-						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   " 
-						+" 						 		  	  )    " 
 						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
 						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
-						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID						  " 
-						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID ,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID   " 
-						+"  MINUS " 
-						+"  SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT      " 
-						+"  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  "
-						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS   " 
-						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   " 
-						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
-						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
-						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   " 
-						+" 						 		   )    " 
-						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
-						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
-						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID " 
-						+" 						 		  AND J1.ISSN_NUMBER IN    " 
-						+"                                         (SELECT PUBSECONDARYID FROM PUBLICATION_WAITLIST WHERE PATRONID = ? " 
-						+" 						 					UNION  " 
-						+"                                          SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     " 
-						+"                                          AND (astchkt.RETURN_DATE is NULL ) )    " 
-						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID    " ;				
+						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID"
+//						+ " AND J1.ISSN_NUMBER NOT IN  (SELECT wtlist.PUBSECONDARYID  FROM publication_waitlist wtlist  WHERE (wtlist.PATRONID = ?))	" 
+						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT   "; 
+//						+"  MINUS " 
+//						+"  SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT      " 
+//						+"  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  "
+//						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS   " 
+//						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   " 
+//						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
+//						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
+//						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   " 
+//						+" 						 		   )    " 
+//						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
+//						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
+//						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID " 
+//						+" 						 		  AND J1.ISSN_NUMBER IN    " 
+//						+"                                         (   SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     " 
+//						+"                                          AND (astchkt.RETURN_DATE is NULL ) )    " 
+//						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID    " ;				
 
 
 		Query q = entitymanager.createNativeQuery(query);
 
 
 		q.setParameter(1, loggedInPatron.getId()).setParameter(2, loggedInPatron.getId()).setParameter(3, loggedInPatron.getId());
+		
+		String query0 = "SELECT cp.asset.id FROM "+AssetCheckout.class.getName()
+				+" cp where cp.returnDate IS NULL";
+
+		String query1 = "SELECT cp.asset.id FROM "+AssetCheckout.class.getName()
+				+" cp where cp.returnDate IS NULL AND cp.patron.id = :id1";
+
+		Query q1 = entitymanager.createQuery(query0);
+		Query q2 = entitymanager.createQuery(query1).setParameter("id1", loggedInPatron.getId());
+		
+		
+		//list of all issued assets
+		List<String> chkoutList = (List<String>) q1.getResultList();
+		List<String> myChkoutList = (List<String>) q2.getResultList();
+
+
 
 
 		List obj1 = q.getResultList();
@@ -180,20 +192,25 @@ public class ResourceJournals extends BaseScreen {
 		emfactory.close();
 
 		int i =0;
+		int ctr=0;
 		jrnls  = new Object[obj1.size()][6];
 		jrnls1 = new Object[obj1.size()][];
 		while(i<obj1.size()){
 			Object[] arr = (Object[]) obj1.get(i);
+			if(myChkoutList.contains((String)arr[0])){
+				i++;
+				continue;
+			}
+			else if(chkoutList.contains((String)arr[0])){
+				jrnls[ctr][5] = "ISSUED";
+			}
+			
 			jrnls1[i] =  arr;
 			jrnls[i][0]=  arr[1];
 			jrnls[i][1]=  arr[2];
 			jrnls[i][2]=  arr[5];
 			jrnls[i][3]=  arr[3];
 			jrnls[i][4]=  arr[4];
-			if(arr[4].toString().equals("Electronic copy"))
-				jrnls[i][5]=  " ";
-			else
-				jrnls[i][5]=  arr[6];
 			
 
 			i++;
