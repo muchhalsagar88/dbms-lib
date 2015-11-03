@@ -334,7 +334,7 @@ public class RoomsScreen extends BaseScreen {
 			Room room = (Room) DBUtils.findEntity(Room.class, rooms.get(choice-1)[0], String.class);
 			boolean status = RoomsManager.reserve(room, startDate, endDate);
 			if(status){
-				choice = readOptionNumber("Successfully booked Room # "+room.getRoomNo()+" on "+date+" from "+startTime+":00 Hrs to "+endTime+":00 Hrs\nDo not forget to check in within 1 Hour of start time\nEnter 0 to go back", 0, 0);
+				choice = readOptionNumber("Successfully booked Room # "+room.getRoomNo()+" on "+date+" from "+startTime+" Hrs to "+endTime+" Hrs\nDo not forget to check in within 1 Hour of start time\nEnter 0 to go back", 0, 0);
 				BaseScreen nextScreen = getNextScreen(RouteConstant.BACK);
 				nextScreen.execute();
 				return;

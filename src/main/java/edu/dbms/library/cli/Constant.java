@@ -34,6 +34,8 @@ public class Constant {
 	
 	public static final String OPTION_ASSET_RENEW = "Renew";
 	
+	public static final String OPTION_ASSET_VIEW = "View";
+	
 	public static final String OPTION_ASSET_RETURN = "Return";
 	
 	public static final String OPTION_ASSET_VIEW_OR_RENEW = "View / Renew";

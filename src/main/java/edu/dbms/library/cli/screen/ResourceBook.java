@@ -89,7 +89,7 @@ public class ResourceBook extends BaseScreen {
 	public Object readInput() {
 		/*
 		 * Buggy!! Returns incorrect input without any input
-		 * 
+		 *
 		 * String option = inputScanner.nextLine();
 		try {
 			int correct = Integer.parseInt(option);
@@ -105,10 +105,10 @@ public class ResourceBook extends BaseScreen {
 	public void displayOptions() {
 
 		String[] title = {""};
-		String[][] options = { 
+		String[][] options = {
 				{"To Checkout: Enter the order Nummber"},
 				{"0 For Main Menu."},
-				
+
 		};
 		TextTable tt = new TextTable(title, options);
 		tt.setAddRowNumbering(true);
@@ -122,14 +122,14 @@ public class ResourceBook extends BaseScreen {
 	}*/
 
 	public void displayBooks() {
-		// opt1: Display only those books tht a patron can checkout. 
+		// opt1: Display only those books tht a patron can checkout.
 		// if the patron has been issued some books. remove those ISBN number wala books from the display list if they are not in waitlist
 		// Display conditions for REserved books??
 		//		books = getBookList(); // publisher is not joined with books yet.
 		clearConsole();
 		String[] title = {"ISBN", "TITLE", "EDITION", "AUTHOR(S)", "PUB_YEAR", "PUBLISHER", "FORMAT", "STATUS"};
 
-		bks = getBookList(); 
+		bks = getBookList();
 		int count = 0;
 
 		TextTable tt = new TextTable(title, bks);
@@ -233,8 +233,8 @@ public class ResourceBook extends BaseScreen {
 		//						+"		  AND BD1.PUBLISHER_ID = PB1.ID "
 		//						+"		  AND BA1.BOOK_ID = B1.ISBN_NUMBER		   "
 		//						+"		  AND AUTH1.ID = BA1.AUTHOR_ID "
-		//						+"		  GROUP BY A1.ASSET_ID ,    B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME, A1.ASSET_TYPE ";		
-		//		
+		//						+"		  GROUP BY A1.ASSET_ID ,    B1.ISBN_NUMBER, BD1.TITLE, BD1.EDITION, BD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT , PB1.NAME, A1.ASSET_TYPE ";
+		//
 
 
 
@@ -297,7 +297,7 @@ public class ResourceBook extends BaseScreen {
 			System.out.println("Your library privileges have been suspended. Please pay your dues to checkout assets.");
 			return;
 		}
-		
+
 try{
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
 				"main");
@@ -316,7 +316,7 @@ try{
 
 		q.setParameter("num", bookId);
 
-		List<AssetCheckout> asc = (List<AssetCheckout>) q.getResultList();
+		List<AssetCheckout> asc = q.getResultList();
 		if(asc.size()>1){
 			throw new Exception("Error01");
 //			System.out.println("Error...more than 1 entry found");
@@ -382,7 +382,7 @@ try{
 		else{
 
 			AssetCheckout asc1 = asc.get(0);
-			if(asc.size()==1 && loggedInPatron.getId() == asc1.getPatron().getId()){ 
+			if(asc.size()==1 && loggedInPatron.getId() == asc1.getPatron().getId()){
 				//renewe condition
 				Date issueDate = new Date();
 				DateTime dt1 = new DateTime(issueDate);
@@ -403,7 +403,7 @@ try{
 				if (isStudent) flag =1;
 				PublicationWaitlist pb = new PublicationWaitlist(loggedInPatron.getId(),book.getDetail().getIsbnNumber(), new Date(), flag );
 
-				DBUtils.persist(pb); 
+				DBUtils.persist(pb);
 
 				System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
 
@@ -430,37 +430,37 @@ catch(Exception e){
 		// checkout Rules:
 		//	1. Reserved books can be checked out for maximum of 4hrs and by only students of the class for which the book is reserved.
 		//	2. Electronic publications Have	no checkout duration.
-		//	3. Journals and Conference Proceedings can be checked out for a period of 12 hours 
+		//	3. Journals and Conference Proceedings can be checked out for a period of 12 hours
 		//	4. Every other book Students: 2 weeks // faculty : 1 month.
 	}
 
 
 //	public void reserveBook(int bookNo){
 //
-//		
+//
 //		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
 //				"main");
 //		EntityManager entitymanager = emfactory.createEntityManager( );
-//		
-//		
-//		
+//
+//
+//
 //		String sdate = null;
 //		Date startDate = null;
 //		String edate = null;
 //		Date endDate = null;
 //		String faculty_id =  SessionUtils.getPatronId();
 //		boolean is_stud =  SessionUtils.isStudent();
-//		
+//
 //		Faculty faculty = (Faculty) DBUtils.findEntity(Faculty.class, faculty_id, String.class);
 //		ArrayList<Course> cList = (ArrayList<Course>) faculty.getCourses();
 //		String query1 = "SELECT bk FROM Book bk"	;
 //		Query q = entitymanager.createQuery(query1);
 //
 //		List<Book> asc = (List<Book>) q.getResultList();
-//		
-//		
+//
+//
 //		while(true){
-//			
+//
 //			sdate = readInput("Enter Start Date in MM/DD/YYYY Format");
 //
 //			startDate = DBUtils.validateDate(sdate, "MM/dd/yyyy", true);
@@ -477,7 +477,7 @@ catch(Exception e){
 //			edate = readInput("Enter End Date in MM/DD/YYYY Format");
 //
 //			endDate = DBUtils.validateDate(edate, "MM/dd/yyyy", true);
-//DateTime 
+//DateTime
 //			if(endDate==null){
 //				System.out.println("Enter a valid End date(future date/time)");
 //				continue;
@@ -489,24 +489,24 @@ catch(Exception e){
 //		System.out.print("COURSE #: ");
 //		for(Course c:cList)
 //			System.out.print(c.getCourseId()+ " / ");
-//		
+//
 //		System.out.println("\n");
-//		
+//
 //		System.out.print("BOOK ISBN#: ");
 //		for(Book b:asc)
 //			System.out.print(b.getDetail().getIsbnNumber()+ " / ");
-//		
+//
 //		String crs_id = readInput("Enter CourseID");
 //		String book_id = readInput("Enter Book ISBN No");
-//		
-//		
-//		
-//		
+//
+//
+//
+//
 //			String insertStmnt = "Insert into RESERVE_BOOK (FROM_DATE, TODATE, BOOK_ISBN, COURSE_ID, FACULTY_ID)"
 //						+ "Values ( ?,?,?,?,?) ";
-//		  
+//
 //				Query query = entitymanager.createNativeQuery(insertStmnt);
-//				
+//
 //				entitymanager.getTransaction( ).begin( );
 //
 //				query.setParameter(1, startDate);
@@ -514,32 +514,32 @@ catch(Exception e){
 //				query.setParameter(3, book_id);
 //				query.setParameter(4, crs_id);
 //				query.setParameter(5, faculty_id);
-//				
+//
 //				entitymanager.getTransaction().commit();
-//				
-//				
+//
+//
 //				entitymanager.close();
 //				emfactory.close();
-//		
-//		
-//		
+//
+//
+//
 //		Course c1 = new Course();
-//		
-//		
+//
+//
 //		Faculty f1 = new Faculty();
 //
 //
-//		
+//
 //		Book b1 = new Book();
 //
-//			
 //
-//				
+//
+//
 ////		ReserveBookKey key1 = new ReserveBookKey();
 ////		key1.setCourseId(c1.getCourseId());
 ////		key1.setFacultyId(f1.getId());
 ////		key1.setIsbnNumber(b1.getDetail().getIsbnNumber());
-////		
+////
 ////		ReserveBook rb = new ReserveBook(key1, new Date(),new Date(), c1, f1);
 ////		DBUtils.persist(rb);
 //

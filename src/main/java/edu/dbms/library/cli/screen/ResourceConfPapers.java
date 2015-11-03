@@ -83,7 +83,7 @@ public class ResourceConfPapers extends BaseScreen {
 	public Object readInput() {
 		/*
 		 * Buggy!! Returns incorrect input without any input
-		 * 
+		 *
 		 * String option = inputScanner.nextLine();
 		try {
 			int correct = Integer.parseInt(option);
@@ -99,7 +99,7 @@ public class ResourceConfPapers extends BaseScreen {
 	public void displayOptions() {
 
 		String[] title = {""};
-		String[][] options = { 
+		String[][] options = {
 				{"To Checkout: Enter the order Nummber"},
 				{"0 For Main Menu."},
 
@@ -116,13 +116,13 @@ public class ResourceConfPapers extends BaseScreen {
 	}*/
 
 	public void displayConfProcs() {
-		// opt1: Display only those books tht a patron can checkout. 
+		// opt1: Display only those books tht a patron can checkout.
 		// if the patron has been issued some books. remove thos ISBN number wala books from the display list..
 		// Display conditions for REserved books??
 		//		confPapers = getPapersList(); // publisher is not joined with books yet.
 		String[] title = {"CONF_NUM", "TITLE", "CONF NAME", "AUTHOR(S)", "PUB_YEAR", "Format","STATUS"};
 
-		Object[][] cp = getPapersList();  
+		Object[][] cp = getPapersList();
 
 		TextTable tt = new TextTable(title, cp);
 		tt.setAddRowNumbering(true);
