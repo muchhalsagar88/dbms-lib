@@ -2,7 +2,9 @@ package edu.dbms.library.cli.screen;
 
 import edu.dbms.library.cli.route.Route;
 import edu.dbms.library.cli.route.RouteConstant;
+import edu.dbms.library.db.manager.FineDueManager;
 import edu.dbms.library.db.manager.LoginManager;
+import edu.dbms.library.db.manager.NotificationManager;
 import edu.dbms.library.init.Initializer;
 import edu.dbms.library.session.SessionUtils;
 import edu.dbms.library.to.LoginTO;
@@ -35,6 +37,12 @@ public class LoginScreen extends BaseScreen {
 				System.out.println("Username password combination is incorrect");
 
 		} while(!validUser);
+
+		// Works only on the last day of the month
+		FineDueManager.generateMonthlyBill();
+		int unreadNotifs = NotificationManager.getDueNotifications(SessionUtils.getPatronId());
+		if(unreadNotifs != 0)
+			System.out.println("You have "+unreadNotifs+" unread notifications. Please proceed to the Notifications screen to view them. ");
 
 		// Hard coding input to 1 for Base Patron Screen
 		clearConsole();
