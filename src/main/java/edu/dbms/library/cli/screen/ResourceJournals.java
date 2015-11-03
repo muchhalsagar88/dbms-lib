@@ -79,7 +79,7 @@ public class ResourceJournals extends BaseScreen {
 	public Object readInput() {
 		/*
 		 * Buggy!! Returns incorrect input without any input
-		 * 
+		 *
 		 * String option = inputScanner.nextLine();
 		try {
 			int correct = Integer.parseInt(option);
@@ -95,10 +95,10 @@ public class ResourceJournals extends BaseScreen {
 	public void displayOptions() {
 
 		String[] title = {""};
-		String[][] options = { 
+		String[][] options = {
 				{"To Checkout: Enter the order Nummber"},
 				{"0 For Main Menu."},
-				
+
 		};
 		TextTable tt = new TextTable(title, options);
 		tt.setAddRowNumbering(true);
@@ -112,14 +112,14 @@ public class ResourceJournals extends BaseScreen {
 	}*/
 
 	public void displayJournals() {
-		// opt1: Display only those books tht a patron can checkout. 
+		// opt1: Display only those books tht a patron can checkout.
 		// if the patron has been issued some books. remove thos ISBN number wala books from the display list..
 		// Display conditions for REserved books??
 		//		journals = getJournalList(); // publisher is not joined with books yet.
 
 		String[] title = {"ISSN", "TITLE",  "AUTHOR(S)", "PUB_YEAR", "FORMAT", "STATUS"};
 
-		Object[][] jrnls = getJournalList(); 
+		Object[][] jrnls = getJournalList();
 
 		TextTable tt = new TextTable(title, jrnls);
 		tt.setAddRowNumbering(true);
@@ -135,35 +135,35 @@ public class ResourceJournals extends BaseScreen {
 				"main");
 		EntityManager entitymanager = emfactory.createEntityManager( );
 
-		String query = 
-				" SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT     " 
-						+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS   " 
-						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   " 
-						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
-						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
-						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   " 
-						+" 						 		  AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	  )    " 
-						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
-						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
-						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID						  " 
-						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID   " 
-						+"  MINUS " 
-						+"  SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT      " 
-						+"  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS   " 
-						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   " 
-						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
-						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
-						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   " 
-						+" 						 		  AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	  )    " 
-						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
-						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
-						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID " 
-						+" 						 		  AND J1.ISSN_NUMBER IN    " 
-						+"                                         (SELECT PUBSECONDARYID FROM PUBLICATION_WAITLIST WHERE PATRONID = ? " 
-						+" 						 					UNION  " 
-						+"                                          SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     " 
-						+"                                          AND (astchkt.RETURN_DATE is NULL  OR astchkt.RETURN_DATE=astchkt.ISSUE_DATE) )    " 
-						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID   " ;				
+		String query =
+				" SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT     "
+						+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS   "
+						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   "
+						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   "
+						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   "
+						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   "
+						+" 						 		  AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	  )    "
+						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   "
+						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     "
+						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID						  "
+						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID   "
+						+"  MINUS "
+						+"  SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT      "
+						+"  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  (CASE WHEN ASC1.ID IS NULL THEN 'AVLBLE' ELSE 'ISSUED' END) as STATUS   "
+						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   "
+						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   "
+						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   "
+						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   "
+						+" 						 		  AND ( ASC1.RETURN_DATE is NULL OR ASC1.RETURN_DATE=ASC1.ISSUE_DATE)	  )    "
+						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   "
+						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     "
+						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID "
+						+" 						 		  AND J1.ISSN_NUMBER IN    "
+						+"                                         (SELECT pub_secondary_id FROM PUBLICATION_WAITLIST WHERE PATRONID = ? "
+						+" 						 					UNION  "
+						+"                                          SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     "
+						+"                                          AND (astchkt.RETURN_DATE is NULL  OR astchkt.RETURN_DATE=astchkt.ISSUE_DATE) )    "
+						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID   " ;
 
 
 		Query q = entitymanager.createNativeQuery(query);
@@ -192,7 +192,7 @@ public class ResourceJournals extends BaseScreen {
 				jrnls[i][5]=  " ";
 			else
 				jrnls[i][5]=  arr[6];
-			
+
 
 			i++;
 		}
@@ -206,7 +206,7 @@ public class ResourceJournals extends BaseScreen {
 
 
 	public void checkout(int bookNo) {
-		
+
 		if(LoginManager.isPatronAccountOnHold(SessionUtils.getPatronId())) {
 			System.out.println("Your library privileges have been suspended. Please pay your dues to checkout assets.");
 			return;
@@ -226,7 +226,7 @@ public class ResourceJournals extends BaseScreen {
 
 		q.setParameter("num", journalId);
 
-		List<AssetCheckout> asc = (List<AssetCheckout>) q.getResultList();
+		List<AssetCheckout> asc = q.getResultList();
 
 		long count = asc.size();
 
@@ -283,7 +283,7 @@ public class ResourceJournals extends BaseScreen {
 		else{
 
 			AssetCheckout asc1 = asc.get(0);
-			if(asc.size()==1 && loggedInPatron.getId() == asc1.getPatron().getId()){ 
+			if(asc.size()==1 && loggedInPatron.getId() == asc1.getPatron().getId()){
 				//renewe condition
 				Date issueDate = new Date();
 				DateTime dt1 = new DateTime(issueDate);
@@ -304,7 +304,7 @@ public class ResourceJournals extends BaseScreen {
 				if (isStudent) flag =1;
 				PublicationWaitlist pb = new PublicationWaitlist(loggedInPatron.getId(),journal.getDetails().getIssnNumber(), new Date(), flag );
 
-				DBUtils.persist(pb); 
+				DBUtils.persist(pb);
 
 				System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
 
@@ -322,7 +322,7 @@ public class ResourceJournals extends BaseScreen {
 			// checkout Rules:
 			//	1. Reserved books can be checked out for maximum of 4hrs and by only students of the class for which the book is reserved.
 			//	2. Electronic publications Have	no checkout duration.
-			//	3. Journals and Conference Proceedings can be checked out for a period of 12 hours 
+			//	3. Journals and Conference Proceedings can be checked out for a period of 12 hours
 			//	4. Every other book Students: 2 weeks // faculty : 1 month.
 		}
 	}

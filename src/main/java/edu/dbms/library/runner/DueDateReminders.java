@@ -12,27 +12,16 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+
 import edu.dbms.library.utils.MailUtils;
 
-public class DueDateReminders implements Runnable {
+public class DueDateReminders implements Job {
 
 	public DueDateReminders() {
 		// TODO Auto-generated constructor stub
-	}
-
-	@Override
-	public void run() {
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DEFAULT_PERSISTENCE_UNIT_NAME);
-		
-		EntityManager entitymanager = emfactory.createEntityManager( );
-		
-		Query q = entitymanager.createNativeQuery("SELECT * FROM DUE_IN_NEXT_3_DAYS");
-		List list = q.getResultList();
-		sendMail(list, "3 Days");
-		q = entitymanager.createNativeQuery("SELECT * FROM DUE_IN_NEXT_24_HRS");
-		list = q.getResultList();
-		sendMail(list, "24 Hours");
 	}
 
 	public static void sendMail(List list, String text){
@@ -52,9 +41,22 @@ public class DueDateReminders implements Runnable {
 			MailUtils.sendMail(mailId, _subject.toString() ,_message.toString());
 		}
 	}
-	
-	public static void main(String[] args) {
-		new DueDateReminders().run();
+
+	@Override
+	public void execute(JobExecutionContext arg0) throws JobExecutionException {
+
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DEFAULT_PERSISTENCE_UNIT_NAME);
+
+		EntityManager entitymanager = emfactory.createEntityManager( );
+
+		Query q = entitymanager.createNativeQuery("SELECT * FROM DUE_IN_NEXT_3_DAYS");
+		List list = q.getResultList();
+		sendMail(list, "3 Days");
+		q = entitymanager.createNativeQuery("SELECT * FROM DUE_IN_NEXT_24_HRS");
+		list = q.getResultList();
+		sendMail(list, "24 Hours");
+
 	}
 
 }

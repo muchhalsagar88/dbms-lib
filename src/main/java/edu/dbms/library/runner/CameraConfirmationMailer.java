@@ -120,7 +120,6 @@ public class CameraConfirmationMailer implements Job {
 				camReturned = checkForCameraAvailability(tempCam);
 				user.setCamAvailable(camReturned);
 			}
-			System.out.println(user);
 			users.add(user);
 		}
 		mailer.sendCameraConfirmationMails(users);
