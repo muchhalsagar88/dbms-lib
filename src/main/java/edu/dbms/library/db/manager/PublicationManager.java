@@ -36,11 +36,12 @@ public class PublicationManager {
 		String deleteExpiredWaitlistsString = "DELETE FROM PUBLICATION_WAITLIST"
 				+ " WHERE START_TIME IS NOT NULL"
 				+ " AND END_TIME IS NOT NULL"
-				+ " AND END_TIME < SYSDATE()";
+				+ " AND END_TIME < SYSDATE";
 
+		entityManager.getTransaction().begin();
 		Query viewRenewBookQuery = entityManager.createNativeQuery(deleteExpiredWaitlistsString);
 		viewRenewBookQuery.executeUpdate();
-
+		entityManager.getTransaction().commit();
 		entityManager.close();
 		emFactory.close();
 	}
@@ -51,19 +52,26 @@ public class PublicationManager {
 				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
-		Query query = em.createQuery("SELECT a AssetCheckout a WHERE a.id=:checkoutId");
+		Query query = em.createQuery("SELECT a from AssetCheckout a WHERE a.id=:checkoutId");
 		query.setParameter("checkoutId", assetCheckoutId);
 
 		AssetCheckout checkout = (AssetCheckout)query.getSingleResult();
 
 
-		Query fineQuery = em.createNativeQuery("SELECT fine_amount from FINE_SNAPSHOT where checkout_id = :checkoutId");
-		fineQuery.setParameter("checkoutId", assetCheckoutId);
-		float fineDue = ((BigDecimal)fineQuery.getSingleResult()).floatValue();
+//		Query fineQuery = em.createNativeQuery("SELECT fine_amount from FINE_SNAPSHOT where checkout_id = :checkoutId");
+//		fineQuery.setParameter("checkoutId", assetCheckoutId);
+//		float fineDue = ((BigDecimal)fineQuery.getSingleResult()).floatValue();
 
+		
+		String updateReturnString = "UPDATE ASSET_CHECKOUT asc1 "
+				+ "set ASC1.RETURN_DATE = sysdate, ASC1.FINE = (SELECT fine_amount from FINE_SNAPSHOT where checkout_id = ?) "
+				+"	WHERE ASC1.ID = ? ";
+		
 		em.getTransaction().begin();
-		checkout.setReturnDate(new Date());
-		checkout.setFine(fineDue);
+		
+		Query q = em.createNativeQuery(updateReturnString).setParameter(1, assetCheckoutId).setParameter(2, assetCheckoutId);
+		int outNo = q.executeUpdate();
+
 		em.getTransaction().commit();
 
 		em.close();
@@ -81,9 +89,8 @@ public class PublicationManager {
 				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
-		Query query = em.createQuery("SELECT w FROM PublicationWaitlist w, Patron p"
-				+ "WHERE w.key.patronId=p.patronId AND "
-				+ "w.key.pubSecondaryId=:secAssetId "
+		Query query = em.createQuery("SELECT w FROM PublicationWaitlist w "
+				+ "WHERE w.key.pubSecondaryId=:secAssetId "
 				+ "ORDER BY w.requestDate, w.isStudent ");
 		query.setParameter("secAssetId", secAssetId);
 
@@ -107,15 +114,15 @@ public class PublicationManager {
 		// check if start time is NULL
 		if(waitlistedPatrons.size() > 0) {
 			if(waitlistedPatrons.get(0).getStartTime() == null) {
-				LocalDateTime ldt = LocalDateTime.now();
+				LocalDateTime ldt1 = LocalDateTime.now();
 
 				em.getTransaction().begin();
-				for(PublicationWaitlist pub: waitlistedPatrons) {
-					pub.setStartTime(ldt.toDate());
-					String start = ldt.toString();
-					ldt = ldt.plusMinutes(30);
-					pub.setEndTime(ldt.toDate());
-					sendAvailabilityMail(pub.getPatron().getEmailAddress(), start, ldt.toString(), title);
+				for(PublicationWaitlist pub1: waitlistedPatrons) {
+					pub1.setStartTime(ldt1.toDate());
+					String start = ldt1.toString();
+					ldt1 = ldt1.plusMinutes(30);
+					pub1.setEndTime(ldt1.toDate());
+					sendAvailabilityMail(pub1.getPatron().getEmailAddress(), start, ldt1.toString(), title);
 				}
 				em.getTransaction().commit();
 
@@ -127,16 +134,17 @@ public class PublicationManager {
 				System.out.println(diff);
 
 				em.getTransaction().begin();
-				for(PublicationWaitlist pub: waitlistedPatrons) {
-					pub.setEndTime(new LocalDateTime(pub.getEndTime()).plusMinutes(diff).toDate());
-					sendAvailabilityMail(pub.getPatron().getEmailAddress(), pub.getStartTime().toString(), pub.getEndTime().toString(), title);
+				for(PublicationWaitlist pub1: waitlistedPatrons) {
+					pub1.setEndTime(new LocalDateTime(pub1.getEndTime()).plusMinutes(diff).toDate());
+					sendAvailabilityMail(pub1.getPatron().getEmailAddress(), pub1.getStartTime().toString(), pub1.getEndTime().toString(), title);
 				}
 				em.getTransaction().commit();
 			}
 		}
 	}
-
-	private static void sendAvailabilityMail(String emailAddress, String startTime, String endTime, String publicationTitle) {
+	}
+		
+	public static void sendAvailabilityMail(String emailAddress, String startTime, String endTime, String publicationTitle) {
 
 		StringBuilder builder = new StringBuilder();
 		builder.append("The book ").append(publicationTitle)
