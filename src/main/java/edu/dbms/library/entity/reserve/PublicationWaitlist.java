@@ -31,6 +31,14 @@ public class PublicationWaitlist extends AbsEntity {
 	@Column(name="request_date")
 	private Date requestDate;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="start_time")
+	private Date startTime;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="end_time")
+	private Date endTime;
+	
 	@Column(name="is_student")
 	private int isStudent;
 
