@@ -18,6 +18,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import edu.dbms.library.db.DBUtils;
+import edu.dbms.library.db.manager.NotificationManager;
 import edu.dbms.library.entity.AssetCheckout;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.utils.MailUtils;
@@ -94,7 +95,8 @@ public class FineDueUpdateMailer implements Job {
 			}
 
 			if(null != message)
-				sendReminderMail(message, entry.getValue().getPatron().getEmailAddress(), subject);
+				sendReminderMail(message, entry.getValue().getPatron().getEmailAddress(), subject,
+						entry.getValue().getPatron().getId());
 		}
 	}
 
@@ -117,9 +119,10 @@ public class FineDueUpdateMailer implements Job {
 		emfactory.close();
 	}
 
-	private void sendReminderMail(String message, String emailAddress, String subject) {
+	private void sendReminderMail(String message, String emailAddress, String subject, String patronId) {
 
 		MailUtils.sendMail(emailAddress, subject, message);
+		NotificationManager.createNotification(patronId, message);
 	}
 
 	@Override

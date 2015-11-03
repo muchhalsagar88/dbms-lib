@@ -12,15 +12,11 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import edu.dbms.library.runner.FineDueUpdateMailer;
 import edu.dbms.library.utils.DateUtils;
 
 public class FineDueReminderMailerJob implements Runnable {
-
-final static Logger logger = LoggerFactory.getLogger(FineDueReminderMailerJob.class);
 
 	@Override
 	public void run() {

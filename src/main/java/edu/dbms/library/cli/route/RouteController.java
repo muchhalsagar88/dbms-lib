@@ -9,6 +9,7 @@ import edu.dbms.library.cli.screen.CheckedOutResourcesScreen;
 import edu.dbms.library.cli.screen.LoginScreen;
 import edu.dbms.library.cli.screen.LogoutScreen;
 import edu.dbms.library.cli.screen.PatronBalanceScreen;
+import edu.dbms.library.cli.screen.PatronNotificationScreen;
 import edu.dbms.library.cli.screen.PatronResourceRequestsScreen;
 import edu.dbms.library.cli.screen.PatronResourcesScreen;
 import edu.dbms.library.cli.screen.PatronScreen;
@@ -22,13 +23,13 @@ import edu.dbms.library.cli.screen.RoomsScreen;
 public class RouteController {
 
 	private static RouteController instance;
-	
+
 	private static Map<String, Class<?>> mapping;
-	
+
 	private RouteController() {
 		populateRouteMapping();
 	}
-	
+
 	private void populateRouteMapping() {
 		mapping = new HashMap<String, Class<?>>();
 		mapping.put(RouteConstant.LOGIN, LoginScreen.class);
@@ -38,28 +39,30 @@ public class RouteController {
 		mapping.put(RouteConstant.PATRON_RESOURCES_CAMERA, CameraListScreen.class);
 		mapping.put(RouteConstant.PATRON_RES_REQUEST, PatronResourceRequestsScreen.class);
 		mapping.put(RouteConstant.PATRON_CHECKED_OUT, CheckedOutResourcesScreen.class);
-		mapping.put(RouteConstant.LOGOUT, LogoutScreen.class);		
-		
+		mapping.put(RouteConstant.LOGOUT, LogoutScreen.class);
+
 		mapping.put(RouteConstant.PATRON_RESOURCES_PUBLICATIONS, ResourcePublications.class);
 		mapping.put(RouteConstant.PUBLICATION_BOOKS, ResourceBook.class);
 		mapping.put(RouteConstant.PUBLICATIONS_JOURNALS, ResourceJournals.class);
 		mapping.put(RouteConstant.PUBLICATIONS_CONFPAPERS, ResourceConfPapers.class);
-		
+
 		mapping.put(RouteConstant.PATRON_RESOURCES_ROOMS, RoomsScreen.class);
-		
+
 		mapping.put(RouteConstant.PATRON_BALANCE, PatronBalanceScreen.class);
+
+		mapping.put(RouteConstant.PATRON_NOTIFICATIONS, PatronNotificationScreen.class);
 	}
-	
+
 	public static synchronized RouteController getInstance() {
 		if(instance == null)
 			instance = new RouteController();
 		return instance;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static Class<? extends BaseScreen> getScreen(String screenOption) {
-	
+
 		return (Class<? extends BaseScreen>) mapping.get(screenOption);
 	}
-	
+
 }

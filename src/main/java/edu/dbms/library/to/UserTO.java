@@ -10,6 +10,8 @@ public class UserTO {
 	// To be used for user with waitlist = 0 only
 	private boolean camAvailable;
 
+	private String patronId;
+
 	public String getFirstName() {
 		return firstName;
 	}
@@ -42,10 +44,19 @@ public class UserTO {
 		this.camAvailable = camAvailable;
 	}
 
-	public UserTO(String firstName, String email, int waitlistNumber) {
+	public String getPatronId() {
+		return patronId;
+	}
+
+	public void setPatronId(String patronId) {
+		this.patronId = patronId;
+	}
+
+	public UserTO(String firstName, String email, int waitlistNumber, String patronId) {
 		this.firstName = firstName;
 		this.emailAddress = email;
 		this.waitlistNumber = waitlistNumber;
+		this.patronId = patronId;
 	}
 
 	@Override

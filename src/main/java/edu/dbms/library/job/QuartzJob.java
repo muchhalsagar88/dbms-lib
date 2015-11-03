@@ -54,6 +54,7 @@ public class QuartzJob implements Runnable {
 			JobDetail jobDetail = newJob(CameraConfirmationMailer.class).build();
 
 	        Trigger trigger = newTrigger()
+	        		.withSchedule(repeatHourlyForever(24*7))
 	        		.startAt(time.toDate())
 	                .build();
 

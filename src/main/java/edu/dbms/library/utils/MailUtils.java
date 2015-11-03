@@ -13,7 +13,7 @@ import javax.mail.internet.MimeMessage;
 public class MailUtils {
 
 	private static Properties getMailerProperties() {
-		
+
 		Properties props = new Properties();
 		props.put("mail.smtp.host", "smtp.gmail.com");
 		props.put("mail.smtp.socketFactory.port", "465");
@@ -21,18 +21,19 @@ public class MailUtils {
 				"javax.net.ssl.SSLSocketFactory");
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.port", "465");
-		
+
 		return props;
 	}
-	
+
 	public static void sendMail(String emailAddress, String subject, String messageBody) {
-		
+
 		final String username = "csc540.009@gmail.com";
 		final String password = "dbms1234";
 
-		Properties props = getMailerProperties(); 
+		Properties props = getMailerProperties();
 		Session session = Session.getInstance(props,
 		  new javax.mail.Authenticator() {
+			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(username, password);
 			}

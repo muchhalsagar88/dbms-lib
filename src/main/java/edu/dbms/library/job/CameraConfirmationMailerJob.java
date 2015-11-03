@@ -12,15 +12,11 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import edu.dbms.library.runner.CameraConfirmationMailer;
 import edu.dbms.library.utils.DateUtils;
 
 public class CameraConfirmationMailerJob implements Runnable {
-
-	final static Logger logger = LoggerFactory.getLogger(CameraConfirmationMailerJob.class);
 
 	@Override
 	public void run() {
