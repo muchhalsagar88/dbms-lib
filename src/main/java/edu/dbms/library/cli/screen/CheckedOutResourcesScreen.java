@@ -484,11 +484,30 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 			String pub_format = (String) books[option - 1][5];
 
 			resBook.checkout(bookId, ast_type, pub_format);
-		} /*else if( option <= numConfProcs) {
-			runRenewPublicationCode(SessionUtils.getPatronId(), (String) confProcs[option - numBooks - 1][0],(BigDecimal) confProcs[option - numBooks - 1][9]);
+		} else if( option <= numConfProcs) {
+
+			ResourceConfPapers resCP = new ResourceConfPapers();
+			
+			String cpId  = (String)  confProcs[option - numBooks - 1][0];
+			BigDecimal ast_type = (BigDecimal.valueOf(3L));
+			String pub_format = (String) confProcs[option - numBooks - 1][6];
+
+			resCP.checkout(cpId,  pub_format);
+			
+			//			runRenewPublicationCode(SessionUtils.getPatronId(), (String) confProcs[option - numBooks - 1][0],(BigDecimal) confProcs[option - numBooks - 1][9]);
 		} else {
-			runRenewPublicationCode(SessionUtils.getPatronId(), (String) journals[option - numBooks - numConfProcs - 1][0],(BigDecimal)journals[option - numBooks - numConfProcs - 1][7]);
-		}*/
+			
+			ResourceJournals resJournal = new ResourceJournals();
+			
+			String journalId  = (String)  journals[option - numBooks - numConfProcs - 1][0];
+			BigDecimal ast_type = (BigDecimal)journals[option - numBooks - numConfProcs - 1][7];
+			String pub_format = (String) journals[option - numBooks - numConfProcs - 1][4];
+
+			resJournal.checkout(journalId, ast_type, pub_format);
+			
+
+//			runRenewPublicationCode(SessionUtils.getPatronId(), (String) journals[option - numBooks - numConfProcs - 1][0],(BigDecimal)journals[option - numBooks - numConfProcs - 1][7]);
+		}
 
 //		System.out.println("Enter code here to renew / waitlist");
 	}
@@ -580,7 +599,7 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 			PublicationManager.returnPublication(((BigDecimal) journals[option - numBooks - numConfProcs - 1][7]).longValue());
 			//runReturnPublicationCode(SessionUtils.getPatronId(), (String) journals[option - numBooks - numConfProcs - 1][0],(BigDecimal)journals[option - numBooks - numConfProcs - 1][7]);
 		}
-
+System.out.println("You have returned the item.");
 
 	}
 

@@ -27,6 +27,7 @@ public class MailUtils {
 
 	public static void sendMail(String emailAddress, String subject, String messageBody) {
 
+		System.out.println(emailAddress+":"+subject+":"+messageBody);
 		final String username = "csc540.009@gmail.com";
 		final String password = "dbms1234";
 

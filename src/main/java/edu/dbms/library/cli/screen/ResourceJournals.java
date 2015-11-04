@@ -1,5 +1,6 @@
 package edu.dbms.library.cli.screen;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,9 +17,11 @@ import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.db.manager.LoginManager;
+import edu.dbms.library.db.manager.PublicationManager;
 import edu.dbms.library.entity.AssetCheckout;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.entity.reserve.PublicationWaitlist;
+import edu.dbms.library.entity.resource.Book;
 import edu.dbms.library.entity.resource.Journal;
 import edu.dbms.library.session.SessionUtils;
 
@@ -56,7 +59,18 @@ public class ResourceJournals extends BaseScreen {
 		}
 		else{
 			// call checkout methods
-			checkout((int)o);
+			
+			
+			int journalNo = (int)o;
+			
+			String journalId  = (String)jrnls1[journalNo-1][0];
+			String pub_format = (String)jrnls1[journalNo-1][4];
+			BigDecimal ast_type = (BigDecimal.valueOf(2L));
+
+			checkout(journalId, ast_type, pub_format);
+
+			
+			
 
 			// update the approproate tables with respect to availibility. Assign return dates to items
 			// checkout possible only for available items
@@ -224,7 +238,284 @@ public class ResourceJournals extends BaseScreen {
 	}
 
 
-	public void checkout(int bookNo) {
+	public void checkout(String journalId , BigDecimal ast_type, String pub_format) {
+
+		//Removing expired Waitlisted entries
+		PublicationManager.removedExpiredWaitlists();
+		if(LoginManager.isPatronAccountOnHold(SessionUtils.getPatronId())) {
+			System.out.println("Your library privileges have been suspended. Please pay your dues to checkout assets.");
+			return;
+		}
+
+		boolean isStudent = SessionUtils.isStudent();
+		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
+		try{
+			EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
+			EntityManager entitymanager = emfactory.createEntityManager( );
+
+			//Get Book details
+			Journal journal = (Journal) DBUtils.findEntity(Journal.class, journalId, String.class);
+			//Query that returns a result if the book is currently checked out
+			String bookAvlbl = "SELECT cp FROM "
+					+ AssetCheckout.class.getName()
+					+ " cp where cp.asset.id = :num and cp.returnDate IS NULL";
+
+			Query qbkAvlbl = entitymanager.createQuery(bookAvlbl);
+			qbkAvlbl.setParameter("num", journalId);
+			List<AssetCheckout> isCheckedOutResult = qbkAvlbl.getResultList();
+
+			//Query that returns all the waitlisted entries for this secondary ID
+			String query = "SELECT cp FROM PublicationWaitlist cp"
+					+" where cp.key.pubSecondaryId = :sec_id ";
+
+			Query q = entitymanager.createQuery(query);
+			q.setParameter("sec_id", journal.getDetails().getIssnNumber());
+			List<PublicationWaitlist> wtList = q.getResultList();
+
+			//If there is no waitlist
+			if(wtList.size() == 0 ){
+				if(isCheckedOutResult.size()==0){ //No one has checked out, so checkout the book to this user
+				
+					try{
+						addJournalToAssetCheckout(pub_format, isStudent, journal, loggedInPatron, ast_type);
+					}
+					catch(Exception e){
+						e.printStackTrace();
+						System.out.println("Some error occured");
+					}
+
+				} else {// Some one has the book checked out
+					
+					//Query to check if this user has the book checked out
+					String query04 = "SELECT cp FROM "+AssetCheckout.class.getName()
+							+" cp where cp.asset.id = :num  AND cp.patron.id = :pat_id and cp.returnDate IS NULL";
+
+					Query q4 = entitymanager.createQuery(query04);
+					q4.setParameter("num", journalId).setParameter("pat_id", loggedInPatron.getId());
+					List<AssetCheckout> isCheckedOutByThisUserResult = q4.getResultList();
+					
+					if(isCheckedOutByThisUserResult.size() == 0){
+						//Add user to waitlist as the book is checked out by someone
+						addToWaitList(isStudent, loggedInPatron.getId(),loggedInPatron, journal.getDetails().getIssnNumber());
+					}
+					else{
+						updateAssetCheckout(entitymanager, isCheckedOutByThisUserResult.get(0),pub_format,isStudent, ast_type);
+					}
+				}
+			} else {//If there is a waitlist for this book
+				
+				boolean isCurrUserinWaitList = false;
+				PublicationWaitlist waitingUser = null;
+				//check ig this user is in waitlist
+				for(PublicationWaitlist wlT : wtList){
+					if(wlT.getPatron().getId() == loggedInPatron.getId()){
+						isCurrUserinWaitList = true;
+						waitingUser = wlT;
+						break;
+					}
+				}
+				
+				if(!isCurrUserinWaitList){	//User is not in waitlist
+					addToWaitList(isStudent, loggedInPatron.getId(),loggedInPatron, journal.getDetails().getIssnNumber());
+				} else { // user is in waitlist....check if book avlble then chkout else donothing
+
+					//Query to check if the book is available and this guy is in waitlist
+					String query01 = "SELECT cp FROM "+AssetCheckout.class.getName()
+							+" cp where cp.asset.id = :num and cp.returnDate IS NULL";
+					
+					Query q0 = entitymanager.createQuery(query01);
+					q0.setParameter("num", journalId);
+					List<AssetCheckout> asc1 = q0.getResultList();
+					
+					if(asc1.size()==0){ //book is avlble
+						Date startTime = waitingUser.getStartTime();
+						Date endTime = waitingUser.getEndTime();
+						Date currTime = new Date();
+						//If this guys assigned checkout time is now
+						if(startTime.before(currTime) && endTime.after(currTime)){
+							try{
+								addJournalToAssetCheckout(pub_format, isStudent, journal, loggedInPatron, ast_type);
+								String removequery = "DELETE  FROM PUBLICATION_WAITLIST pw "
+										+"  where pw.PUB_SECONDARY_ID = ? and  PATRON_ID = ? ";
+
+								Query retq0 = entitymanager.createNativeQuery(removequery);
+								retq0.setParameter(1, journal.getDetails().getIssnNumber()).setParameter(2, loggedInPatron.getId());
+
+								entitymanager.getTransaction().begin();
+								retq0.executeUpdate();
+								entitymanager.getTransaction().commit();
+
+							}
+							catch(Exception e){
+								e.printStackTrace();
+								System.out.println("The book is already issued by you...");
+							}
+						} else 
+							System.out.println("You can not checkout the book at this time");
+					} else{
+						//Do nothing
+						System.out.println(" You are already in waitlist. The book hasnt been returned yet. You will be notified");
+					}
+				}
+			}
+
+			entitymanager.close();
+			emfactory.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			System.out.println("Error..Asset reserved More than one time by the same patron");
+		}
+	}
+	
+	
+
+	private void updateAssetCheckout(EntityManager entitymanager, AssetCheckout assetCheckout, String pub_format, boolean isStudent, BigDecimal ast_type) {
+
+
+		Date issueDate = new Date();
+		DateTime dt1 = new DateTime(issueDate);
+		DateTime dt2 = null;
+		Date dueDate ;
+
+		if(pub_format.equals("Physical copy")){
+			//			System.out.println("HARD\n\n\n");
+			dt2 = dt1.plusHours(12);
+			
+			dueDate = dt2.toDate();
+			assetCheckout.setDueDate(dueDate);
+
+			int flag = 0;
+			if (isStudent) flag =1;
+
+			String updatequery = "UPDATE ASSET_CHECKOUT asc1 set asc1.DUE_DATE = ?"
+					+" where asc1.id = ? ";
+
+
+			Query upq = entitymanager.createNativeQuery(updatequery);
+
+			upq.setParameter(1, dueDate).setParameter(2, assetCheckout.getId());
+
+			entitymanager.getTransaction().begin();
+			int output = upq.executeUpdate();
+			entitymanager.getTransaction().commit();			
+
+			//			clearConsole();
+			System.out.println("The item has been checked out: The return time is :"+ dueDate);
+
+
+		}
+
+
+	}
+
+	public void addToWaitList(boolean isStudent, String patronid, Patron loggedInPatron, String isbnNumber) {
+		// TODO Auto-generated method stub
+
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
+		EntityManager entitymanager = emfactory.createEntityManager( );
+
+		int flag = 0;
+		if (isStudent) flag =1;
+
+		String query = "SELECT cp FROM PublicationWaitlist cp"
+				+" where cp.key.pubSecondaryId = :sec_id ORDER BY cp.requestDate desc, cp.isStudent desc";
+
+
+		Query q = entitymanager.createQuery(query);
+
+		q.setParameter("sec_id", isbnNumber);
+
+		List<PublicationWaitlist> wtList = q.getResultList();
+
+		
+		PublicationWaitlist pb = new PublicationWaitlist(patronid,isbnNumber, new Date(), flag );
+		pb.setPatron(loggedInPatron);
+		if(wtList.size() == 0){
+			DBUtils.persist(pb);
+		}
+		else{
+			PublicationWaitlist wl = wtList.get(0);
+			Date maxDate  = wl.getEndTime();
+			if(maxDate == null){
+
+			}
+			else{
+				DateTime dt1= new DateTime(maxDate);
+				DateTime dt2= dt1.plusMinutes(1);
+				DateTime dt3= dt1.plusMinutes(30);
+				pb.setStartTime(dt2.toDate());
+				pb.setEndTime(dt3.toDate());
+				
+				String pubDetailQry = "SELECT d.title FROM BOOK_DETAIL d WHERE d.isbn_number=? "
+						+ "UNION "
+						+ "SELECT d.title FROM JOURNAL_DETAIL d WHERE d.issn_number=? "
+						+ "UNION "
+						+ "SELECT d.title FROM CONFERENCE_PROCEEDING_DETAIL d WHERE d.conf_num=?";
+
+				Query publicationDetailQuery = entitymanager.createNativeQuery(pubDetailQry);
+				publicationDetailQuery.setParameter(1, isbnNumber);
+				publicationDetailQuery.setParameter(2, isbnNumber);
+				publicationDetailQuery.setParameter(3, isbnNumber);
+
+				String title = (String)publicationDetailQuery.getSingleResult();
+
+				PublicationManager.sendJournalAvailabilityMail(loggedInPatron.getEmailAddress(), pb.getStartTime().toString(), pb.getEndTime().toString(), title);
+			}
+
+			DBUtils.persist(pb);
+		}
+		
+		entitymanager.close();
+		emfactory.close();
+		System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
+
+	}
+
+	private void addJournalToAssetCheckout(String pub_format, boolean isStudent, Journal journal, Patron loggedInPatron, BigDecimal ast_type) {
+		AssetCheckout astChkOut = new AssetCheckout();
+
+		Date issueDate = new Date();
+		DateTime dt1 = new DateTime(issueDate);
+		DateTime dt2 = null;
+		Date dueDate ;
+
+		if(pub_format.equals("Physical copy")){
+			//			System.out.println("HARD\n\n\n");
+			dt2 = dt1.plusHours(12);
+			
+
+			dueDate = dt2.toDate();
+			astChkOut.setAssetSecondaryId(journal.getDetails().getIssnNumber());
+			astChkOut.setAsset(journal);
+			astChkOut.setIssueDate(issueDate );
+			astChkOut.setDueDate(dueDate);
+			astChkOut.setPatron(loggedInPatron);
+			DBUtils.persist(astChkOut);
+			//			clearConsole();
+			System.out.println("The item has been checked out: The return time is :"+ dueDate);
+
+
+		}
+		else{
+			//				System.out.println("SOFT\n\n\n");
+			dt2= dt1.plusMinutes(0);
+
+			astChkOut.setAssetSecondaryId(journal.getDetails().getIssnNumber());
+			astChkOut.setAsset(journal);
+			astChkOut.setIssueDate(issueDate );
+			astChkOut.setDueDate(issueDate);
+			astChkOut.setReturnDate(issueDate);
+			astChkOut.setPatron(loggedInPatron);
+			DBUtils.persist(astChkOut);
+			//			clearConsole();
+			System.out.println("The item has been checked out: The return time is : N/A");
+		}
+	}
+
+	
+	
+	/*public void checkout(int bookNo) {
 
 		if(LoginManager.isPatronAccountOnHold(SessionUtils.getPatronId())) {
 			System.out.println("Your library privileges have been suspended. Please pay your dues to checkout assets.");
@@ -344,5 +635,5 @@ public class ResourceJournals extends BaseScreen {
 			//	3. Journals and Conference Proceedings can be checked out for a period of 12 hours
 			//	4. Every other book Students: 2 weeks // faculty : 1 month.
 		}
-	}
+	}*/
 }

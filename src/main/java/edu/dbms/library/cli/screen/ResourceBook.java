@@ -447,7 +447,7 @@ public class ResourceBook extends BaseScreen {
 
 	}
 
-	private void addToWaitList(boolean isStudent, String patronid, Patron loggedInPatron, String isbnNumber) {
+	public void addToWaitList(boolean isStudent, String patronid, Patron loggedInPatron, String isbnNumber) {
 		// TODO Auto-generated method stub
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
@@ -498,7 +498,7 @@ public class ResourceBook extends BaseScreen {
 
 				String title = (String)publicationDetailQuery.getSingleResult();
 
-				PublicationManager.sendAvailabilityMail(loggedInPatron.getEmailAddress(), pb.getStartTime().toString(), pb.getEndTime().toString(), title);
+				PublicationManager.sendBookAvailabilityMail(loggedInPatron.getEmailAddress(), pb.getStartTime().toString(), pb.getEndTime().toString(), title);
 			}
 
 			DBUtils.persist(pb);
