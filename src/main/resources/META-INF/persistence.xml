@@ -43,13 +43,13 @@
 		<class>edu.dbms.library.entity.reserve.CameraReservation</class>
 		<class>edu.dbms.library.entity.reserve.PublicationWaitlist</class>
 		
+		<class>edu.dbms.library.entity.Notification</class>
+		
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:xe"/>
-			<property name="javax.persistence.jdbc.user" value="nikhil"/>
-			<property name="javax.persistence.jdbc.password" value="password"/>
+			<property name="javax.persistence.jdbc.user" value="RAP"/>
+			<property name="javax.persistence.jdbc.password" value="pass123"/>
 			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
-			
-			<property name="eclipselink.logging.level" value="OFF"/>
 			<!-- For SQL query debug  -->
 			<property name="eclipselink.logging.level.sql" value="OFF"/>
 			<property name="eclipselink.logging.parameters" value="true"/>

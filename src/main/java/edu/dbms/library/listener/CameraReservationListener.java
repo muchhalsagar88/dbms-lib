@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import org.joda.time.LocalDateTime;
 
 import edu.dbms.library.db.DBUtils;
+import edu.dbms.library.db.manager.NotificationManager;
 import edu.dbms.library.entity.reserve.CameraReservation;
 import edu.dbms.library.utils.MailUtils;
 
@@ -57,6 +58,7 @@ public final class CameraReservationListener {
 					builder.append(tempHour - 12).append("pm");
 
 				MailUtils.sendMail(nextReservation.getPatron().getEmailAddress(), "Availability of reserved camera", builder.toString());
+				NotificationManager.createNotification(nextReservation.getPatron().getId(), builder.toString());
 			}
 		}
 	}

@@ -16,6 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import edu.dbms.library.entity.reserve.PublicationWaitlist;
+
 @Entity
 @Table(name="patron")
 @Inheritance(strategy=InheritanceType.JOINED)
@@ -48,6 +50,20 @@ public class Patron extends AbsEntity {
 
 	@OneToOne(mappedBy="patron")
 	private LoginDetails loginDetails;
+
+	@OneToMany(mappedBy="patron")
+	private Collection<PublicationWaitlist> waitlists;
+
+	@OneToMany(mappedBy="patron")
+	private Collection<Notification> notifications;
+
+	public Collection<Notification> getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(Collection<Notification> notifications) {
+		this.notifications = notifications;
+	}
 
 	public Collection<AssetCheckout> getAssetCheckouts() {
 		return assetCheckouts;

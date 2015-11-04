@@ -12,23 +12,19 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import edu.dbms.library.runner.CameraConfirmationMailer;
 import edu.dbms.library.utils.DateUtils;
 
 public class CameraConfirmationMailerJob implements Runnable {
 
-	final static Logger logger = LoggerFactory.getLogger(CameraConfirmationMailerJob.class);
-	
 	@Override
 	public void run() {
-		
+
 		LocalDate localDate = DateUtils.getNextFriday();
 		LocalDateTime time = localDate.toLocalDateTime(LocalTime.MIDNIGHT);
 		time = time.plusHours(8);
-		
+
 		Scheduler scheduler;
 		try {
 			scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -41,19 +37,19 @@ public class CameraConfirmationMailerJob implements Runnable {
 	                .build();
 
 	        scheduler.scheduleJob(jobDetail, trigger);
-	        
+
 		} catch (SchedulerException e) {
-			
+
 			e.printStackTrace();
 		}
     }
-	
+
 	public static void main(String []args) {
-		
+
 		LocalDate localDate = DateUtils.getNextFriday();
 		LocalDateTime time = localDate.toLocalDateTime(LocalTime.MIDNIGHT);
 		time = time.plusHours(8);
-		
+
 		Scheduler scheduler;
 		try {
 			scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -62,7 +58,7 @@ public class CameraConfirmationMailerJob implements Runnable {
 	        JobDetail jobDetail = newJob(CameraConfirmationMailer.class).build();
 
 	        Trigger trigger = newTrigger()
-	        		//.withIdentity(triggerKey("myTrigger", "myTriggerGroup"))	
+	        		//.withIdentity(triggerKey("myTrigger", "myTriggerGroup"))
 	        		.withSchedule(simpleSchedule())
 	                    .startAt(time.toDate())
 	                    .build();
@@ -74,6 +70,6 @@ public class CameraConfirmationMailerJob implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 }
