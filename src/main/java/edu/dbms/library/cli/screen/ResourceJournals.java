@@ -76,7 +76,7 @@ public class ResourceJournals extends BaseScreen {
 			// checkout possible only for available items
 			// if resource not available..put the request in waitlist
 			// checkout rnew possible only if waitlist is empty -- update the due dates nd relevant data.
-			System.out.println("The item has been checked out!!");
+			//System.out.println("The item has been checked out!!");
 		}
 
 
