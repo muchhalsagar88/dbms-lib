@@ -56,6 +56,17 @@ public class AssetCheckout {
 	@OneToOne(mappedBy="assetCheckout")
 	private CameraReservation cameraReservation;
 
+	@OneToOne(mappedBy="assetCheckout")
+	private FinePaid finePaid;
+
+	public FinePaid getFinePaid() {
+		return finePaid;
+	}
+
+	public void setFinePaid(FinePaid finePaid) {
+		this.finePaid = finePaid;
+	}
+
 	public RoomReserve getRoomReserve() {
 		return roomReserve;
 	}
