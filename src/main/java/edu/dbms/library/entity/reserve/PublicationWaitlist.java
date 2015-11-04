@@ -31,9 +31,16 @@ public class PublicationWaitlist extends AbsEntity {
 	@Column(name="request_date")
 	private Date requestDate;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="start_time")
+	private Date startTime;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="end_time")
+	private Date endTime;
+
 	@Column(name="is_student")
 	private int isStudent;
-
 
 	public PubWaitlistPK getKey() {
 		return key;
@@ -76,6 +83,22 @@ public class PublicationWaitlist extends AbsEntity {
 
 	public PublicationWaitlist() {
 		super();
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
 	}
 
 }

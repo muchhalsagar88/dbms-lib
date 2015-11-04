@@ -31,6 +31,14 @@ public class Constant {
 	public static final String OPTION_ASSET_CHECKOUT = "Checkout";
 	
 	public static final String OPTION_ASSET_RESERVE = "Reserve";
+	
+	public static final String OPTION_ASSET_RENEW = "Renew";
+	
+	public static final String OPTION_ASSET_VIEW = "View";
+	
+	public static final String OPTION_ASSET_RETURN = "Return";
+	
+	public static final String OPTION_ASSET_VIEW_OR_RENEW = "View / Renew";
 
 	public static final String PUBLICATION_BOOKS = "Books";
 	public static final String PUBLICATIONS_JOURNALS = "Journals" ;

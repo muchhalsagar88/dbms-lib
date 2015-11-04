@@ -177,6 +177,24 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 
 		em.getTransaction().commit();
 		em.clear();em.close();
+
+		// Make all the other requests as CANCELLED
+		em = emfactory.createEntityManager();
+		Query cancelReservationQuery = em.createQuery("SELECT c FROM CameraReservation c "
+				+ "WHERE c.cameraReservationKey.cameraId=:cameraId AND "
+				+ "c.cameraReservationKey.issueDate=:issueDate AND "
+				+ "c.status='ACTIVE' ");
+		cancelReservationQuery.setParameter("cameraId", c.getCamera().getId());
+		cancelReservationQuery.setParameter("issueDate", currDate);
+
+		List<CameraReservation> toCancel = cancelReservationQuery.getResultList();
+
+		em.getTransaction().begin();
+		for(CameraReservation res: toCancel)
+			res.setStatus("CANCELLED");
+
+		em.getTransaction().commit();
+		em.clear();em.close();
 		System.out.println("The item has been checked out!!");
 	}
 

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package edu.dbms.library.cli.screen;
 
@@ -26,7 +26,7 @@ import edu.dbms.library.session.SessionUtils;
 public class RoomsScreen extends BaseScreen {
 
 	/**
-	 * 
+	 *
 	 */
 	public RoomsScreen() {
 		super();
@@ -91,7 +91,7 @@ public class RoomsScreen extends BaseScreen {
 			choice = readOptionNumber("No rooms available to check in\nEnter 0 to go back", 0, 0);
 			BaseScreen nextScreen = getNextScreen(SessionUtils.getCurrentRoute());
 			nextScreen.execute();
-			return;			
+			return;
 		}
 		else{
 			int roomNo = readOptionNumber("Enter a choice (0 to go back)", 0, rooms.size());
@@ -108,14 +108,14 @@ public class RoomsScreen extends BaseScreen {
 				nextScreen.execute();
 				return;
 			}
-			
+
 		}
 
-		
+
 	}
 
 
-	
+
 	private void checkoutRoom() {
 		System.out.println("=============Checkout Room==========");
 		int choice = -1;
@@ -175,7 +175,7 @@ public class RoomsScreen extends BaseScreen {
 						return;
 					}
 				}
-					
+
 			}
 			else
 			{
@@ -197,7 +197,7 @@ public class RoomsScreen extends BaseScreen {
 			}
 		}
 
-		
+
 	}
 
 	private void bookRoom() {
@@ -266,7 +266,7 @@ public class RoomsScreen extends BaseScreen {
 						continue;
 					}
 					if(endTime-startTime>300){
-						System.out.println("Rooms can be booked for maximum 30 minutes\nInvalid Time Entered...\nPlease enter a valid time");
+						System.out.println("Rooms can be booked for maximum 3 hours\nInvalid Time Entered...\nPlease enter a valid time");
 						continue;
 					}
 				}
@@ -340,7 +340,7 @@ public class RoomsScreen extends BaseScreen {
 				return;
 			}
 			break;
-		}			
+		}
 	}
 
 	@Override
