@@ -331,7 +331,7 @@ public class ResourceBook extends BaseScreen {
 						addToWaitList(isStudent, loggedInPatron.getId(),loggedInPatron, book.getDetail().getIsbnNumber());
 					}
 					else{
-						updateAssetCheckout(entitymanager, isCheckedOutByThisUserResult.get(0),pub_format,isStudent, ast_type);
+						updateAssetCheckout(entitymanager, isCheckedOutByThisUserResult.get(0),pub_format,isStudent, ast_type, book.getDetail().getIsbnNumber());
 					}
 				}
 			} else {//If there is a waitlist for this book
@@ -400,7 +400,7 @@ public class ResourceBook extends BaseScreen {
 		}
 	}
 
-	private void updateAssetCheckout(EntityManager entitymanager, AssetCheckout assetCheckout, String pub_format, boolean isStudent, BigDecimal ast_type) {
+	private void updateAssetCheckout(EntityManager entitymanager, AssetCheckout assetCheckout, String pub_format, boolean isStudent, BigDecimal ast_type, String isbnNo) {
 
 
 		Date issueDate = new Date();
@@ -408,10 +408,22 @@ public class ResourceBook extends BaseScreen {
 		DateTime dt2 = null;
 		Date dueDate ;
 
+		boolean resBook = false;
+		String getResBooks = "SELECT BOOK_ISBN FROM RESERVE_BOOK";
+		
+	
+		Query bookQuery = entitymanager.createNativeQuery(getResBooks);
+		List<String> isbnList= bookQuery.getResultList();
+		if(isbnList.contains(isbnNo)){
+			resBook = true;
+		}
+	
+	
+		
 		if(pub_format.equals("Physical copy")){
 			//			System.out.println("HARD\n\n\n");
 			if (isStudent ){
-				if(ast_type.intValue() == 4)
+				if(resBook)
 					dt2 = dt1.plusHours(4);
 				else
 					dt2 = dt1.plusDays(14);
@@ -513,15 +525,35 @@ public class ResourceBook extends BaseScreen {
 	private void addBookToAssetCheckout(String pub_format, boolean isStudent, Book book, Patron loggedInPatron, BigDecimal ast_type) {
 		AssetCheckout astChkOut = new AssetCheckout();
 
+		boolean resBook = false;
 		Date issueDate = new Date();
 		DateTime dt1 = new DateTime(issueDate);
 		DateTime dt2 = null;
 		Date dueDate ;
+		
+		String getResBooks = "SELECT BOOK_ISBN FROM RESERVE_BOOK";
+		
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 
+		EntityManager entitymanager = emfactory.createEntityManager( );
+
+		Query bookQuery = entitymanager.createNativeQuery(getResBooks);
+		List<String> isbnList= bookQuery.getResultList();
+		if(isbnList.contains(book.getDetail().getIsbnNumber())){
+			resBook = true;
+		}
+		
+
+		entitymanager.close();
+		emfactory.close();
+
+		
+		
 		if(pub_format.equals("Physical copy")){
 			//			System.out.println("HARD\n\n\n");
 			if (isStudent ){
-				if(ast_type.intValue() == 4)
+				if(resBook)
 					dt2 = dt1.plusHours(4);
 				else
 					dt2 = dt1.plusDays(14);
