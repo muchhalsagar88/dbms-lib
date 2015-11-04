@@ -207,7 +207,8 @@ public class ResourceJournals extends BaseScreen {
 
 		int i =0;
 		int ctr=0;
-		jrnls  = new Object[obj1.size()][6];
+		
+		Object[][] jrnlsTmp = new Object[obj1.size()][6];
 		jrnls1 = new Object[obj1.size()][];
 		while(i<obj1.size()){
 			Object[] arr = (Object[]) obj1.get(i);
@@ -216,20 +217,27 @@ public class ResourceJournals extends BaseScreen {
 				continue;
 			}
 			else if(chkoutList.contains((String)arr[0])){
-				jrnls[ctr][5] = "ISSUED";
+				jrnlsTmp[ctr][5] = "ISSUED";
 			}
 			
-			jrnls1[i] =  arr;
-			jrnls[i][0]=  arr[1];
-			jrnls[i][1]=  arr[2];
-			jrnls[i][2]=  arr[5];
-			jrnls[i][3]=  arr[3];
-			jrnls[i][4]=  arr[4];
+			jrnls1[ctr] =  arr;
+			jrnlsTmp[ctr][0]=  arr[1];
+			jrnlsTmp[ctr][1]=  arr[2];
+			jrnlsTmp[ctr][2]=  arr[5];
+			jrnlsTmp[ctr][3]=  arr[3];
+			jrnlsTmp[ctr][4]=  arr[4];
 			
-
+			ctr++;
 			i++;
 		}
 
+		jrnls  = new Object[ctr][6];
+
+		for(i = 0; i < ctr; i++) {
+			
+			jrnls[i] = jrnlsTmp[i];
+		}
+		
 
 		return jrnls ;
 

@@ -168,7 +168,8 @@ public class ResourceConfPapers extends BaseScreen {
 		emfactory.close();
 
 		int i =0;
-		confPprs  = new Object[obj1.size()][7];
+		Object[][] confPprsTmp = new Object[obj1.size()][7];
+		
 		confPprs1 = new Object[obj1.size()][];
 		int ctr=0;
 		while(i<obj1.size()){
@@ -178,19 +179,25 @@ public class ResourceConfPapers extends BaseScreen {
 				continue;
 			}
 			else if(chkoutList.contains((String)arr[0])){
-				confPprs[ctr][6] = "ISSUED";
+				confPprsTmp[ctr][6] = "ISSUED";
 			}
 			
 			confPprs1[ctr] =  arr;
-			confPprs[ctr][0]=  arr[2];
-			confPprs[ctr][1]=  arr[3];
-			confPprs[ctr][2]=  arr[4];
-			confPprs[ctr][3]=  arr[7];
-			confPprs[ctr][4]=  arr[5];
-			confPprs[ctr][5]=  arr[6];
-			i++; ctr++;
+			confPprsTmp[ctr][0]=  arr[2];
+			confPprsTmp[ctr][1]=  arr[3];
+			confPprsTmp[ctr][2]=  arr[4];
+			confPprsTmp[ctr][3]=  arr[7];
+			confPprsTmp[ctr][4]=  arr[5];
+			confPprsTmp[ctr][5]=  arr[6];
+			i++; 
+			ctr++;
 		}
 
+		
+		confPprs  = new Object[ctr][7];		
+		for(i = 0; i < ctr; i++) {
+			confPprs[i] = confPprsTmp[i];
+		}
 
 		return confPprs ;
 
