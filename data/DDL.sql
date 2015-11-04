@@ -37,7 +37,7 @@ CREATE TABLE asset_checkout (ID NUMBER(19) NOT NULL, asset_secondary_id VARCHAR2
 CREATE TABLE asset_checkout_constraint (asset_secondary_id VARCHAR2(255) NOT NULL, patron_id VARCHAR2(255) NOT NULL, ASSETCHECKOUT_ID NUMBER(19) NULL, PRIMARY KEY (asset_secondary_id, patron_id));
 CREATE TABLE room_reservation (RESERVATION_ID NUMBER(19) NOT NULL, end_time TIMESTAMP NULL, reserve_time TIMESTAMP NULL, start_time TIMESTAMP NULL, patron_id VARCHAR2(255) NULL, ROOM_asset_id VARCHAR2(255) NULL, checkout_id NUMBER(19) NULL, PRIMARY KEY (RESERVATION_ID));
 CREATE TABLE camera_reservation (reserve_date TIMESTAMP NULL, reservation_status VARCHAR2(20) DEFAULT 'ACTIVE', issue_date TIMESTAMP NOT NULL, camera_id VARCHAR2(255) NOT NULL, patron_id VARCHAR2(255) NOT NULL, checkout_id NUMBER(19) NULL, PRIMARY KEY (issue_date, camera_id, patron_id));
-CREATE TABLE publication_waitlist (is_student NUMBER(10) NULL, request_date TIMESTAMP NULL, pub_secondary_id VARCHAR2(255) NOT NULL, patron_id VARCHAR2(255) NOT NULL, PRIMARY KEY (pub_secondary_id, patron_id));
+CREATE TABLE publication_waitlist (is_student NUMBER(10) NULL, request_date TIMESTAMP NULL, end_time TIMESTAMP NULL, start_time TIMESTAMP NULL, pub_secondary_id VARCHAR2(255) NOT NULL, patron_id VARCHAR2(255) NOT NULL, PRIMARY KEY (pub_secondary_id, patron_id));
 CREATE TABLE enroll (student_id VARCHAR2(255) NOT NULL, course_id NUMBER(19) NOT NULL, PRIMARY KEY (student_id, course_id));
 CREATE TABLE teach (faculty_id VARCHAR2(255) NOT NULL, course_id NUMBER(19) NOT NULL, PRIMARY KEY (faculty_id, course_id));
 CREATE TABLE BOOK_AUTHOR (AUTHOR_ID VARCHAR2(255) NOT NULL, BOOK_ID VARCHAR2(255) NOT NULL, PRIMARY KEY (AUTHOR_ID, BOOK_ID));
@@ -286,20 +286,18 @@ FOR EACH ROW
 DECLARE
 cnt INTEGER;
 BEGIN
-        SELECT COUNT(*) INTO cnt 
-        FROM PATRON PT, ASSET_TYPE AST, ASSET ASS, STUDENT S, ENROLL E, RESERVE_BOOK RB 
-        WHERE (S.STUDENT_ID = PT.PATRON_ID 
+        SELECT COUNT(*) INTO cnt
+        FROM PATRON PT, ASSET_TYPE AST, BOOK B, ASSET ASS, STUDENT S, ENROLL E, RESERVE_BOOK RB 
+        WHERE 
+        AST.ASSETTYPEID = ASS.ASSET_TYPE 
+        AND ASS.ASSET_ID = :new.ASSET_ASSET_ID
+        AND ASS.ASSET_ID = B.BOOK_ID
+        AND B.ISBN_NUMBER = RB.BOOK_ISBN(+)
+        AND S.STUDENT_ID = PT.PATRON_ID
         AND S.STUDENT_ID = E.STUDENT_ID
-        AND RB.COURSE_ID = E.COURSE_ID
-        AND SYSDATE BETWEEN RB.FROM_DATE AND RB.TODATE
-        AND   ASS.ASSET_ID = :new.ASSET_ASSET_ID 
-        AND AST.ASSETTYPEID = ASS.ASSET_TYPE 
-        AND AST.SUB_CATEGORY = 'Reserve Book' 
-        AND PT.PATRON_ID = :new.PATRON_ID)
-		OR (ASS.ASSET_ID = :new.ASSET_ASSET_ID 
-        AND AST.ASSETTYPEID = ASS.ASSET_TYPE 
-        AND AST.SUB_CATEGORY <> 'Reserve Book' 
-        );
+        AND PT.PATRON_ID = :new.PATRON_ID
+        AND ((AST.SUB_CATEGORY = 'Reserved Book' AND RB.COURSE_ID = E.COURSE_ID AND SYSDATE BETWEEN RB.FROM_DATE AND RB.TODATE)
+          OR (AST.SUB_CATEGORY <> 'Reserved Book'));
         IF cnt = 0 THEN
             RAISE_APPLICATION_ERROR(-20013, 'RESERVE_BOOK_INVALID_USER');
         END IF;
