@@ -1,6 +1,7 @@
 package edu.dbms.library.cli.screen;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import org.joda.time.PeriodType;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.AssetCheckout;
+import edu.dbms.library.entity.FinePaid;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.session.SessionUtils;
 
@@ -97,10 +99,18 @@ public class PatronBalanceScreen extends BaseScreen {
 		query.setParameter("patronId", SessionUtils.getPatronId());
 
 		List<AssetCheckout> fineDueAssets = query.getResultList();
+		List<FinePaid> finesPaid = new ArrayList<FinePaid>();
+
 		em.getTransaction().begin();
-		for(AssetCheckout temp: fineDueAssets)
+		for(AssetCheckout temp: fineDueAssets) {
+			float paid = temp.getFine();
 			temp.setFine(0f);
+			FinePaid paidFine = new FinePaid(new Date(), paid, temp.getPatron(), temp);
+			em.persist(paidFine);
+			finesPaid.add(paidFine);
+		}
 		em.getTransaction().commit();
+
 	}
 
 	@SuppressWarnings("unchecked")

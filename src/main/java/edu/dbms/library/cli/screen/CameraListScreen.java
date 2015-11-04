@@ -94,24 +94,27 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 	private void reserveOption() {
 
 		List<String> fridays = displayFridays();
-		readInputLabel();
+		int input = readOptionNumber("Enter your choice: ", 1, fridays.size());
+
+		/*readInputLabel();
 		Object input = readInput();
 		while(!(input instanceof Integer)) {
 			System.out.println("Incorrect input.");
 			readInputLabel();
 			input = readInput();
-		}
-		String selectedFriday = mapFridayToOption(fridays, (Integer)input);
+		}*/
+		String selectedFriday = mapFridayToOption(fridays, input);
 
 		displayAssets();
-		readInputLabel();
+		input = readOptionNumber("Enter your choice: ", 1, assets.size());
+		/*readInputLabel();
 		input = readInput();
 		while(!(input instanceof Integer)) {
 			System.out.println("Incorrect input.");
 			readInputLabel();
 			input = readInput();
-		}
-		Camera c = mapAssetToInputOption((int) input);
+		}*/
+		Camera c = mapAssetToInputOption(input);
 		System.out.println(reserve(c, selectedFriday));
 	}
 

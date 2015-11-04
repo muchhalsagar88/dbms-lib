@@ -57,6 +57,17 @@ public class Patron extends AbsEntity {
 	@OneToMany(mappedBy="patron")
 	private Collection<Notification> notifications;
 
+	@OneToMany(mappedBy="patron")
+	private Collection<FinePaid> finesPaid;
+
+	public Collection<FinePaid> getFinesPaid() {
+		return finesPaid;
+	}
+
+	public void setFinesPaid(Collection<FinePaid> finesPaid) {
+		this.finesPaid = finesPaid;
+	}
+
 	public Collection<Notification> getNotifications() {
 		return notifications;
 	}

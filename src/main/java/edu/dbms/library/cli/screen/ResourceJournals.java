@@ -59,18 +59,18 @@ public class ResourceJournals extends BaseScreen {
 		}
 		else{
 			// call checkout methods
-			
-			
+
+
 			int journalNo = (int)o;
-			
+
 			String journalId  = (String)jrnls1[journalNo-1][0];
 			String pub_format = (String)jrnls1[journalNo-1][4];
 			BigDecimal ast_type = (BigDecimal.valueOf(2L));
 
 			checkout(journalId, ast_type, pub_format);
 
-			
-			
+
+
 
 			// update the approproate tables with respect to availibility. Assign return dates to items
 			// checkout possible only for available items
@@ -145,44 +145,43 @@ public class ResourceJournals extends BaseScreen {
 
 		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
 
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				"main");
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager entitymanager = emfactory.createEntityManager( );
 
-		String query = 
-				" SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT     " 
+		String query =
+				" SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT     "
 						+" ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS  "
-						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 " 
-						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
-						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
-						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
-						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
+						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 "
+						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   "
+						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   "
+						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   "
+						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     "
 						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID"
-//						+ " AND J1.ISSN_NUMBER NOT IN  (SELECT wtlist.PUBSECONDARYID  FROM publication_waitlist wtlist  WHERE (wtlist.PATRONID = ?))	" 
-						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT   "; 
-//						+"  MINUS " 
-//						+"  SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT      " 
+//						+ " AND J1.ISSN_NUMBER NOT IN  (SELECT wtlist.PUBSECONDARYID  FROM publication_waitlist wtlist  WHERE (wtlist.PATRONID = ?))	"
+						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT   ";
+//						+"  MINUS "
+//						+"  SELECT A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT      "
 //						+"  ,rtrim (xmlagg (xmlelement (e, AUTH1.NAME || ',')).extract ('//text()'), ',') AUTHORS,  "
-//						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS   " 
-//						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   " 
-//						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   " 
-//						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   " 
-//						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   " 
-//						+" 						 		   )    " 
-//						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   " 
-//						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     " 
-//						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID " 
-//						+" 						 		  AND J1.ISSN_NUMBER IN    " 
-//						+"                                         (   SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     " 
-//						+"                                          AND (astchkt.RETURN_DATE is NULL ) )    " 
-//						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID    " ;				
+//						+ " (CASE WHEN ( ASC1.RETURN_DATE is NULL  AND ASC1.ASSET_ASSET_ID = A1.ASSET_ID ) THEN 'ISSUED' ELSE 'AVLBLE' END) as STATUS   "
+//						+"  from JOURNAL j1, Publication p1,   JOURNAL_DETAIL jd1 , Asset a1 ,  Author auth1, JOURNAL_AUTHOR ja1 , ASSET_CHECKOUT asc1   "
+//						+" 						 		  WHERE J1.JOURNAL_ID = a1.ASSET_ID   "
+//						+" 						 		  AND a1.ASSET_ID = P1.PUBLICATION_ID   "
+//						+" 						 		  AND ( ASC1.ASSET_ASSET_ID(+) = A1.ASSET_ID   "
+//						+" 						 		   )    "
+//						+" 						 		  AND J1.ISSN_NUMBER = JD1.ISSN_NUMBER   "
+//						+" 						 		  AND JA1.JOURNAL_ID = J1.ISSN_NUMBER		     "
+//						+" 						 		  AND AUTH1.ID = JA1.AUTHOR_ID "
+//						+" 						 		  AND J1.ISSN_NUMBER IN    "
+//						+"                                         (   SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     "
+//						+"                                          AND (astchkt.RETURN_DATE is NULL ) )    "
+//						+" 						 		  GROUP BY A1.ASSET_ID , J1.ISSN_NUMBER ,  JD1.TITLE , JD1.PUBLICATIONYEAR, P1.PUBLICATIONFORMAT, ASC1.ID,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID    " ;
 
 
 		Query q = entitymanager.createNativeQuery(query);
 
 
 		q.setParameter(1, loggedInPatron.getId()).setParameter(2, loggedInPatron.getId()).setParameter(3, loggedInPatron.getId());
-		
+
 		String query0 = "SELECT cp.asset.id FROM "+AssetCheckout.class.getName()
 				+" cp where cp.returnDate IS NULL";
 
@@ -191,11 +190,11 @@ public class ResourceJournals extends BaseScreen {
 
 		Query q1 = entitymanager.createQuery(query0);
 		Query q2 = entitymanager.createQuery(query1).setParameter("id1", loggedInPatron.getId());
-		
-		
+
+
 		//list of all issued assets
-		List<String> chkoutList = (List<String>) q1.getResultList();
-		List<String> myChkoutList = (List<String>) q2.getResultList();
+		List<String> chkoutList = q1.getResultList();
+		List<String> myChkoutList = q2.getResultList();
 
 
 
@@ -207,26 +206,26 @@ public class ResourceJournals extends BaseScreen {
 
 		int i =0;
 		int ctr=0;
-		
+
 		Object[][] jrnlsTmp = new Object[obj1.size()][6];
 		jrnls1 = new Object[obj1.size()][];
 		while(i<obj1.size()){
 			Object[] arr = (Object[]) obj1.get(i);
-			if(myChkoutList.contains((String)arr[0])){
+			if(myChkoutList.contains(arr[0])){
 				i++;
 				continue;
 			}
-			else if(chkoutList.contains((String)arr[0])){
+			else if(chkoutList.contains(arr[0])){
 				jrnlsTmp[ctr][5] = "ISSUED";
 			}
-			
+
 			jrnls1[ctr] =  arr;
 			jrnlsTmp[ctr][0]=  arr[1];
 			jrnlsTmp[ctr][1]=  arr[2];
 			jrnlsTmp[ctr][2]=  arr[5];
 			jrnlsTmp[ctr][3]=  arr[3];
 			jrnlsTmp[ctr][4]=  arr[4];
-			
+
 			ctr++;
 			i++;
 		}
@@ -234,10 +233,10 @@ public class ResourceJournals extends BaseScreen {
 		jrnls  = new Object[ctr][6];
 
 		for(i = 0; i < ctr; i++) {
-			
+
 			jrnls[i] = jrnlsTmp[i];
 		}
-		
+
 
 		return jrnls ;
 
@@ -283,7 +282,7 @@ public class ResourceJournals extends BaseScreen {
 			//If there is no waitlist
 			if(wtList.size() == 0 ){
 				if(isCheckedOutResult.size()==0){ //No one has checked out, so checkout the book to this user
-				
+
 					try{
 						addJournalToAssetCheckout(pub_format, isStudent, journal, loggedInPatron, ast_type);
 					}
@@ -293,7 +292,7 @@ public class ResourceJournals extends BaseScreen {
 					}
 
 				} else {// Some one has the book checked out
-					
+
 					//Query to check if this user has the book checked out
 					String query04 = "SELECT cp FROM "+AssetCheckout.class.getName()
 							+" cp where cp.asset.id = :num  AND cp.patron.id = :pat_id and cp.returnDate IS NULL";
@@ -301,7 +300,7 @@ public class ResourceJournals extends BaseScreen {
 					Query q4 = entitymanager.createQuery(query04);
 					q4.setParameter("num", journalId).setParameter("pat_id", loggedInPatron.getId());
 					List<AssetCheckout> isCheckedOutByThisUserResult = q4.getResultList();
-					
+
 					if(isCheckedOutByThisUserResult.size() == 0){
 						//Add user to waitlist as the book is checked out by someone
 						addToWaitList(isStudent, loggedInPatron.getId(),loggedInPatron, journal.getDetails().getIssnNumber());
@@ -311,7 +310,7 @@ public class ResourceJournals extends BaseScreen {
 					}
 				}
 			} else {//If there is a waitlist for this book
-				
+
 				boolean isCurrUserinWaitList = false;
 				PublicationWaitlist waitingUser = null;
 				//check ig this user is in waitlist
@@ -322,7 +321,7 @@ public class ResourceJournals extends BaseScreen {
 						break;
 					}
 				}
-				
+
 				if(!isCurrUserinWaitList){	//User is not in waitlist
 					addToWaitList(isStudent, loggedInPatron.getId(),loggedInPatron, journal.getDetails().getIssnNumber());
 				} else { // user is in waitlist....check if book avlble then chkout else donothing
@@ -330,11 +329,11 @@ public class ResourceJournals extends BaseScreen {
 					//Query to check if the book is available and this guy is in waitlist
 					String query01 = "SELECT cp FROM "+AssetCheckout.class.getName()
 							+" cp where cp.asset.id = :num and cp.returnDate IS NULL";
-					
+
 					Query q0 = entitymanager.createQuery(query01);
 					q0.setParameter("num", journalId);
 					List<AssetCheckout> asc1 = q0.getResultList();
-					
+
 					if(asc1.size()==0){ //book is avlble
 						Date startTime = waitingUser.getStartTime();
 						Date endTime = waitingUser.getEndTime();
@@ -358,7 +357,7 @@ public class ResourceJournals extends BaseScreen {
 								e.printStackTrace();
 								System.out.println("The book is already issued by you...");
 							}
-						} else 
+						} else
 							System.out.println("You can not checkout the book at this time");
 					} else{
 						//Do nothing
@@ -375,8 +374,8 @@ public class ResourceJournals extends BaseScreen {
 			System.out.println("Error..Asset reserved More than one time by the same patron");
 		}
 	}
-	
-	
+
+
 
 	private void updateAssetCheckout(EntityManager entitymanager, AssetCheckout assetCheckout, String pub_format, boolean isStudent, BigDecimal ast_type) {
 
@@ -389,7 +388,7 @@ public class ResourceJournals extends BaseScreen {
 		if(pub_format.equals("Physical copy")){
 			//			System.out.println("HARD\n\n\n");
 			dt2 = dt1.plusHours(12);
-			
+
 			dueDate = dt2.toDate();
 			assetCheckout.setDueDate(dueDate);
 
@@ -406,7 +405,7 @@ public class ResourceJournals extends BaseScreen {
 
 			entitymanager.getTransaction().begin();
 			int output = upq.executeUpdate();
-			entitymanager.getTransaction().commit();			
+			entitymanager.getTransaction().commit();
 
 			//			clearConsole();
 			System.out.println("The item has been checked out: The return time is :"+ dueDate);
@@ -436,7 +435,7 @@ public class ResourceJournals extends BaseScreen {
 
 		List<PublicationWaitlist> wtList = q.getResultList();
 
-		
+
 		PublicationWaitlist pb = new PublicationWaitlist(patronid,isbnNumber, new Date(), flag );
 		pb.setPatron(loggedInPatron);
 		if(wtList.size() == 0){
@@ -454,7 +453,7 @@ public class ResourceJournals extends BaseScreen {
 				DateTime dt3= dt1.plusMinutes(30);
 				pb.setStartTime(dt2.toDate());
 				pb.setEndTime(dt3.toDate());
-				
+
 				String pubDetailQry = "SELECT d.title FROM BOOK_DETAIL d WHERE d.isbn_number=? "
 						+ "UNION "
 						+ "SELECT d.title FROM JOURNAL_DETAIL d WHERE d.issn_number=? "
@@ -473,7 +472,7 @@ public class ResourceJournals extends BaseScreen {
 
 			DBUtils.persist(pb);
 		}
-		
+
 		entitymanager.close();
 		emfactory.close();
 		System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
@@ -491,7 +490,7 @@ public class ResourceJournals extends BaseScreen {
 		if(pub_format.equals("Physical copy")){
 			//			System.out.println("HARD\n\n\n");
 			dt2 = dt1.plusHours(12);
-			
+
 
 			dueDate = dt2.toDate();
 			astChkOut.setAssetSecondaryId(journal.getDetails().getIssnNumber());
@@ -521,8 +520,8 @@ public class ResourceJournals extends BaseScreen {
 		}
 	}
 
-	
-	
+
+
 	/*public void checkout(int bookNo) {
 
 		if(LoginManager.isPatronAccountOnHold(SessionUtils.getPatronId())) {

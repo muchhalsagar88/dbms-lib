@@ -92,7 +92,7 @@ public class ResourceConfPapers extends BaseScreen {
 		tt.printTable();
 	}
 
-	
+
 	public void displayConfProcs() {
 		// opt1: Display only those books tht a patron can checkout.
 		// if the patron has been issued some books. remove thos ISBN number wala books from the display list..
@@ -112,8 +112,7 @@ public class ResourceConfPapers extends BaseScreen {
 
 		Patron loggedInPatron = (Patron) DBUtils.findEntity(Patron.class, SessionUtils.getPatronId(), String.class);
 
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				"main", DBUtils.getPropertiesMap());
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager entitymanager = emfactory.createEntityManager( );
 
 		String query = " SELECT A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT  "
@@ -141,7 +140,7 @@ public class ResourceConfPapers extends BaseScreen {
 //				+"						 		  AND conf1.CONF_NUM IN   "
 //				+"						 		  			   ( SELECT ASSET_SECONDARY_ID FROM asset_checkout astchkt WHERE astchkt.patron_id = ?     "
 //				+"						 					AND (astchkt.RETURN_DATE is NULL  )  )   "
-//				+"						 		  GROUP BY A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT, ASC1.ID ,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID " ;		
+//				+"						 		  GROUP BY A1.ASSET_ID , CONF1.CONF_PROC_ID, CONF1.CONF_NUM, CPD1.TITLE,CPD1.CONFERENCENAME,CPD1.PUB_YEAR, P1.PUBLICATIONFORMAT, ASC1.ID ,ASC1.RETURN_DATE, ASC1.ISSUE_DATE, ASC1.ASSET_ASSET_ID " ;
 
 
 		Query q = entitymanager.createNativeQuery(query);
@@ -156,11 +155,11 @@ public class ResourceConfPapers extends BaseScreen {
 
 		Query q1 = entitymanager.createQuery(query0);
 		Query q2 = entitymanager.createQuery(query1).setParameter("id1", loggedInPatron.getId());
-		
-		
+
+
 		//list of all issued assets
-		List<String> chkoutList = (List<String>) q1.getResultList();
-		List<String> myChkoutList = (List<String>) q2.getResultList();
+		List<String> chkoutList = q1.getResultList();
+		List<String> myChkoutList = q2.getResultList();
 
 
 		List obj1 = q.getResultList();
@@ -169,19 +168,19 @@ public class ResourceConfPapers extends BaseScreen {
 
 		int i =0;
 		Object[][] confPprsTmp = new Object[obj1.size()][7];
-		
+
 		confPprs1 = new Object[obj1.size()][];
 		int ctr=0;
 		while(i<obj1.size()){
 			Object[] arr = (Object[]) obj1.get(i);
-			if(myChkoutList.contains((String)arr[0])){
+			if(myChkoutList.contains(arr[0])){
 				i++;
 				continue;
 			}
-			else if(chkoutList.contains((String)arr[0])){
+			else if(chkoutList.contains(arr[0])){
 				confPprsTmp[ctr][6] = "ISSUED";
 			}
-			
+
 			confPprs1[ctr] =  arr;
 			confPprsTmp[ctr][0]=  arr[2];
 			confPprsTmp[ctr][1]=  arr[3];
@@ -189,12 +188,12 @@ public class ResourceConfPapers extends BaseScreen {
 			confPprsTmp[ctr][3]=  arr[7];
 			confPprsTmp[ctr][4]=  arr[5];
 			confPprsTmp[ctr][5]=  arr[6];
-			i++; 
+			i++;
 			ctr++;
 		}
 
-		
-		confPprs  = new Object[ctr][7];		
+
+		confPprs  = new Object[ctr][7];
 		for(i = 0; i < ctr; i++) {
 			confPprs[i] = confPprsTmp[i];
 		}
@@ -242,7 +241,7 @@ public class ResourceConfPapers extends BaseScreen {
 			//If there is no waitlist
 			if(wtList.size() == 0 ){
 				if(isCheckedOutResult.size()==0){ //No one has checked out, so checkout the conf Proc to this user
-				
+
 					try{
 						addConfProcToAssetCheckout(pub_format, isStudent,confProc, loggedInPatron);
 					}
@@ -252,7 +251,7 @@ public class ResourceConfPapers extends BaseScreen {
 					}
 
 				} else {// Some one has the conf proc checked out
-					
+
 					//Query to check if this user has the conf proc checked out
 					String query04 = "SELECT cp FROM "+AssetCheckout.class.getName()
 							+" cp where cp.asset.id = :num  AND cp.patron.id = :pat_id and cp.returnDate IS NULL";
@@ -260,7 +259,7 @@ public class ResourceConfPapers extends BaseScreen {
 					Query q4 = entitymanager.createQuery(query04);
 					q4.setParameter("num", confProcId).setParameter("pat_id", loggedInPatron.getId());
 					List<AssetCheckout> isCheckedOutByThisUserResult = q4.getResultList();
-					
+
 					if(isCheckedOutByThisUserResult.size() == 0){
 						//Add user to waitlist as the conf proc is checked out by someone
 						addToWaitList(isStudent, loggedInPatron.getId(),loggedInPatron, confProc.getDetails().getConfNumber());
@@ -270,7 +269,7 @@ public class ResourceConfPapers extends BaseScreen {
 					}
 				}
 			} else {//If there is a waitlist for this conf proc
-				
+
 				boolean isCurrUserinWaitList = false;
 				PublicationWaitlist waitingUser = null;
 				//check if this user is in waitlist
@@ -281,7 +280,7 @@ public class ResourceConfPapers extends BaseScreen {
 						break;
 					}
 				}
-				
+
 				if(!isCurrUserinWaitList){	//User is not in waitlist
 					addToWaitList(isStudent, loggedInPatron.getId(),loggedInPatron, confProc.getDetails().getConfNumber());
 				} else { // user is in waitlist....check if conf proc avlble then chkout else do nothing
@@ -289,11 +288,11 @@ public class ResourceConfPapers extends BaseScreen {
 					//Query to check if the conf proc is available and this person is in waitlist
 					String query01 = "SELECT cp FROM "+AssetCheckout.class.getName()
 							+" cp where cp.asset.id = :num and cp.returnDate IS NULL";
-					
+
 					Query q0 = entitymanager.createQuery(query01);
 					q0.setParameter("num", confProcId);
 					List<AssetCheckout> asc1 = q0.getResultList();
-					
+
 					if(asc1.size()==0){ //conf proc is avlble
 						Date startTime = waitingUser.getStartTime();
 						Date endTime = waitingUser.getEndTime();
@@ -317,7 +316,7 @@ public class ResourceConfPapers extends BaseScreen {
 								e.printStackTrace();
 								System.out.println("The conference proceeding is already issued by you...");
 							}
-						} else 
+						} else
 							System.out.println("You can not checkout the conference proceeding at this time");
 					} else{
 						//Do nothing
@@ -334,7 +333,7 @@ public class ResourceConfPapers extends BaseScreen {
 			System.out.println("Error..Asset reserved More than one time by the same patron");
 		}
 	}
-	
+
 	private void updateAssetCheckout(EntityManager entitymanager, AssetCheckout assetCheckout, String pub_format, boolean isStudent) {
 
 
@@ -367,7 +366,7 @@ public class ResourceConfPapers extends BaseScreen {
 
 			entitymanager.getTransaction().begin();
 			int output = upq.executeUpdate();
-			entitymanager.getTransaction().commit();			
+			entitymanager.getTransaction().commit();
 
 			System.out.println("The item has been checked out: The return time is :"+ dueDate);
 		}
@@ -408,7 +407,7 @@ public class ResourceConfPapers extends BaseScreen {
 				DateTime dt3= dt1.plusMinutes(30);
 				pb.setStartTime(dt2.toDate());
 				pb.setEndTime(dt3.toDate());
-				
+
 				String pubDetailQry = "SELECT d.title FROM BOOK_DETAIL d WHERE d.isbn_number=? "
 						+ "UNION "
 						+ "SELECT d.title FROM JOURNAL_DETAIL d WHERE d.issn_number=? "
@@ -427,7 +426,7 @@ public class ResourceConfPapers extends BaseScreen {
 
 			DBUtils.persist(pb);
 		}
-		
+
 		entitymanager.close();
 		emfactory.close();
 		System.out.println("The item you have requested is not avlble. You are on waitlist and will be notified when the item is available");
@@ -471,5 +470,5 @@ public class ResourceConfPapers extends BaseScreen {
 			DBUtils.persist(astChkOut);
 			System.out.println("The item has been checked out: The return time is : N/A");
 		}
-	}		
+	}
 }
