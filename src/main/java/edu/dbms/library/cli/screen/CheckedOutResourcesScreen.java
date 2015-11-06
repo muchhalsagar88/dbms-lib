@@ -15,7 +15,6 @@ import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
-import edu.dbms.library.db.manager.PublicationManager;
 import edu.dbms.library.db.manager.RoomsManager;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.session.SessionUtils;
@@ -414,7 +413,8 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 		List journalsResult = viewRenewJournalQuery.getResultList();
 		int numJournals = journalsResult.size();
 		
-		
+		entityManager.close();
+		emFactory.close();
 		
 		int i = 0;
 		int j = 0;
@@ -475,19 +475,14 @@ public class CheckedOutResourcesScreen extends BaseScreen{
 		//ENTER CODE TO RENEW/PUT INTO WAITLIST
 		
 		if(option <= numBooks) {
-//			ResourceBook rb = new ResourceBook();
-//			rb.checkout(bookNo);
-			PublicationManager.returnBook(entityManager, ((BigDecimal)books[option - 1][9]).intValue());
-//			runReturnPublicationCode(SessionUtils.getPatronId(), (String) books[option - 1][0], (BigDecimal) books[option - 1][9]);
-		} else if( option <= numConfProcs) {
-			runReturnPublicationCode(SessionUtils.getPatronId(), (String) confProcs[option - numBooks - 1][0],(BigDecimal) confProcs[option - numBooks - 1][9]);
+			//runRenewPublication(((BigDecimal) books[option - 1][9]).longValue());
+		} /*else if( option <= numConfProcs) {
+			runRenewPublicationCode(SessionUtils.getPatronId(), (String) confProcs[option - numBooks - 1][0],(BigDecimal) confProcs[option - numBooks - 1][9]);
 		} else {
-			runReturnPublicationCode(SessionUtils.getPatronId(), (String) journals[option - numBooks - numConfProcs - 1][0],(BigDecimal)journals[option - numBooks - numConfProcs - 1][7]);
-		}
-		
+			runRenewPublicationCode(SessionUtils.getPatronId(), (String) journals[option - numBooks - numConfProcs - 1][0],(BigDecimal)journals[option - numBooks - numConfProcs - 1][7]);
+		}*/
+
 		System.out.println("Enter code here to renew / waitlist");
-		entityManager.close();
-		emFactory.close();
 	}
 	
 private void executeReturnPublications() {
@@ -568,11 +563,14 @@ private void executeReturnPublications() {
 		}
 		
 		if(option <= numBooks) {
-			runReturnPublicationCode(SessionUtils.getPatronId(), (String) books[option - 1][0], (BigDecimal) books[option - 1][9]);
+			//runReturnPublicationCode(SessionUtils.getPatronId(), (String) books[option - 1][0], (BigDecimal) books[option - 1][9]);
+			PublicationManager.returnPublication(((BigDecimal) books[option - 1][9]).longValue());
 		} else if( option <= numConfProcs) {
-			runReturnPublicationCode(SessionUtils.getPatronId(), (String) confProcs[option - numBooks - 1][0],(BigDecimal) confProcs[option - numBooks - 1][9]);
+			//runReturnPublicationCode(SessionUtils.getPatronId(), (String) confProcs[option - numBooks - 1][0],(BigDecimal) confProcs[option - numBooks - 1][9]);
+			PublicationManager.returnPublication(((BigDecimal) confProcs[option - numBooks - 1][9]).longValue());
 		} else {
-			runReturnPublicationCode(SessionUtils.getPatronId(), (String) journals[option - numBooks - numConfProcs - 1][0],(BigDecimal)journals[option - numBooks - numConfProcs - 1][7]);
+			PublicationManager.returnPublication(((BigDecimal) journals[option - numBooks - numConfProcs - 1][7]).longValue());
+			//runReturnPublicationCode(SessionUtils.getPatronId(), (String) journals[option - numBooks - numConfProcs - 1][0],(BigDecimal)journals[option - numBooks - numConfProcs - 1][7]);
 		}
 		
 		
