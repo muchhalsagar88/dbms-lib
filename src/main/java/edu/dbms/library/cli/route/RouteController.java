@@ -7,6 +7,7 @@ import edu.dbms.library.cli.screen.BaseScreen;
 import edu.dbms.library.cli.screen.CameraListScreen;
 import edu.dbms.library.cli.screen.LoginScreen;
 import edu.dbms.library.cli.screen.LogoutScreen;
+import edu.dbms.library.cli.screen.PatronBalanceScreen;
 import edu.dbms.library.cli.screen.PatronResourcesScreen;
 import edu.dbms.library.cli.screen.PatronScreen;
 import edu.dbms.library.cli.screen.ProfileScreen;
@@ -42,6 +43,7 @@ public class RouteController {
 		
 		mapping.put(RouteConstant.PATRON_RESOURCES_ROOMS, RoomsScreen.class);
 		
+		mapping.put(RouteConstant.PATRON_BALANCE, PatronBalanceScreen.class);
 	}
 	
 	public static synchronized RouteController getInstance() {
