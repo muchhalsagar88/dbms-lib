@@ -61,6 +61,7 @@ public class AssetPatronConstraint extends AbsEntity {
 		this.key = new AssetPatronConstaintPK(assetType, patronType);
 		this.duration = duration;
 		this.fine = fine;
+		this.fineDuration = fineDuration;
 	}
 	
 	public AssetPatronConstraint() {
