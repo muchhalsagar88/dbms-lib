@@ -103,5 +103,4 @@ public class LoginTest extends BaseTest {
 		removeAllEntities(Department.class);
 		System.out.println("@After: executedAfterEach");
 	}
-	
 }
