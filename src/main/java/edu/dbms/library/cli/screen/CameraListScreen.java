@@ -16,6 +16,7 @@ import org.joda.time.LocalDate;
 
 import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
+import edu.dbms.library.cli.route.Route;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.AssetCheckout;
@@ -27,29 +28,39 @@ import edu.dbms.library.utils.DateUtils;
 
 public class CameraListScreen extends AssetListScreen<Camera> {
 
+	public CameraListScreen() {
+		options.put(3, new Route(RouteConstant.BACK));
+	}
+	
 	@Override
 	public void execute() {
 		
 		displayReserveCheckoutOpts();
-		Object o = readInput();
-		while(!(o instanceof Integer)) {
-			System.out.println("Incorrect input.");
-			readInputLabel();
-			o = readInput();
-		}
-		
-		if((int)o == 1){
+		int option = readOptionNumber("Enter your choice", 1, 3);
+		String nextScreenUrl = "";
+		switch (option) {
+		case 3:
+			nextScreenUrl = RouteConstant.BACK;
+			break;
+
+		case 2: 
+			checkout();
+			nextScreenUrl = RouteConstant.PATRON_BASE;
+			break;
 			
+		case 1:
 			reserveOption();
 			System.out.println("The item has been reserved!!");
+			nextScreenUrl = RouteConstant.PATRON_BASE;
+			break;
+			
+		default:
+			nextScreenUrl = RouteConstant.BACK;
+			break;
 		}
-		else if((int)o == 2){
-			// call checkout methods
-			checkout();
-		} 
 		
 		// Redirect to Base screen after checkout notification
-		BaseScreen nextScreen = getNextScreen(RouteConstant.PATRON_BASE);
+		BaseScreen nextScreen = getNextScreen(nextScreenUrl);
 		nextScreen.execute();
 	}
 	
@@ -87,6 +98,7 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 	/*
 	 * TODO:	Write code to persist this asset against this patron
 	 */
+	@SuppressWarnings("unchecked")
 	private void checkout() {
 		
 		if(! DateUtils.isCameraCheckoutFriday()) {
@@ -253,6 +265,7 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 		String[][] options = { 
 							{Constant.OPTION_ASSET_RESERVE},
 							{Constant.OPTION_ASSET_CHECKOUT},
+							{Constant.OPTION_BACK}
 							};
 		TextTable tt = new TextTable(title, options);
 		tt.setAddRowNumbering(true);
