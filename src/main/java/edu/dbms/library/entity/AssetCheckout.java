@@ -47,6 +47,9 @@ public class AssetCheckout {
 	@Column(name="return_date")
 	private Date returnDate;
 	
+	@Column(name="fine")
+	private float fine;
+	
 	@OneToOne(mappedBy="checkOut")
 	private RoomReserve roomReserve;
 	
@@ -119,6 +122,14 @@ public class AssetCheckout {
 
 	public void setCameraReservation(CameraReservation cameraReservation) {
 		this.cameraReservation = cameraReservation;
+	}
+
+	public float getFine() {
+		return fine;
+	}
+
+	public void setFine(float fine) {
+		this.fine = fine;
 	}
 
 }
