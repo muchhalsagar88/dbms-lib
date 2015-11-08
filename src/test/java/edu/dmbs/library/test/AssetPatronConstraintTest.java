@@ -34,13 +34,19 @@ public class AssetPatronConstraintTest extends BaseTest {
 		constraint =  new AssetPatronConstraint(4, 'S', 4, 24, 2.0f);
 		DBUtils.persist(constraint);
 		
+		constraint =  new AssetPatronConstraint(7, 'S', 4, 1, 1.0f);
+		DBUtils.persist(constraint);
+		
+		constraint =  new AssetPatronConstraint(7, 'F', 4, 1, 1.0f);
+		DBUtils.persist(constraint);
+		
 	}
 
 	@Test
 	public void testDataGeneration() {
 		
 		Assert.assertEquals("Number of asset-patron constraints is different", 
-				6, getCount(AssetPatronConstraint.class));
+				8, getCount(AssetPatronConstraint.class));
 	}
 	
 	@After
