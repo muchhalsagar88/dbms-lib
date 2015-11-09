@@ -1,8 +1,13 @@
 package edu.dbms.library.entity;
 
+import java.util.Collection;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import edu.dbms.library.entity.resource.Book;
 
 @Entity
 @Table(name="publisher")
@@ -36,4 +41,6 @@ public class Publisher extends AbsEntity {
 		this.name = name;
 	}
 	
+	@OneToMany(mappedBy="publisher")
+	private Collection<Book> books;
 }

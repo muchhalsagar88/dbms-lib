@@ -36,6 +36,8 @@
 		<class>edu.dbms.library.entity.AssetCheckoutConstraint</class>
 		<class>edu.dbms.library.entity.RoomReserve</class>
 		<class>edu.dbms.library.entity.reserve.CameraReservation</class>
+		<class>edu.dbms.library.entity.reserve.PublicationWaitlist</class>
+		
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:xe"/>
 			<property name="javax.persistence.jdbc.user" value="csc540"/>

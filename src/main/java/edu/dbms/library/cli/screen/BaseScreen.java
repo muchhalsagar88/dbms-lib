@@ -6,9 +6,9 @@ import java.util.Scanner;
 
 import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.route.Route;
-import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.cli.route.RouteController;
 import edu.dbms.library.session.SessionUtils;
+import edu.dbms.library.cli.route.RouteConstant;
 
 public abstract class BaseScreen {
 

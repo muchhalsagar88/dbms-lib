@@ -1,5 +1,6 @@
 package edu.dbms.library.db.manager;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -122,7 +123,6 @@ public class RoomsManager extends DBManager {
 		catch(Exception e){
 			return false;
 		}
-		return true;
 	}
 
 	public static boolean cancel(long reservationId) {

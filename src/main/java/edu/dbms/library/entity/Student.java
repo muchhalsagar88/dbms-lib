@@ -154,4 +154,13 @@ public class Student extends Patron {
 	public void setSex(Character sex) {
 		this.sex = sex;
 	}
+
+	public Collection<Course> getCourses() {
+		return courses;
+	}
+
+	public void setCourses(Collection<Course> courses) {
+		this.courses = courses;
+	}
+	
 }
