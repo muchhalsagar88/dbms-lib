@@ -41,15 +41,12 @@ public class CatalogTest extends BaseTest {
 		
 		DegreeProgram dp1 = new DegreeProgram();
 		dp1.setName("MS");
-		dp1.setClassfication(c2);
 		
 		DegreeProgram dp2 = new DegreeProgram();
 		dp2.setName("BS");
-		dp2.setClassfication(c1);
 		
 		DegreeProgram dp3 = new DegreeProgram();
 		dp3.setName("PostDoc");
-		dp3.setClassfication(c3);
 		
 		DBUtils.persist(dp1);
 		DBUtils.persist(dp2);

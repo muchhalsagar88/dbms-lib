@@ -27,6 +27,7 @@
 		<class>edu.dbms.library.entity.catalog.Classification</class>
 		<class>edu.dbms.library.entity.catalog.DegreeProgram</class>
 		<class>edu.dbms.library.entity.catalog.Year</class>
+		<class>edu.dbms.library.entity.catalog.DegreeYear</class>
 		<class>edu.dbms.library.entity.catalog.AssetPatronConstraint</class>
 		<class>edu.dbms.library.entity.catalog.AssetType</class>
 		

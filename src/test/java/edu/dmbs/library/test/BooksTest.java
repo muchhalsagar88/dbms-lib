@@ -11,6 +11,7 @@ import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.Address;
 import edu.dbms.library.entity.Author;
 import edu.dbms.library.entity.Library;
+import edu.dbms.library.entity.Publisher;
 import edu.dbms.library.entity.resource.Book;
 import edu.dbms.library.entity.resource.PublicationFormat;
 import junit.framework.Assert;
@@ -42,13 +43,16 @@ public class BooksTest extends BaseTest {
 		DBUtils.persist(a1);
 		DBUtils.persist(a2);
 		
+		Publisher publisher = new Publisher(1, "Publisher One");
+		DBUtils.persist(publisher);
+		
 		List<Book> bookList = new ArrayList<Book>();
-		Book b1 = new Book(lib, format1, "Satanic Verses", "2001", 2002,"isbn201012" );
+		Book b1 = new Book(lib, format1, "Satanic Verses", "2001", 2002,"isbn201012", publisher);
 		b1.setAuthor(a1);
 		bookList.add(b1);
 		
 				
-		Book b2 = new Book(lib, format2, "Harry Potter", "2001", 2005,"isbn201012" );
+		Book b2 = new Book(lib, format2, "Harry Potter", "2001", 2005,"isbn201012", publisher);
 		b2.setAuthor(a2);
 		bookList.add(b2);
 	
@@ -76,6 +80,7 @@ public class BooksTest extends BaseTest {
 	public void clearTestData() {
 		
 		removeAllEntities(Book.class);
+		removeAllEntities(Publisher.class);
 		removeAllEntities(Author.class);
 		removeAllEntities(Library.class);
 		
