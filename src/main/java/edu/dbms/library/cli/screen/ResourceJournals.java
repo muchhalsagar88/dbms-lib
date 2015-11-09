@@ -1,3 +1,4 @@
+package edu.dbms.library.cli.screen;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,15 +13,11 @@ import org.joda.time.DateTime;
 
 import dnl.utils.text.table.TextTable;
 import edu.dbms.library.cli.Constant;
-import edu.dbms.library.cli.route.Route;
 import edu.dbms.library.cli.route.RouteConstant;
 import edu.dbms.library.db.DBUtils;
 import edu.dbms.library.entity.AssetCheckout;
-import edu.dbms.library.entity.AssetCheckoutConstraint;
 import edu.dbms.library.entity.Patron;
 import edu.dbms.library.entity.reserve.PublicationWaitlist;
-import edu.dbms.library.entity.resource.Book;
-import edu.dbms.library.entity.resource.ConferenceProceeding;
 import edu.dbms.library.entity.resource.Journal;
 import edu.dbms.library.session.SessionUtils;
 

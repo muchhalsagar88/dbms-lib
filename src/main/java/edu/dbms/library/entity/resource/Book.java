@@ -10,7 +10,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import edu.dbms.library.entity.Author;
 import edu.dbms.library.entity.Library;
+import edu.dbms.library.entity.Publisher;
 
 @Entity
 @Table(name="book")
@@ -19,9 +21,6 @@ import edu.dbms.library.entity.Library;
 public class Book extends Publication {
 
 	private String isbnNumber;
-
-	/*@OneToMany(mappedBy="book")
-	private Collection<ReserveBook> reserveBooks;*/
 
 	public Book() {
 		super();
