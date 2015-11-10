@@ -16,9 +16,13 @@
 		
 		<class>edu.dbms.library.entity.resource.Asset</class>
 		<class>edu.dbms.library.entity.resource.Book</class>
+		<class>edu.dbms.library.entity.resource.BookDetail</class>
 		<class>edu.dbms.library.entity.resource.Camera</class>
+		<class>edu.dbms.library.entity.resource.CameraDetail</class>
 		<class>edu.dbms.library.entity.resource.ConferenceProceeding</class>
+		<class>edu.dbms.library.entity.resource.ConferenceProceedingDetail</class>
 		<class>edu.dbms.library.entity.resource.Journal</class>
+		<class>edu.dbms.library.entity.resource.JournalDetail</class>
 		<class>edu.dbms.library.entity.resource.Publication</class>
 		<class>edu.dbms.library.entity.resource.Room</class>
 		<class>edu.dbms.library.entity.resource.StudyRoom</class>
