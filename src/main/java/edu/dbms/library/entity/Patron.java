@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="patron")
 @Inheritance(strategy=InheritanceType.JOINED)
-@DiscriminatorColumn(name="patron_type", discriminatorType=DiscriminatorType.CHAR)
+@DiscriminatorColumn(name="patron_type", discriminatorType=DiscriminatorType.CHAR, columnDefinition="CHAR(1)")
 public class Patron extends AbsEntity {
 
 	@Id
