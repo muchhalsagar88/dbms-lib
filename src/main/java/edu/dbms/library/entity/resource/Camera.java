@@ -2,6 +2,8 @@ package edu.dbms.library.entity.resource;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
@@ -10,6 +12,10 @@ import javax.persistence.Table;
 @DiscriminatorValue("7")
 @PrimaryKeyJoinColumn(name="camera_id", referencedColumnName="asset_id")
 public class Camera extends Asset {
+	
+	@ManyToOne
+	@JoinColumn(name="camera_detail_id")
+	private CameraDetail detail;
 	
 	public Camera() {
 		super();
