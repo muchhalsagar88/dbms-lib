@@ -1,8 +1,8 @@
 package edu.dbms.library.entity.resource;
 
-import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -14,7 +14,7 @@ import javax.persistence.Table;
 public class Book extends Publication {
 
 	@ManyToOne
-	@Column(name="isbn_number")
+	@JoinColumn(name="isbn_number")
 	private BookDetail detail;
 	
 	public Book() {
