@@ -1,12 +1,16 @@
 package edu.dbms.library.entity.resource;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import edu.dbms.library.entity.AbsEntity;
 
+@Entity
+@Table(name="camera_detail")
 public class CameraDetail extends AbsEntity {
 	
 	@Id
