@@ -5,8 +5,6 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class Address {
 	
-	private long addressId;
-	
 	private String addressLineOne;
 	
 	private String addressLineTwo;
@@ -47,10 +45,6 @@ public class Address {
 		this.pinCode = pinCode;
 	}
 	
-	public long getAddressId() {
-		return addressId;
-	}
-
 	public Address(String addressLineOne, String addressLineTwo, String cityName, int pinCode) {
 		this.addressLineOne = addressLineOne;
 		this.addressLineTwo = addressLineTwo;

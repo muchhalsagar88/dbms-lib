@@ -8,7 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import edu.dbms.library.entity.resource.Publication;
+import edu.dbms.library.entity.resource.BookDetail;
+import edu.dbms.library.entity.resource.ConferenceProceedingDetail;
+import edu.dbms.library.entity.resource.JournalDetail;
 
 @Entity
 @Table(name="author")
@@ -20,7 +22,13 @@ public class Author extends AbsEntity {
 	private String name;
 
 	@ManyToMany(mappedBy="authors")
-	private Collection<Publication> publications;
+	private Collection<BookDetail> books;
+	
+	@ManyToMany(mappedBy="authors")
+	private Collection<JournalDetail> journals;
+	
+	@ManyToMany(mappedBy="authors")
+	private Collection<ConferenceProceedingDetail> confPapers;
 	
 	public Author() {
 		this.id = UUID.randomUUID().toString();

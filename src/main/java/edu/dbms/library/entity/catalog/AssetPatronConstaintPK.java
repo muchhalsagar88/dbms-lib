@@ -9,7 +9,7 @@ public class AssetPatronConstaintPK {
 	@Column(name="asset_type_id")
 	private int assetType;
 	
-	@Column(name="patron_type")
+	@Column(name="patron_type", columnDefinition="CHAR(1)")
 	private char patronType;
 
 	public int getAssetType() {
