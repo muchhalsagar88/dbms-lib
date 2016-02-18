@@ -22,7 +22,7 @@ public final class CameraReservationListener {
 			System.out.println("cancelled: "+reservation);
 
 			EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-					DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+					DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 			EntityManager em = emfactory.createEntityManager();
 
 			Query query = em.createQuery("SELECT c FROM CameraReservation c "

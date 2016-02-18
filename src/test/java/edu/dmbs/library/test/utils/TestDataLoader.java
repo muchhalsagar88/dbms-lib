@@ -18,6 +18,8 @@ import javax.persistence.Persistence;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
+import edu.dbms.library.db.DBUtils;
+
 public class TestDataLoader {
 
 	private static final String TEST_DATA_PATH = "Data/TestData";
@@ -36,7 +38,7 @@ public class TestDataLoader {
 		File testDataDirectory = null;
 		ArrayList<String> csvFiles = new ArrayList<String>();
 		ArrayList<String> filesSeq = new ArrayList<String>();
-		BufferedReader br = null; 
+		BufferedReader br = null;
 		try{
 			String testDataDirectoryPath = TEST_DATA_PATH.replaceAll("/", "\\"+File.separator);
 			testDataDirectory = new File(testDataDirectoryPath);
@@ -72,11 +74,11 @@ public class TestDataLoader {
 			String DEFAULT_PERSISTENCE_UNIT_NAME = "main";
 
 			EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-					DEFAULT_PERSISTENCE_UNIT_NAME);
+					DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 
 			EntityManager entitymanager = emfactory.createEntityManager( );
 
-			
+
 			for (String file : filesSeq) {
 				entitymanager.getTransaction( ).begin( );
 				loadFileData(file, entitymanager);
@@ -88,7 +90,7 @@ public class TestDataLoader {
 				entitymanager.getTransaction().commit();
 			}
 
-			
+
 			entitymanager.close();
 			emfactory.close();
 
@@ -125,19 +127,19 @@ public class TestDataLoader {
 
 				if(value.indexOf("TO_DATE")==0)
 					date = true;
-				
+
 				if(value.indexOf("'")>-1 && !date)
 					value = record.get(i).replaceAll("'", "''");
-				
+
 				if(!date)
 					buffer.append("'");
-				
+
 				buffer.append(value);
-				
+
 				if(!date)
 					buffer.append("'");
-				
-				
+
+
 				if(i<size-1)
 					buffer.append(", ");
 				else
@@ -146,7 +148,7 @@ public class TestDataLoader {
 			System.out.println(buffer.toString());
 
 			em.createNativeQuery(buffer.toString()).executeUpdate();
-			
+
 		}
 
 		return true;

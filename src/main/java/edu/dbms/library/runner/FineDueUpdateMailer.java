@@ -47,7 +47,7 @@ public class FineDueUpdateMailer implements Job {
 	private void checkOverdues() {
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
 		Query query = em.createQuery("SELECT a FROM AssetCheckout a "
@@ -101,7 +101,7 @@ public class FineDueUpdateMailer implements Job {
 	private void setHoldOnAccount(String patronId) {
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
 		Query query = em.createQuery("SELECT p FROM Patron p "
