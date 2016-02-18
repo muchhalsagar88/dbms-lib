@@ -54,7 +54,7 @@ public class CameraConfirmationMailer implements Job {
 				builder.append("Your camera is available for pick up till 10:00 am today. In case you are unable to check out by that time, "
 						+ "your reservation will be cancelled");
 			}
-			MailUtils.sendMail(user.getEmailAddress(), builder.toString());
+			MailUtils.sendMail(user.getEmailAddress(), "Availability of reserved camera", builder.toString());
 		}
 		
 	}

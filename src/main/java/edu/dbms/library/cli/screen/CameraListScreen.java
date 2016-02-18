@@ -6,10 +6,14 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.ColumnResult;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityResult;
+import javax.persistence.FieldResult;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
+import javax.persistence.SqlResultSetMapping;
 
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
@@ -26,6 +30,21 @@ import edu.dbms.library.entity.resource.Camera;
 import edu.dbms.library.session.SessionUtils;
 import edu.dbms.library.utils.DateUtils;
 
+@SqlResultSetMapping(name="OngoingFines", 
+entities={ 
+    @EntityResult(entityClass=edu.dbms.library.entity.resource.Camera.class, fields={
+        @FieldResult(name="fine_duration", column="fine_duration"),
+        @FieldResult(name="fine", column="fine")}
+    ),
+    @EntityResult(entityClass=edu.dbms.library.entity.resource.Camera.class, fields={
+        @FieldResult(name="fine_duration", column="fine_duration"),
+        @FieldResult(name="fine", column="fine")}
+    )
+},
+columns={
+    @ColumnResult(name="overdue_hrs")
+}
+)
 public class CameraListScreen extends AssetListScreen<Camera> {
 
 	public CameraListScreen() {
@@ -246,7 +265,15 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 	}
 	
 	public void displayAssets() {
-		assets = getAssetList(Camera.class);
+		//assets = getAssetList(Camera.class);
+		
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+		EntityManager em = emfactory.createEntityManager();
+		
+		Query query = em.createQuery("SELECT c FROM Camera c");
+		assets = (List<Camera>)query.getResultList();
+		
 		String[] title = {"Maker", "Model", "Lens Detail", "Memory Available"};
 		
 		Object[][] cams = new Object[assets.size()][]; 
