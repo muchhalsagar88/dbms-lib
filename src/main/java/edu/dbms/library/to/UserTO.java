@@ -2,10 +2,13 @@ package edu.dbms.library.to;
 
 public class UserTO {
 	private String firstName;
-	
+
 	private String emailAddress;
-	
+
 	private int waitlistNumber;
+
+	// To be used for user with waitlist = 0 only
+	private boolean camAvailable;
 
 	public String getFirstName() {
 		return firstName;
@@ -31,6 +34,14 @@ public class UserTO {
 		this.waitlistNumber = waitlistNumber;
 	}
 
+	public boolean isCamAvailable() {
+		return camAvailable;
+	}
+
+	public void setCamAvailable(boolean camAvailable) {
+		this.camAvailable = camAvailable;
+	}
+
 	public UserTO(String firstName, String email, int waitlistNumber) {
 		this.firstName = firstName;
 		this.emailAddress = email;
@@ -39,8 +50,8 @@ public class UserTO {
 
 	@Override
 	public String toString() {
-		return String.format("UserTO[firstName: %s, emailAddress: %s, waitlist: %d]", 
+		return String.format("UserTO[firstName: %s, emailAddress: %s, waitlist: %d]",
 				this.firstName, this.emailAddress, this.waitlistNumber);
 	}
-	
+
 }
