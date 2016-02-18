@@ -26,6 +26,9 @@ public class ConferenceProceedingDetail extends AbsEntity {
 	
 	private String title;
 	
+	@Column(name="pub_year")
+	private int year;
+	
 	@OneToMany(mappedBy="details")
 	private Collection<ConferenceProceeding> confProceedings;
 
@@ -58,6 +61,14 @@ public class ConferenceProceedingDetail extends AbsEntity {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public int getYear() {
+		return year;
+	}
+
+	public void setYear(int year) {
+		this.year = year;
 	}
 
 	public Collection<ConferenceProceeding> getConfProceedings() {

@@ -20,11 +20,11 @@ import edu.dbms.library.entity.resource.Asset;
 @Entity
 @Table(name="asset_checkout")
 public class AssetCheckout {
-	
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
-	
+
 	@ManyToOne
 	private Asset asset;
 
@@ -38,24 +38,24 @@ public class AssetCheckout {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="issue_date")
 	private Date issueDate;
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="due_date")
 	private Date dueDate;
-	
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="return_date")
 	private Date returnDate;
-	
+
 	@Column(name="fine")
 	private float fine;
-	
+
 	@OneToOne(mappedBy="checkOut")
 	private RoomReserve roomReserve;
-	
+
 	@OneToOne(mappedBy="assetCheckout")
 	private CameraReservation cameraReservation;
-	
+
 	public RoomReserve getRoomReserve() {
 		return roomReserve;
 	}
@@ -130,6 +130,13 @@ public class AssetCheckout {
 
 	public void setFine(float fine) {
 		this.fine = fine;
+	}
+
+	@Override
+	public String toString() {
+		return "AssetCheckout [id=" + id + ", assetSecondaryId="
+				+ assetSecondaryId + ", issueDate=" + issueDate + ", dueDate=" + dueDate + ", returnDate=" + returnDate
+				+ ", fine=" + fine + ", patron=" + patron + "]";
 	}
 
 }
