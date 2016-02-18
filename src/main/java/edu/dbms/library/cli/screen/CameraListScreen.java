@@ -132,7 +132,7 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 		}
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
 		Date currDate = DateUtils.formatToQueryDate(LocalDate.now());
@@ -205,7 +205,7 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 			DBUtils.persist(reservation);
 
 			EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-					DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+					DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 			EntityManager entitymanager = emfactory.createEntityManager();
 
 			Query query = entitymanager.createQuery("SELECT COUNT(res.cameraReservationKey.cameraId) FROM CameraReservation res"
@@ -275,7 +275,7 @@ public class CameraListScreen extends AssetListScreen<Camera> {
 		//assets = getAssetList(Camera.class);
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
 		Query query = em.createQuery("SELECT c FROM Camera c");

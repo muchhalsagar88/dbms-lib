@@ -67,7 +67,7 @@ public class CameraConfirmationMailer implements Job {
 	private boolean checkForCameraAvailability(String cameraId) {
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
 		Query query = em.createQuery("SELECT a FROM AssetCheckout a "
@@ -93,7 +93,7 @@ public class CameraConfirmationMailer implements Job {
 		Date d = mailer.formatToQueryDate(date);
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
 		Query query = em.createQuery("SELECT c.cameraReservationKey.cameraId, c.cameraReservationKey.patronId, "

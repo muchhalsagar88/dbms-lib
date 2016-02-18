@@ -68,7 +68,7 @@ public class PatronBalanceScreen extends BaseScreen {
 	private void clearPatronHold(String patronId) {
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
 		Patron patron = em.find(Patron.class, patronId);
@@ -85,7 +85,7 @@ public class PatronBalanceScreen extends BaseScreen {
 	private void payDueFines() {
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
 		// Late returns fines
@@ -107,7 +107,7 @@ public class PatronBalanceScreen extends BaseScreen {
 	private double calculateBalance() {
 
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory(
-				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME);
+				DBUtils.DEFAULT_PERSISTENCE_UNIT_NAME, DBUtils.getPropertiesMap());
 		EntityManager em = emfactory.createEntityManager();
 
 		// Late returns fines
